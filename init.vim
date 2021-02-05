@@ -3,7 +3,7 @@
 " Ian's Vim Configuration
 "
 " Author: Ian Ding <ianding1@icloud.com>
-" Date: 2020-07-12
+" Date: 02/04/2021
 
 " Install some necessary plugins.
 call plug#begin('~/.local/share/nvim/plugged')
@@ -11,10 +11,18 @@ call plug#begin('~/.local/share/nvim/plugged')
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'gruvbox-community/gruvbox'
-Plug 'scrooloose/nerdcommenter'
+Plug 'tomtom/tcomment_vim'
+Plug 'Yggdroot/LeaderF'
 Plug 'mbbill/undotree'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'neovimhaskell/haskell-vim'
+Plug 'tpope/vim-vinegar'
+Plug 'vim-airline/vim-airline'
+Plug 'leafgarland/typescript-vim'
+Plug 'peitalin/vim-jsx-typescript'
+Plug 'jiangmiao/auto-pairs'
+Plug 'alvan/vim-closetag'
+Plug 'tpope/vim-obsession'
 
 call plug#end()
 
@@ -23,9 +31,6 @@ set termguicolors
 
 " Use gruvbox.
 colorscheme gruvbox
-
-" This allows :find to search recursively.
-set path+=**
 
 " Use space globally instead of tab.
 set expandtab
@@ -133,6 +138,8 @@ nnoremap [c :cN<CR>
 nnoremap ]c :cn<CR>
 nnoremap [l :lN<CR>
 nnoremap ]l :ln<CR>
+nnoremap [t :tabNext<CR>
+nnoremap ]t :tabnext<CR>
 
 " Turn off match highlighting easily. Didn't bind it to <leader>h since
 " <leader>h is occupied by vim-gutgugger.
@@ -142,12 +149,28 @@ nnoremap <leader>n :noh<CR>
 set grepprg=rg\ --vimgrep\ --trim
 set grepformat=%f:%l:%v:%m
 
+" LeaderF
+let g:Lf_WindowPosition = 'popup'
+let g:Lf_PreviewInPopup = 1
+let g:Lf_ShowDevIcons = 0
+let g:Lf_ShortcutF = '<leader>f'
+let g:Lf_ShortcutB = '<leader>b'
+
+" Autoclose
+let g:closetag_filetypes = 'html'
+let g:closetag_xhtml_filetypes = 'jsx,tsx,vue'
+let g:closetag_emptyTags_caseSensitive = 1
+let g:closetag_regions = {
+    \ 'typescript.tsx': 'jsxRegion,tsxRegion',
+    \ 'javascript.jsx': 'jsxRegion',
+    \ }
+let g:closetag_shortcut = '>'
+let g:closetag_close_shortcut = '<leader>>'
 
 " ========================================================================
 "                               coc.nvim
 " ========================================================================
 
-set cmdheight=2
 set updatetime=300
 set shortmess+=c
 
@@ -170,12 +193,8 @@ endfunction
 
 inoremap <silent><expr> <c-space> coc#refresh()
 
-if exists('*complete_info')
-  inoremap <expr> <cr> complete_info()["selected"] != "-1"
-        \ ? "\<C-y>" : "\<C-g>u\<CR>"
-else
-  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-endif
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+      \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
@@ -188,19 +207,23 @@ nnoremap <silent> K :call <SID>show_documentation()<CR>
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
   else
-    call CocAction('doHover')
+    execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
 
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 nmap <leader>rn <Plug>(coc-rename)
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+xmap <leader>F  <Plug>(coc-format-selected)
+nmap <leader>F  <Plug>(coc-format-selected)
 
 augroup vimrc_group
   autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
   " autocmd FileType javascript setl formatexpr=CocAction('formatSelected')
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
@@ -220,6 +243,24 @@ omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 
+nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1)
+      \ : "\<C-f>"
+nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0)
+      \ : "\<C-b>"
+inoremap <nowait><expr> <C-f> coc#float#has_scroll()
+      \ ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+inoremap <nowait><expr> <C-b> coc#float#has_scroll()
+      \ ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+
+if has('nvim')
+  vnoremap <nowait><expr> <C-f> coc#float#has_scroll()
+        \ ? coc#float#nvim_scroll(1, 1) : "\<C-f>"
+  vnoremap <nowait><expr> <C-b> coc#float#has_scroll()
+        \ ? coc#float#nvim_scroll(0, 1) : "\<C-b>"
+endif
+
+" Use CTRL-S for selections ranges.
+" Requires 'textDocument/selectionRange' support of language server.
 nmap <silent> <C-s> <Plug>(coc-range-select)
 xmap <silent> <C-s> <Plug>(coc-range-select)
 
@@ -236,3 +277,11 @@ nnoremap <silent><nowait> <leader><space>s  :<C-u>CocList -I symbols<cr>
 nnoremap <silent><nowait> <leader><space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <leader><space>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <leader><space>p  :<C-u>CocListResume<CR>
+
+let g:coc_global_extensions = [
+      \ 'coc-json',
+      \ 'coc-python',
+      \ 'coc-tsserver',
+      \ 'coc-prettier',
+      \ 'coc-vetur',
+      \ ]

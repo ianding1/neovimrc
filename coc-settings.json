@@ -17,5 +17,7 @@
       ],
       "filetypes": ["hs", "lhs", "haskell"]
     }
-  }
+  },
+  "vetur.validation.template": false,
+  "vetur.experimental.templateInterpolationService": true
 }
