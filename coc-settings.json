@@ -19,5 +19,6 @@
     }
   },
   "vetur.validation.template": false,
-  "vetur.experimental.templateInterpolationService": true
+  "vetur.experimental.templateInterpolationService": true,
+  "coc.preferences.formatOnSaveFiletypes": ["vue"]
 }

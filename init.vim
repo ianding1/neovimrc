@@ -10,7 +10,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
-Plug 'gruvbox-community/gruvbox'
+Plug 'lifepillar/vim-solarized8'
 Plug 'tomtom/tcomment_vim'
 Plug 'Yggdroot/LeaderF'
 Plug 'mbbill/undotree'
@@ -18,19 +18,21 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'neovimhaskell/haskell-vim'
 Plug 'tpope/vim-vinegar'
 Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
 Plug 'jiangmiao/auto-pairs'
 Plug 'alvan/vim-closetag'
 Plug 'tpope/vim-obsession'
+Plug 'posva/vim-vue'
 
 call plug#end()
 
 " Use 24-bit colors in the terminal.
 set termguicolors
 
-" Use gruvbox.
-colorscheme gruvbox
+" Use solarized.
+colorscheme solarized8_flat
 
 " Use space globally instead of tab.
 set expandtab
@@ -39,8 +41,8 @@ set expandtab
 set shiftwidth=2
 set softtabstop=2
 
-" Don't show a visual line under the cursor.
-set nocursorline
+" Show cursor line.
+set cursorline
 
 " Show a column at line 81.
 set colorcolumn=81
