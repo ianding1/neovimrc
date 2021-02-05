@@ -23,6 +23,7 @@ Plug 'peitalin/vim-jsx-typescript'
 Plug 'jiangmiao/auto-pairs'
 Plug 'alvan/vim-closetag'
 Plug 'tpope/vim-obsession'
+Plug 'posva/vim-vue'
 
 call plug#end()
 
@@ -31,6 +32,10 @@ set termguicolors
 
 " Use gruvbox.
 colorscheme gruvbox
+
+" Vue files don't look very nice in gruvbox. Prevent the code from being
+" orange everywhere.
+hi link javaScript GruvboxFg0
 
 " Use space globally instead of tab.
 set expandtab
@@ -220,14 +225,6 @@ nmap <leader>rn <Plug>(coc-rename)
 xmap <leader>F  <Plug>(coc-format-selected)
 nmap <leader>F  <Plug>(coc-format-selected)
 
-augroup vimrc_group
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " autocmd FileType javascript setl formatexpr=CocAction('formatSelected')
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
 
@@ -285,3 +282,19 @@ let g:coc_global_extensions = [
       \ 'coc-prettier',
       \ 'coc-vetur',
       \ ]
+
+
+" Autocommand
+augroup vimrc_group
+  autocmd!
+
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+
+  " autocmd FileType javascript setl formatexpr=CocAction('formatSelected')
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+
+  " Show diff in a new tab.
+  autocmd User FugitiveIndex nmap <buffer><silent> dt :Gtabedit
+        \ <Plug><cfile><Bar>Gdiffsplit<CR>
+augroup end
