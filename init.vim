@@ -8,21 +8,26 @@
 " Install some necessary plugins.
 call plug#begin('~/.local/share/nvim/plugged')
 
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
 Plug 'gruvbox-community/gruvbox'
-Plug 'tomtom/tcomment_vim'
-Plug 'Yggdroot/LeaderF'
-Plug 'mbbill/undotree'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'neovimhaskell/haskell-vim'
-Plug 'tpope/vim-vinegar'
+Plug 'airblade/vim-gitgutter'
 Plug 'vim-airline/vim-airline'
-Plug 'leafgarland/typescript-vim'
-Plug 'peitalin/vim-jsx-typescript'
+Plug 'mbbill/undotree'
+Plug 'Yggdroot/LeaderF'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-vinegar'
+Plug 'tpope/vim-rsi'
+Plug 'tpope/vim-obsession'
+
+Plug 'tomtom/tcomment_vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'alvan/vim-closetag'
-Plug 'tpope/vim-obsession'
+
+Plug 'neovimhaskell/haskell-vim'
+Plug 'leafgarland/typescript-vim'
+Plug 'peitalin/vim-jsx-typescript'
 Plug 'posva/vim-vue'
 
 call plug#end()
@@ -78,6 +83,12 @@ set mouse=a
 " Show the line number.
 set number
 
+" Always show 5 lines above or below the cursor.
+set scrolloff=5
+
+" Hide the mode prompt.
+set noshowmode
+
 " Persist the undo information in the file system.
 if has('persistent_undo')
     silent call system('mkdir -p ~/.cache/vim-undo')
@@ -106,14 +117,6 @@ set clipboard=unnamed
 set splitbelow
 set splitright
 
-" Use Emacs-like key mapping in Command mode.
-cmap <c-a> <Home>
-cmap <c-e> <End>
-cmap <c-f> <Right>
-cmap <c-b> <Left>
-cmap <c-n> <Down>
-cmap <c-p> <Up>
-
 " Toggle the undotree.
 function! <SID>toggle_undo_tree()
     UndotreeToggle
@@ -135,20 +138,6 @@ if has('gui_running')
   set guioptions-=T
   set guioptions-=b
 endif
-
-" From tpope's vim-unimpaired.
-nnoremap [b :bN<CR>
-nnoremap ]b :bn<CR>
-nnoremap [c :cN<CR>
-nnoremap ]c :cn<CR>
-nnoremap [l :lN<CR>
-nnoremap ]l :ln<CR>
-nnoremap [t :tabNext<CR>
-nnoremap ]t :tabnext<CR>
-
-" Turn off match highlighting easily. Didn't bind it to <leader>h since
-" <leader>h is occupied by vim-gutgugger.
-nnoremap <leader>n :noh<CR>
 
 " Grep command
 set grepprg=rg\ --vimgrep\ --trim
@@ -281,6 +270,7 @@ let g:coc_global_extensions = [
       \ 'coc-tsserver',
       \ 'coc-prettier',
       \ 'coc-vetur',
+      \ 'coc-vimlsp',
       \ ]
 
 
