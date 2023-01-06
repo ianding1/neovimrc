@@ -85,7 +85,7 @@ vim.o.showmode = false
 -- Persist the undo records on the disk.
 if vim.fn.has('persistent_undo') == 1 then
   vim.fn.system('mkdir -p $HOME/.cache/vim-undo')
-  vim.o.undodir = os.getenv( "HOME" ) .. '/.cache/vim-undo'
+  vim.o.undodir = os.getenv("HOME") .. '/.cache/vim-undo'
   vim.o.undofile = true
 end
 
@@ -272,3 +272,5 @@ require('lspconfig').sumneko_lua.setup {
 }
 
 require('lspconfig').ocamllsp.setup {}
+require('lspconfig').tsserver.setup {}
+require('lspconfig').eslint.setup {}
