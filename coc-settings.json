@@ -1,6 +1,0 @@
-{
-  "languageserver": {},
-  "vetur.validation.template": false,
-  "vetur.experimental.templateInterpolationService": true,
-  "coc.preferences.formatOnSaveFiletypes": []
-}
