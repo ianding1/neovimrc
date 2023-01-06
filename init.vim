@@ -3,7 +3,7 @@
 " Ian's Vim Configuration
 "
 " Author: Ian Ding <ianding1@icloud.com>
-" Date: 02/04/2021
+" Date: 01/05/2023
 
 " Install some necessary plugins.
 call plug#begin('~/.local/share/nvim/plugged')
@@ -19,13 +19,11 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-rsi'
-Plug 'tpope/vim-obsession'
 
 Plug 'tomtom/tcomment_vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'alvan/vim-closetag'
 
-Plug 'neovimhaskell/haskell-vim'
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
 Plug 'posva/vim-vue'
