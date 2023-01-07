@@ -1,39 +1,5 @@
--- Plugins.
-require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim'
-  use 'nvim-lua/plenary.nvim'
-  use 'sainnhe/everforest'
-  use 'mbbill/undotree'
-  use 'nvim-lualine/lualine.nvim'
-  use 'nvim-telescope/telescope.nvim'
-  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
-  use 'nvim-tree/nvim-web-devicons'
-  use 'm4xshen/autoclose.nvim'
-
-  use 'tpope/vim-fugitive'
-  use 'tpope/vim-vinegar'
-  use 'tpope/vim-rsi'
-  use 'tomtom/tcomment_vim'
-
-  use 'williamboman/mason.nvim'
-  use 'williamboman/mason-lspconfig.nvim'
-  use 'neovim/nvim-lspconfig'
-  use 'jose-elias-alvarez/null-ls.nvim'
-  use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-  use 'hrsh7th/cmp-nvim-lsp'
-  use 'hrsh7th/cmp-path'
-  use 'hrsh7th/nvim-cmp'
-  use 'saadparwaiz1/cmp_luasnip'
-  use 'onsails/lspkind.nvim'
-  use 'L3MON4D3/LuaSnip'
-end)
-
 -- Use 24-bit colors in the terminal.
 vim.o.termguicolors = true
-
--- Set color scheme.
-vim.o.background = 'dark'
-vim.cmd('colorscheme everforest')
 
 -- Use spaces instead of tabs.
 vim.o.expandtab = true
@@ -111,6 +77,69 @@ vim.o.signcolumn = 'number'
 -- Set completion options.
 vim.o.completeopt = 'menu,menuone,noselect'
 
+-- Plugins.
+local ensure_packer = function()
+  local fn = vim.fn
+  local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+  if fn.empty(fn.glob(install_path)) > 0 then
+    fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path })
+    vim.cmd [[packadd packer.nvim]]
+    return true
+  end
+  return false
+end
+
+local packer_bootstrap = ensure_packer()
+
+require('packer').startup(function(use)
+  use 'wbthomason/packer.nvim'
+  use 'nvim-lua/plenary.nvim'
+
+  use 'sainnhe/everforest'
+  use 'mbbill/undotree'
+  use 'nvim-lualine/lualine.nvim'
+  use 'nvim-telescope/telescope.nvim'
+  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  use 'nvim-tree/nvim-web-devicons'
+  use 'm4xshen/autoclose.nvim'
+
+  use 'tpope/vim-fugitive'
+  use 'tpope/vim-vinegar'
+  use 'tpope/vim-rsi'
+  use 'tomtom/tcomment_vim'
+
+  use 'williamboman/mason.nvim'
+  use 'williamboman/mason-lspconfig.nvim'
+  use 'neovim/nvim-lspconfig'
+  use 'jose-elias-alvarez/null-ls.nvim'
+  use { 'nvim-treesitter/nvim-treesitter',
+    run = function()
+      local installer = require('nvim-treesitter.install')
+      local ts_update = installer.update { with_sync = true }
+      ts_update()
+    end,
+  }
+
+  use 'hrsh7th/cmp-nvim-lsp'
+  use 'hrsh7th/cmp-path'
+  use 'hrsh7th/nvim-cmp'
+  use 'saadparwaiz1/cmp_luasnip'
+  use 'onsails/lspkind.nvim'
+  use 'L3MON4D3/LuaSnip'
+
+  if packer_bootstrap then
+    require('packer').sync()
+  end
+end)
+
+if packer_bootstrap then
+  return
+end
+
+-- Set color scheme.
+vim.o.background = 'dark'
+vim.cmd('colorscheme everforest')
+
 -- Set lualine theme.
 require('lualine').setup {
   options = { theme = 'everforest' }
@@ -120,13 +149,13 @@ require('lualine').setup {
 vim.api.nvim_create_user_command(
   'ToggleUndoTree',
   'UndotreeToggle | UndotreeFocus',
-  {}
-)
+  {})
+
 vim.keymap.set('n', '<leader>u', ':ToggleUndoTree<CR>',
   { silent = true, noremap = true })
 
 -- Set up autoclose.
-require('autoclose').setup({})
+require('autoclose').setup {}
 
 -- Set up telescope.
 local builtin = require('telescope.builtin')
