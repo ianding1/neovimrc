@@ -1,13 +1,11 @@
 -- Plugins.
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
+  use 'nvim-lua/plenary.nvim'
   use 'sainnhe/everforest'
   use 'mbbill/undotree'
   use 'nvim-lualine/lualine.nvim'
-  use {
-    'nvim-telescope/telescope.nvim',
-    requires = { 'nvim-lua/plenary.nvim' }
-  }
+  use 'nvim-telescope/telescope.nvim'
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   use 'nvim-tree/nvim-web-devicons'
   use 'm4xshen/autoclose.nvim'
@@ -20,14 +18,13 @@ require('packer').startup(function(use)
   use 'williamboman/mason.nvim'
   use 'williamboman/mason-lspconfig.nvim'
   use 'neovim/nvim-lspconfig'
-  use {
-    'nvim-treesitter/nvim-treesitter',
-    run = ':TSUpdate',
-  }
+  use 'jose-elias-alvarez/null-ls.nvim'
+  use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-path'
   use 'hrsh7th/nvim-cmp'
   use 'saadparwaiz1/cmp_luasnip'
+  use 'onsails/lspkind.nvim'
   use 'L3MON4D3/LuaSnip'
 end)
 
@@ -133,14 +130,14 @@ require('autoclose').setup({})
 
 -- Set up telescope.
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+vim.keymap.set('n', '<leader>f', builtin.find_files, {})
+vim.keymap.set('n', '<leader>g', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>b', builtin.buffers, {})
 
 -- Set up auto completion.
 local cmp = require('cmp')
 local luasnip = require('luasnip')
+local lspkind = require('lspkind')
 
 cmp.setup {
   snippet = {
@@ -173,6 +170,19 @@ cmp.setup {
       end
     end, { 'i', 's' }),
   }),
+  formatting = {
+    format = function(entry, vim_item)
+      if vim.tbl_contains({ 'path' }, entry.source.name) then
+        local icon, hl_group = require('nvim-web-devicons').get_icon(entry:get_completion_item().label)
+        if icon then
+          vim_item.kind = icon
+          vim_item.kind_hl_group = hl_group
+          return vim_item
+        end
+      end
+      return lspkind.cmp_format({ with_text = false })(entry, vim_item)
+    end
+  },
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     { name = 'path' },
@@ -199,22 +209,20 @@ require('nvim-treesitter.configs').setup {
   }
 }
 
-
 -- Set up LSP package manager.
 require('mason').setup()
 require('mason-lspconfig').setup {
   ensure_installed = { 'sumneko_lua' },
-  automatic_installation = false,
+  automatic_installation = true,
 }
 
--- Set up LSP key maps.
+-- Set up LSP global configurations.
 local opts = { noremap = true, silent = true }
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
 
--- Set up LSP global configurations.
 local lspconfig = require('lspconfig')
 local lsp_defaults = lspconfig.util.default_config
 
@@ -234,21 +242,31 @@ lsp_defaults.on_attach = function(_, bufnr)
   vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
   vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
   vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wl', function()
+  vim.keymap.set('n', '<leader>k', vim.lsp.buf.signature_help, bufopts)
+  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+  vim.keymap.set('n', '<leader>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, bufopts)
-  vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
+  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
+  vim.keymap.set('n', '<leader>h', function()
+    vim.lsp.buf.format { async = true }
+  end, bufopts)
 end
 
 lsp_defaults.flags = {
   debounce_text_changes = 150,
+}
+
+-- Set up null-ls.
+local null_ls = require('null-ls')
+
+null_ls.setup {
+  sources = {
+    null_ls.builtins.formatting.prettier,
+  }
 }
 
 -- Set up Lua LSP for Neovim.
@@ -270,7 +288,3 @@ require('lspconfig').sumneko_lua.setup {
     }
   }
 }
-
-require('lspconfig').ocamllsp.setup {}
-require('lspconfig').tsserver.setup {}
-require('lspconfig').eslint.setup {}
