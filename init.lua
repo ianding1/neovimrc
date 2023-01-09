@@ -95,7 +95,7 @@ require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
   use 'nvim-lua/plenary.nvim'
 
-  use 'sainnhe/everforest'
+  use 'NLKNguyen/papercolor-theme'
   use 'mbbill/undotree'
   use 'nvim-lualine/lualine.nvim'
   use 'nvim-telescope/telescope.nvim'
@@ -170,12 +170,12 @@ end
 
 -- Set color scheme.
 vim.o.background = 'dark'
-try_cmd('colorscheme everforest')
+try_cmd('colorscheme PaperColor')
 
 -- Set lualine theme.
 try_require('lualine', function(lualine)
   lualine.setup {
-    options = { theme = 'everforest' }
+    options = { theme = 'auto' }
   }
 end)
 
