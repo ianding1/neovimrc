@@ -52,9 +52,6 @@ if vim.fn.has('persistent_undo') == 1 then
   vim.o.undofile = true
 end
 
--- Split the diff window vertically.
-vim.o.diffopt = vim.o.diffopt .. ',vertical'
-
 -- Don't wrap lines.
 vim.o.wrap = false
 
