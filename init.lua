@@ -121,7 +121,6 @@ require('packer').startup(function(use)
   }
 
   use 'hrsh7th/cmp-nvim-lsp'
-  use 'hrsh7th/cmp-path'
   use 'hrsh7th/nvim-cmp'
   use 'saadparwaiz1/cmp_luasnip'
   use 'onsails/lspkind.nvim'
@@ -204,58 +203,56 @@ try_require('telescope.builtin', function(builtin)
 end)
 
 -- Set up auto completion.
-try_require({ 'cmp', 'luasnip', 'lspkind' }, function(cmp, luasnip, lspkind)
-  cmp.setup {
-    snippet = {
-      expand = function(args)
-        luasnip.lsp_expand(args.body)
-      end,
-    },
-    mapping = cmp.mapping.preset.insert({
-      ['<C-n>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-p>'] = cmp.mapping.scroll_docs(4),
-      ['<C-j>'] = cmp.mapping.select_next_item(),
-      ['<C-k>'] = cmp.mapping.select_prev_item(),
-      ['<CR>'] = cmp.mapping.confirm { select = true },
-      ['<Tab>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_next_item()
-        elseif luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-      ['<S-Tab>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-        elseif luasnip.jumpable(-1) then
-          luasnip.jump(-1)
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-    }),
-    formatting = {
-      format = function(entry, vim_item)
-        if vim.tbl_contains({ 'path' }, entry.source.name) then
-          local icon, hl_group = require('nvim-web-devicons').get_icon(entry:get_completion_item().label)
-          if icon then
-            vim_item.kind = icon
-            vim_item.kind_hl_group = hl_group
-            return vim_item
+try_require({ 'cmp', 'luasnip', 'lspkind', 'nvim-web-devicons' },
+  function(cmp, luasnip, lspkind, devicons)
+    cmp.setup {
+      snippet = {
+        expand = function(args)
+          luasnip.lsp_expand(args.body)
+        end,
+      },
+      mapping = cmp.mapping.preset.insert({
+        ['<C-f>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-b>'] = cmp.mapping.scroll_docs(4),
+        ['<CR>'] = cmp.mapping.confirm { select = true },
+        ['<Tab>'] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_next_item()
+          elseif luasnip.expand_or_jumpable() then
+            luasnip.expand_or_jump()
+          else
+            fallback()
           end
+        end, { 'i', 's' }),
+        ['<S-Tab>'] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item()
+          elseif luasnip.jumpable(-1) then
+            luasnip.jump(-1)
+          else
+            fallback()
+          end
+        end, { 'i', 's' }),
+      }),
+      formatting = {
+        format = function(entry, vim_item)
+          if vim.tbl_contains({ 'path' }, entry.source.name) then
+            local icon, hl_group = devicons.get_icon(entry:get_completion_item().label)
+            if icon then
+              vim_item.kind = icon
+              vim_item.kind_hl_group = hl_group
+              return vim_item
+            end
+          end
+          return lspkind.cmp_format({ with_text = false })(entry, vim_item)
         end
-        return lspkind.cmp_format({ with_text = false })(entry, vim_item)
-      end
-    },
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-      { name = 'path' },
-      { name = 'buffer' },
-    })
-  }
-end)
+      },
+      sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'buffer' },
+      })
+    }
+  end)
 
 -- Set up treesitter.
 try_require('nvim-treesitter.configs', function(treesitter)
