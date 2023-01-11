@@ -271,8 +271,16 @@ try_require('nvim-treesitter.configs', function(treesitter)
         end
       end,
       additional_vim_regex_highlighting = false,
-    }
+    },
+    indent = {
+      enable = true,
+    },
   }
+
+  -- Set up folding.
+  vim.o.foldmethod = 'expr'
+  vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+  vim.o.foldenable = false
 end)
 
 -- Set up LSP.
