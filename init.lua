@@ -177,7 +177,6 @@ try_require('lualine', function(lualine)
     options = { theme = 'auto' }
   }
 end)
-
 -- Set up undotree.
 vim.keymap.set('n', '<leader>u', ':UndotreeToggle<CR>',
   { silent = true, noremap = true })
@@ -194,6 +193,8 @@ try_require('telescope', function(telescope)
       path_display = { 'truncate' },
     }
   }
+
+  telescope.load_extension('fzf')
 end)
 
 try_require('telescope.builtin', function(builtin)
