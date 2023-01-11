@@ -183,12 +183,7 @@ try_require('lualine', function(lualine)
 end)
 
 -- Set up undotree.
-vim.api.nvim_create_user_command(
-  'ToggleUndoTree',
-  'UndotreeToggle | UndotreeFocus',
-  {})
-
-vim.keymap.set('n', '<leader>u', ':ToggleUndoTree<CR>',
+vim.keymap.set('n', '<leader>u', ':UndotreeToggle<CR>',
   { silent = true, noremap = true })
 
 -- Set up autoclose.
@@ -197,6 +192,14 @@ try_require('autoclose', function(autoclose)
 end)
 
 -- Set up telescope.
+try_require('telescope', function(telescope)
+  telescope.setup {
+    defaults = {
+      path_display = { 'truncate' },
+    }
+  }
+end)
+
 try_require('telescope.builtin', function(builtin)
   vim.keymap.set('n', '<leader>f', builtin.find_files, {})
   vim.keymap.set('n', '<leader>g', builtin.live_grep, {})
@@ -288,8 +291,8 @@ try_require({ 'mason', 'mason-lspconfig', 'lspconfig' }, function(mason, mason_l
 
   local opts = { noremap = true, silent = true }
   vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-  vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-  vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+  vim.keymap.set('n', '[e', vim.diagnostic.goto_prev, opts)
+  vim.keymap.set('n', ']e', vim.diagnostic.goto_next, opts)
   vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
 
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
@@ -314,7 +317,7 @@ try_require({ 'mason', 'mason-lspconfig', 'lspconfig' }, function(mason, mason_l
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
     vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-    vim.keymap.set('n', '<leader>h', function()
+    vim.keymap.set('n', '<leader>=', function()
       vim.lsp.buf.format { async = true }
     end, bufopts)
   end
