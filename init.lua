@@ -101,7 +101,7 @@ require('packer').startup(function(use)
   use 'nvim-telescope/telescope.nvim'
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   use 'nvim-tree/nvim-web-devicons'
-  use 'm4xshen/autoclose.nvim'
+  use 'windwp/nvim-autopairs'
 
   use 'tpope/vim-fugitive'
   use 'tpope/vim-vinegar'
@@ -177,13 +177,17 @@ try_require('lualine', function(lualine)
     options = { theme = 'auto' }
   }
 end)
+
 -- Set up undotree.
 vim.keymap.set('n', '<leader>u', ':UndotreeToggle<CR>',
   { silent = true, noremap = true })
 
--- Set up autoclose.
-try_require('autoclose', function(autoclose)
-  autoclose.setup {}
+-- Set up autopairs.
+try_require('nvim-autopairs', function(autopairs)
+  autopairs.setup {}
+
+  -- Disable closing single quotes on file type ocaml.
+  autopairs.get_rule("'")[1].not_filetypes = { 'ocaml' }
 end)
 
 -- Set up telescope.
