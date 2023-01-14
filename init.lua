@@ -74,9 +74,6 @@ vim.o.signcolumn = 'number'
 -- Set completion options.
 vim.o.completeopt = 'menu,menuone,noselect'
 
--- Set the default list view to tree.
-vim.g.netrw_liststyle = 3
-
 -- Plugins.
 local ensure_packer = function()
   local fn = vim.fn
