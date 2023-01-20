@@ -99,6 +99,7 @@ require('packer').startup(function(use)
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   use 'nvim-tree/nvim-web-devicons'
   use 'windwp/nvim-autopairs'
+  use 'skywind3000/asyncrun.vim'
 
   use 'tpope/vim-fugitive'
   use 'tpope/vim-vinegar'
