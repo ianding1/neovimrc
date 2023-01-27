@@ -74,6 +74,10 @@ vim.o.signcolumn = 'number'
 -- Set completion options.
 vim.o.completeopt = 'menu,menuone,noselect'
 
+-- Remap <Esc> to <C-\><C-n> and <C-v><Esc> to <Esc>
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
+vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
+
 -- Plugins.
 local ensure_packer = function()
   local fn = vim.fn
