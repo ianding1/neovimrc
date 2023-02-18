@@ -110,7 +110,7 @@ require('packer').startup(function(use)
   -- Undotree UI. Visualize the undo history as a tree.
   use 'mbbill/undotree'
 
-  -- Beautiful status line plugin written in Lua.
+  -- Pretty status line written in Lua.
   use 'nvim-lualine/lualine.nvim'
 
   -- Powerful fuzzy finder written in Lua.
@@ -127,8 +127,7 @@ require('packer').startup(function(use)
   use 'windwp/nvim-autopairs'
 
   -- A very powerful Git plugin for Vim.
-  -- See http://vimcasts.org/categories/git/ for a series of awesome tutorials
-  -- on fugitive.
+  -- See http://vimcasts.org/categories/git/ for a series of awesome tutorials on fugitive.
   use 'tpope/vim-fugitive'
 
 
@@ -143,8 +142,12 @@ require('packer').startup(function(use)
   use 'tomtom/tcomment_vim'
 
   -- Below are the plugins to configure LSP and auto completion.
-  -- This configuration uses Neovim's native LSP API. An alternative to Neovim LSP is coc.nvim,
-  -- which supports both Neovim and Vim and may be more user-friendly to new users.
+  --
+  -- This configuration uses Neovim's native LSP API. You are encouraged to also check out
+  -- coc.nvim, which was created before Neovim LSP was added, closed in the gap for Vim
+  -- LSP support, and has maintained an active community till today.
+  --
+  -- I don't use snippets personally but Neovim LSP requires a snippet engine.
   use 'williamboman/mason.nvim'
   use 'williamboman/mason-lspconfig.nvim'
   use 'neovim/nvim-lspconfig'
@@ -164,7 +167,6 @@ require('packer').startup(function(use)
       ts_update()
     end,
   }
-
 
   -- Run :PackerSync if it is the first time.
   -- You still need to run :PackerSync from time to time to keep all the plugins
