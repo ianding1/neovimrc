@@ -295,7 +295,7 @@ end)
 try_require({ 'mason', 'mason-lspconfig', 'lspconfig' }, function(mason, mason_lspconfig, lspconfig)
   mason.setup()
   mason_lspconfig.setup {
-    ensure_installed = { 'sumneko_lua' },
+    ensure_installed = { 'lua_ls' },
     automatic_installation = false,
   }
 
@@ -337,7 +337,7 @@ try_require({ 'mason', 'mason-lspconfig', 'lspconfig' }, function(mason, mason_l
   }
 
   -- Set up Lua LSP for Neovim.
-  lspconfig.sumneko_lua.setup {
+  lspconfig.lua_ls.setup {
     capabilities = capabilities,
     on_attach = on_attach,
     flags = flags,
