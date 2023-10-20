@@ -116,7 +116,7 @@ require('packer').startup(function(use)
   -- Powerful fuzzy finder written in Lua.
   -- See https://github.com/nvim-telescope/telescope.nvim
   use 'nvim-telescope/telescope.nvim'
-  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
 
   -- VSCode-like icons for Git, file types, and etc.
   -- Patched fonts are required for these icons to be rendered correctly.
@@ -327,7 +327,7 @@ try_require({ 'cmp', 'luasnip', 'lspkind', 'nvim-web-devicons' },
 -- Set up treesitter.
 try_require('nvim-treesitter.configs', function(treesitter)
   treesitter.setup {
-    ensure_installed = { 'c', 'lua', 'vim', 'help' },
+    ensure_installed = { 'c', 'lua', 'vim', 'vimdoc' },
     sync_install = false,
     auto_install = true,
     ignore_install = {},
