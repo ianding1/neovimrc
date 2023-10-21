@@ -218,282 +218,269 @@ local try_require = function(names, fn)
   end
 end
 
--- A function that runs a Vim command and swallows the error if the command
--- fails.
-local try_cmd = function(cmd, fn)
-  local status_ok, _ = pcall(vim.cmd, cmd)
-  if status_ok and type(fn) == 'function' then
-    fn()
-  end
-end
-
 -- Set color scheme to carbonfox, a variant of nightfox.
 vim.o.background = 'dark'
-try_cmd('colorscheme carbonfox')
+vim.cmd('colorscheme carbonfox')
 
 -- Set up lualine theme.
-try_require('lualine', function(lualine)
-  lualine.setup {
-    options = { theme = 'auto' }
-  }
-end)
+local lualine = require('lualine')
+lualine.setup {
+  options = { theme = 'auto' }
+}
 
 -- Set up undotree.
 vim.keymap.set('n', '<leader>u', ':UndotreeToggle<CR>',
   { silent = true, noremap = true })
 
 -- Set up autopairs.
-try_require('nvim-autopairs', function(autopairs)
-  autopairs.setup {}
+local autopairs = require('nvim-autopairs')
+autopairs.setup {}
 
-  -- Disable closing single quotes on ocaml files.
-  autopairs.get_rule("'")[1].not_filetypes = { 'ocaml' }
-end)
+-- Disable closing single quotes on ocaml files.
+autopairs.get_rule("'")[1].not_filetypes = { 'ocaml' }
 
 -- Set up telescope.
-try_require('telescope', function(telescope)
-  telescope.setup {
-    defaults = {
-      path_display = { 'truncate' },
-    }
+local telescope = require('telescope')
+telescope.setup {
+  defaults = {
+    path_display = { 'truncate' },
   }
+}
 
-  telescope.load_extension('fzf')
-end)
+telescope.load_extension('fzf')
 
 -- Set up key mappings for telescope.
-try_require('telescope.builtin', function(builtin)
-  -- Bind <leader>f to find files in directory.
-  -- Note: <leader> is bound to <space> at the beginning of this configuraiton.
-  vim.keymap.set('n', '<leader>f', builtin.find_files, {})
-  -- Bind <leader>/ to grep in directory. Ripgrep is required.
-  vim.keymap.set('n', '<leader>/', builtin.live_grep, {})
-  -- Bind <leader>b to find buffers.
-  vim.keymap.set('n', '<leader>b', builtin.buffers, {})
-  -- Bind <leader>: to find commands.
-  vim.keymap.set('n', '<leader>:', builtin.commands, {})
-end)
+local builtin = require('telescope.builtin')
+-- Bind <leader>f to find files in directory.
+-- Note: <leader> is bound to <space> at the beginning of this configuraiton.
+vim.keymap.set('n', '<leader>f', builtin.find_files, {})
+-- Bind <leader>/ to grep in directory. Ripgrep is required.
+vim.keymap.set('n', '<leader>/', builtin.live_grep, {})
+-- Bind <leader>b to find buffers.
+vim.keymap.set('n', '<leader>b', builtin.buffers, {})
+-- Bind <leader>: to find commands.
+vim.keymap.set('n', '<leader>:', builtin.commands, {})
 
 -- Set up auto completion.
-try_require({ 'cmp', 'luasnip', 'lspkind', 'nvim-web-devicons' },
-  function(cmp, luasnip, lspkind, devicons)
-    cmp.setup {
-      snippet = {
-        expand = function(args)
-          luasnip.lsp_expand(args.body)
-        end,
-      },
-      -- Set up key mappings for the completion popup window.
-      mapping = cmp.mapping.preset.insert({
-        -- Bind <C-f> to scrolling the documentation window down.
-        ['<C-f>'] = cmp.mapping.scroll_docs(-4),
-        -- Bind <C-b> to scrolling the documentation window up.
-        ['<C-b>'] = cmp.mapping.scroll_docs(4),
-        -- Bind <CR> to confirming completion.
-        ['<CR>'] = cmp.mapping.confirm { select = true },
-        -- Bind <Tab> to selecting the next candidate.
-        ['<Tab>'] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_next_item()
-          elseif luasnip.expand_or_jumpable() then
-            luasnip.expand_or_jump()
-          else
-            fallback()
-          end
-        end, { 'i', 's' }),
-        -- Bind <Super-Tab> to selecting the previous candidate.
-        ['<S-Tab>'] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-          else
-            fallback()
-          end
-        end, { 'i', 's' }),
-      }),
-      formatting = {
-        -- Add icons to the completion popup window.
-        format = function(entry, vim_item)
-          if vim.tbl_contains({ 'path' }, entry.source.name) then
-            local icon, hl_group = devicons.get_icon(entry:get_completion_item().label)
-            if icon then
-              vim_item.kind = icon
-              vim_item.kind_hl_group = hl_group
-              return vim_item
-            end
-          end
-          return lspkind.cmp_format({ with_text = false })(entry, vim_item)
+local cmp = require('cmp')
+local luasnip = require('luasnip')
+local lspkind = require('lspkind')
+local devicons = require('nvim-web-devicons')
+cmp.setup {
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
+    end,
+  },
+  -- Set up key mappings for the completion popup window.
+  mapping = cmp.mapping.preset.insert({
+    -- Bind <C-f> to scrolling the documentation window down.
+    ['<C-f>'] = cmp.mapping.scroll_docs(-4),
+    -- Bind <C-b> to scrolling the documentation window up.
+    ['<C-b>'] = cmp.mapping.scroll_docs(4),
+    -- Bind <CR> to confirming completion.
+    ['<CR>'] = cmp.mapping.confirm { select = true },
+    -- Bind <Tab> to selecting the next candidate.
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+    -- Bind <Super-Tab> to selecting the previous candidate.
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+  }),
+  formatting = {
+    -- Add icons to the completion popup window.
+    format = function(entry, vim_item)
+      if vim.tbl_contains({ 'path' }, entry.source.name) then
+        local icon, hl_group = devicons.get_icon(entry:get_completion_item().label)
+        if icon then
+          vim_item.kind = icon
+          vim_item.kind_hl_group = hl_group
+          return vim_item
         end
-      },
-      sources = cmp.config.sources({
-        { name = 'nvim_lsp' },
-        { name = 'buffer' },
-      })
-    }
-  end)
+      end
+      return lspkind.cmp_format({ with_text = false })(entry, vim_item)
+    end
+  },
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'buffer' },
+  })
+}
 
 -- Set up treesitter.
-try_require('nvim-treesitter.configs', function(treesitter)
-  treesitter.setup {
-    ensure_installed = { 'c', 'lua', 'vim', 'vimdoc' },
-    sync_install = false,
-    auto_install = true,
-    ignore_install = {},
-    highlight = {
-      enable = true,
-      disable = function(_, buf)
-        -- Disable treesitter when the file size is larger than 1 MB.
-        local max_filesize = 1024 * 1024
-        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-        if ok and stats and stats.size > max_filesize then
-          return true
-        end
-      end,
-      -- Disable Vim's regex-based syntax highlighting when treesitter is enabled.
-      additional_vim_regex_highlighting = false,
-    },
-    indent = {
-      enable = true,
-    },
-  }
+local treesitter = require('nvim-treesitter.configs')
+treesitter.setup {
+  ensure_installed = { 'c', 'lua', 'vim', 'vimdoc' },
+  sync_install = false,
+  auto_install = true,
+  ignore_install = {},
+  highlight = {
+    enable = true,
+    disable = function(_, buf)
+      -- Disable treesitter when the file size is larger than 1 MB.
+      local max_filesize = 1024 * 1024
+      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      if ok and stats and stats.size > max_filesize then
+        return true
+      end
+    end,
+    -- Disable Vim's regex-based syntax highlighting when treesitter is enabled.
+    additional_vim_regex_highlighting = false,
+  },
+  indent = {
+    enable = true,
+  },
+}
 
-  -- Set up folding with treesitter.
-  -- See :h folding for how to use Vim folding.
-  vim.o.foldmethod = 'expr'
-  vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
-  vim.o.foldenable = false
-end)
+-- Set up folding with treesitter.
+-- See :h folding for how to use Vim folding.
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.o.foldenable = false
 
 -- Set up LSP.
-try_require({ 'mason', 'mason-lspconfig', 'lspconfig' }, function(mason, mason_lspconfig, lspconfig)
-  mason.setup()
-  mason_lspconfig.setup {
-    ensure_installed = { 'lua_ls' },
-    automatic_installation = false,
-  }
+local mason = require('mason')
+local mason_lspconfig = require('mason-lspconfig')
+local lspconfig = require('lspconfig')
+mason.setup()
+mason_lspconfig.setup {
+  ensure_installed = { 'lua_ls' },
+  automatic_installation = false,
+}
 
-  local opts = { noremap = true, silent = true }
-  -- Bind <space>e to showing error under the cursor.
-  vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-  -- Bind [e to jumping to the previous error.
-  vim.keymap.set('n', '[e', vim.diagnostic.goto_prev, opts)
-  -- Bind ]e to jumping to the next error.
-  vim.keymap.set('n', ']e', vim.diagnostic.goto_next, opts)
-  -- Bind <space>q to showing the error list.
-  vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+local opts = { noremap = true, silent = true }
+-- Bind <space>e to showing error under the cursor.
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+-- Bind [e to jumping to the previous error.
+vim.keymap.set('n', '[e', vim.diagnostic.goto_prev, opts)
+-- Bind ]e to jumping to the next error.
+vim.keymap.set('n', ']e', vim.diagnostic.goto_next, opts)
+-- Bind <space>q to showing the error list.
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
 
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-  local on_attach = function(_, bufnr)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+local on_attach = function(_, bufnr)
+  -- Enable completion triggered by <c-x><c-o>
+  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-    -- Mappings.
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    local bufopts = { noremap = true, silent = true, buffer = bufnr }
-    -- Bind gD to jumping to declaration of the symbol under the cursor.
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-    -- Bind gd to jumping to definition of the symbol under the cursor.
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-    -- Bind K to showing the documentation for the symbol under the cursor.
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-    -- Bind gi to jumping to the implementation of the symbol under the cursor.
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-    -- Bind <leader>k to showing the signature of the symbol under the curosr.
-    vim.keymap.set('n', '<leader>k', vim.lsp.buf.signature_help, bufopts)
-    -- Some less-used key bindings for workspace folder management.
-    vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-    vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-    vim.keymap.set('n', '<leader>wl', function()
-      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, bufopts)
-    -- Bind <leader>rn to renaming the symbol.
-    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
-    -- Bind <leader>ca to showing code actions.
-    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
-    -- Bind gr to showing references.
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-    -- Bind <leader>= to formatting the whole document.
-    vim.keymap.set('n', '<leader>=', function()
-      vim.lsp.buf.format { async = true }
-    end, bufopts)
-  end
+  -- Mappings.
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  local bufopts = { noremap = true, silent = true, buffer = bufnr }
+  -- Bind gD to jumping to declaration of the symbol under the cursor.
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+  -- Bind gd to jumping to definition of the symbol under the cursor.
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+  -- Bind K to showing the documentation for the symbol under the cursor.
+  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+  -- Bind gi to jumping to the implementation of the symbol under the cursor.
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+  -- Bind <leader>k to showing the signature of the symbol under the curosr.
+  vim.keymap.set('n', '<leader>k', vim.lsp.buf.signature_help, bufopts)
+  -- Some less-used key bindings for workspace folder management.
+  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+  vim.keymap.set('n', '<leader>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, bufopts)
+  -- Bind <leader>rn to renaming the symbol.
+  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+  -- Bind <leader>ca to showing code actions.
+  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+  -- Bind gr to showing references.
+  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+  -- Bind <leader>= to formatting the whole document.
+  vim.keymap.set('n', '<leader>=', function()
+    vim.lsp.buf.format { async = true }
+  end, bufopts)
+end
 
-  local flags = {
-    debounce_text_changes = 150,
-  }
+local flags = {
+  debounce_text_changes = 150,
+}
 
-  -- Set up Lua LSP for Neovim.
-  lspconfig.lua_ls.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    flags = flags,
-    settings = {
-      Lua = {
-        runtime = {
-          version = 'LuaJIT',
-        },
-        diagnostics = {
-          globals = { 'vim' },
-        },
-        workspace = {
-          library = vim.api.nvim_get_runtime_file('', true),
-        },
-        telemetry = {
-          enable = false,
-        }
+-- Set up Lua LSP for Neovim.
+lspconfig.lua_ls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  flags = flags,
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        globals = { 'vim' },
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file('', true),
+      },
+      telemetry = {
+        enable = false,
       }
     }
   }
+}
 
-  lspconfig.bashls.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    flags = flags,
-  }
+lspconfig.bashls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  flags = flags,
+}
 
-  lspconfig.jsonls.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    flags = flags,
-  }
+lspconfig.jsonls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  flags = flags,
+}
 
-  lspconfig.ocamllsp.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    flags = flags,
-  }
+lspconfig.ocamllsp.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  flags = flags,
+}
 
-  lspconfig.pyright.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    flags = flags,
-  }
+lspconfig.pyright.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  flags = flags,
+}
 
-  lspconfig.rust_analyzer.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    flags = flags,
-  }
+lspconfig.rust_analyzer.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  flags = flags,
+}
 
-  lspconfig.tsserver.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    flags = flags,
-  }
+lspconfig.tsserver.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  flags = flags,
+}
 
-  -- Add new language servers here.
-  -- Note that capabilities, on_attach and flags must be set on any custom
-  -- configuration. Otherwise key mappings won't work.
-end)
+-- Add new language servers here.
+-- Note that capabilities, on_attach and flags must be set on any custom
+-- configuration. Otherwise key mappings won't work.
 
 -- Set up null-ls.
-try_require('null-ls', function(null_ls)
-  null_ls.setup {
-    sources = {
-      -- Add formatting support with Prettier.
-      null_ls.builtins.formatting.prettier,
-    }
+local null_ls = require('null-ls')
+null_ls.setup {
+  sources = {
+    -- Add formatting support with Prettier.
+    null_ls.builtins.formatting.prettier,
   }
-end)
+}
