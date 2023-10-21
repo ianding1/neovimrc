@@ -27,12 +27,6 @@ vim.o.backup = false
 vim.o.writebackup = false
 vim.o.swapfile = false
 
--- Set the leader key to space.
-vim.g.mapleader = ' '
-
--- Set the local leader key to backslash.
-vim.g.maplocalleader = '\\'
-
 -- Enable mouse in the terminal.
 vim.o.mouse = 'a'
 
@@ -67,9 +61,6 @@ vim.o.clipboard = 'unnamed'
 -- Split the window on below (horizontally) or right (vertically).
 vim.o.splitbelow = true
 vim.o.splitright = true
-
--- Combine the sign column with line number column.
-vim.o.signcolumn = 'number'
 
 -- Set completion options.
 vim.o.completeopt = 'menu,menuone,noselect'
@@ -121,14 +112,17 @@ require('packer').startup(function(use)
   -- Pretty status line written in Lua.
   use 'nvim-lualine/lualine.nvim'
 
+  -- Show git signs.
+  use 'lewis6991/gitsigns.nvim'
+
   -- Powerful fuzzy finder written in Lua.
   -- See https://github.com/nvim-telescope/telescope.nvim
   use 'nvim-telescope/telescope.nvim'
   use {
     'nvim-telescope/telescope-fzf-native.nvim',
     run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && ' ..
-      'cmake --build build --config Release && ' ..
-      'cmake --install build --prefix build'
+        'cmake --build build --config Release && ' ..
+        'cmake --install build --prefix build'
   }
   use 'nvim-telescope/telescope-file-browser.nvim'
 
@@ -160,7 +154,6 @@ require('packer').startup(function(use)
   use 'williamboman/mason.nvim'
   use 'williamboman/mason-lspconfig.nvim'
   use 'neovim/nvim-lspconfig'
-  use 'jose-elias-alvarez/null-ls.nvim'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/nvim-cmp'
   use 'saadparwaiz1/cmp_luasnip'
@@ -202,8 +195,12 @@ lualine.setup {
   options = { theme = 'auto' }
 }
 
+-- Set up gitsigns.
+local gitsigns = require('gitsigns')
+gitsigns.setup {}
+
 -- Set up undotree.
-vim.keymap.set('n', '<leader>u', ':UndotreeToggle<CR>', { noremap = true })
+vim.keymap.set('n', '<space>u', ':UndotreeToggle<CR>', { noremap = true })
 
 -- Set up autopairs.
 local autopairs = require('nvim-autopairs')
@@ -225,24 +222,24 @@ telescope.load_extension('file_browser')
 
 -- Set up key mappings for telescope.
 local builtin = require('telescope.builtin')
--- Bind <leader>f to Telescope builtins.
--- Note: <leader> is bound to <space> at the beginning of this configuraiton.
-vim.keymap.set('n', '<leader>ff', builtin.find_files)
-vim.keymap.set('n', '<leader>fr', builtin.oldfiles)
-vim.keymap.set('n', '<leader>fg', builtin.live_grep)
-vim.keymap.set('n', '<leader>fb', builtin.buffers)
-vim.keymap.set('n', '<leader>fh', builtin.help_tags)
+-- Bind <space>f to Telescope builtins.
+-- Note: <space> is bound to <space> at the beginning of this configuraiton.
+vim.keymap.set('n', '<space>f', builtin.find_files)
+vim.keymap.set('n', '<space>r', builtin.oldfiles)  -- r for recent
+vim.keymap.set('n', '<space>g', builtin.live_grep)
+vim.keymap.set('n', '<space>b', builtin.buffers)
+vim.keymap.set('n', '<space>h', builtin.help_tags)
 
 vim.keymap.set(
   'n',
-  '<leader>f/',
+  '<space>cd',  -- cd for "current directory"
   ':Telescope file_browser<CR>',
   { noremap = true }
 )
 
 vim.keymap.set(
   'n',
-  '<leader>f.',
+  '-',  -- - is bound to "go to parent directory" in vinegar.vim
   ':Telescope file_browser path=%:p:h select_buffer=true<CR>',
   { noremap = true }
 )
@@ -253,12 +250,12 @@ vim.keymap.set('n', 'gd', builtin.lsp_definitions)
 vim.keymap.set('n', 'gi', builtin.lsp_implementations)
 vim.keymap.set('n', 'gr', builtin.lsp_references)
 -- Show diagnostics for the current buffer.
-vim.keymap.set('n', '<leader>q', function()
+vim.keymap.set('n', '<space>d', function()  -- d for diagnostics
   builtin.diagnostics { bufnr = 0 }
 end)
 
 -- Show diagnostics for all open buffers.
-vim.keymap.set('n', '<leader>Q', builtin.diagnostics)
+vim.keymap.set('n', '<space>D', builtin.diagnostics)
 
 -- Set up auto completion.
 local cmp = require('cmp')
@@ -361,14 +358,19 @@ mason_lspconfig.setup {
   automatic_installation = false,
 }
 
+-- Make the original `,` accessible via `,,`.
+-- Original `,`: repeat the last `ftFT` in the opposite direction.
+-- It is used much less frequently than `;` personally so I repurposed it as
+-- the prefix key for LSP commands.
+vim.keymap.set({ 'n', 'v' }, ',,', ',', { noremap = true })
+
 -- Bind <space>e to showing error under the cursor.
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
+-- e for error.
+vim.keymap.set('n', ',e', vim.diagnostic.open_float)
 -- Bind [e to jumping to the previous error.
 vim.keymap.set('n', '[e', vim.diagnostic.goto_prev)
 -- Bind ]e to jumping to the next error.
 vim.keymap.set('n', ']e', vim.diagnostic.goto_next)
-
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
@@ -376,19 +378,19 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- Enable completion triggered by <c-x><c-o>
     vim.bo[event.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-    -- Bind K to showing the documentation for the symbol under the cursor.
     local bufopts = { buffer = event.buf }
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
     vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
-    vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, bufopts)
-
-    -- Bind <leader>= to formatting the whole document.
-    vim.keymap.set('n', '<leader>=', function()
+    vim.keymap.set('n', ';rn', vim.lsp.buf.rename, bufopts)
+    vim.keymap.set({ 'n', 'v' }, ';a', vim.lsp.buf.code_action, bufopts)
+    vim.keymap.set('n', ',f', function()
       vim.lsp.buf.format { async = true }
     end, bufopts)
+
   end
 })
+
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 -- Set up Lua LSP for Neovim.
 lspconfig.lua_ls.setup {
@@ -438,12 +440,3 @@ lspconfig.tsserver.setup {
 -- Add new language servers here.
 -- Note that capabilities, on_attach and flags must be set on any custom
 -- configuration. Otherwise key mappings won't work.
-
--- Set up null-ls.
-local null_ls = require('null-ls')
-null_ls.setup {
-  sources = {
-    -- Add formatting support with Prettier.
-    null_ls.builtins.formatting.prettier,
-  }
-}
