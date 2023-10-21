@@ -124,8 +124,12 @@ require('packer').startup(function(use)
   -- Powerful fuzzy finder written in Lua.
   -- See https://github.com/nvim-telescope/telescope.nvim
   use 'nvim-telescope/telescope.nvim'
-  use { 'nvim-telescope/telescope-fzf-native.nvim', run =
-  'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
+  use {
+    'nvim-telescope/telescope-fzf-native.nvim',
+    run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && ' ..
+      'cmake --build build --config Release && ' ..
+      'cmake --install build --prefix build'
+  }
 
   -- VSCode-like icons for Git, file types, and etc.
   -- Patched fonts are required for these icons to be rendered correctly.
@@ -169,7 +173,8 @@ require('packer').startup(function(use)
 
   -- Syntax highlighting based off of treesitter, a generic parser generator tool that supports a variety
   -- of programming languages.
-  use { 'nvim-treesitter/nvim-treesitter',
+  use {
+    'nvim-treesitter/nvim-treesitter',
     run = function()
       local installer = require('nvim-treesitter.install')
       local ts_update = installer.update { with_sync = true }
@@ -189,33 +194,6 @@ end)
 if packer_bootstrap then
   print('Please restart Neovim to load the plugins just installed.')
   return
-end
-
--- A function that calls `fn` with the lua module only if the module can be
--- found.
-local try_require = function(names, fn)
-  if type(names) == 'table' then
-    local all_ok = true
-    local modules = {}
-
-    for i, name in pairs(names) do
-      local status_ok, module = pcall(require, name)
-      if status_ok then
-        modules[i] = module
-      else
-        all_ok = false
-      end
-    end
-
-    if all_ok then
-      fn(unpack(modules))
-    end
-  else
-    local status_ok, module = pcall(require, names)
-    if status_ok then
-      fn(module)
-    end
-  end
 end
 
 -- Set color scheme to carbonfox, a variant of nightfox.
