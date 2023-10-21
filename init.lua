@@ -391,51 +391,34 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
--- Set up Lua LSP for Neovim.
-lspconfig.lua_ls.setup {
-  capabilities = capabilities,
-  settings = {
-    Lua = {
-      runtime = {
-        version = 'LuaJIT',
-      },
-      diagnostics = {
-        globals = { 'vim' },
-      },
-      workspace = {
-        library = vim.api.nvim_get_runtime_file('', true),
-      },
-      telemetry = {
-        enable = false,
+-- Automatically set up LSP servers installed via mason.
+mason_lspconfig.setup_handlers {
+  -- Default set up handler.
+  function(server_name)
+    lspconfig[server_name].setup {
+      capabilities = capabilities,
+    }
+  end,
+  lua_ls = function()
+    lspconfig.lua_ls.setup {
+      capabilities = capabilities,
+      settings = {
+        Lua = {
+          runtime = {
+            version = 'LuaJIT',
+          },
+          diagnostics = {
+            globals = { 'vim' },
+          },
+          workspace = {
+            library = vim.api.nvim_get_runtime_file('', true),
+          },
+          telemetry = {
+            enable = false,
+          }
+        }
       }
     }
-  }
+  end
 }
 
-lspconfig.bashls.setup {
-  capabilities = capabilities,
-}
-
-lspconfig.jsonls.setup {
-  capabilities = capabilities,
-}
-
-lspconfig.ocamllsp.setup {
-  capabilities = capabilities,
-}
-
-lspconfig.pyright.setup {
-  capabilities = capabilities,
-}
-
-lspconfig.rust_analyzer.setup {
-  capabilities = capabilities,
-}
-
-lspconfig.tsserver.setup {
-  capabilities = capabilities,
-}
-
--- Add new language servers here.
--- Note that capabilities, on_attach and flags must be set on any custom
--- configuration. Otherwise key mappings won't work.
