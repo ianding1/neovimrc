@@ -79,6 +79,14 @@ vim.o.completeopt = 'menu,menuone,noselect'
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
 vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
 
+-- Neovide configuration.
+if vim.g.neovide then
+  vim.o.guifont = "Hack Nerd Font Mono,Source Code Pro:h13"
+  vim.g.neovide_cursor_animate_in_insert_mode = false
+  vim.g.neovide_hide_mouse_when_typing = true
+  vim.g.neovide_input_macos_alt_is_meta = true
+end
+
 -- Plugin configuration.
 
 -- ensure_packer is a function that installs packer.nvim for you if it has not
@@ -116,7 +124,8 @@ require('packer').startup(function(use)
   -- Powerful fuzzy finder written in Lua.
   -- See https://github.com/nvim-telescope/telescope.nvim
   use 'nvim-telescope/telescope.nvim'
-  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
+  use { 'nvim-telescope/telescope-fzf-native.nvim', run =
+  'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
 
   -- VSCode-like icons for Git, file types, and etc.
   -- Patched fonts are required for these icons to be rendered correctly.
@@ -182,7 +191,7 @@ if packer_bootstrap then
   return
 end
 
--- A function that calls `fn` with the lua module only if the module can be 
+-- A function that calls `fn` with the lua module only if the module can be
 -- found.
 local try_require = function(names, fn)
   if type(names) == 'table' then
@@ -209,7 +218,7 @@ local try_require = function(names, fn)
   end
 end
 
--- A function that runs a Vim command and swallows the error if the command 
+-- A function that runs a Vim command and swallows the error if the command
 -- fails.
 local try_cmd = function(cmd, fn)
   local status_ok, _ = pcall(vim.cmd, cmd)
@@ -277,7 +286,7 @@ try_require({ 'cmp', 'luasnip', 'lspkind', 'nvim-web-devicons' },
       -- Set up key mappings for the completion popup window.
       mapping = cmp.mapping.preset.insert({
         -- Bind <C-f> to scrolling the documentation window down.
-        ['<C-f>'] = cmp.mapping.scroll_docs( -4),
+        ['<C-f>'] = cmp.mapping.scroll_docs(-4),
         -- Bind <C-b> to scrolling the documentation window up.
         ['<C-b>'] = cmp.mapping.scroll_docs(4),
         -- Bind <CR> to confirming completion.
@@ -296,8 +305,8 @@ try_require({ 'cmp', 'luasnip', 'lspkind', 'nvim-web-devicons' },
         ['<S-Tab>'] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
-          elseif luasnip.jumpable( -1) then
-            luasnip.jump( -1)
+          elseif luasnip.jumpable(-1) then
+            luasnip.jump(-1)
           else
             fallback()
           end
@@ -438,15 +447,37 @@ try_require({ 'mason', 'mason-lspconfig', 'lspconfig' }, function(mason, mason_l
     }
   }
 
-  -- Set up LSP for TypeScript.
-  lspconfig.tsserver.setup {
+  lspconfig.bashls.setup {
     capabilities = capabilities,
     on_attach = on_attach,
     flags = flags,
   }
 
-  -- Set up LSP for OCaml.
+  lspconfig.jsonls.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = flags,
+  }
+
   lspconfig.ocamllsp.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = flags,
+  }
+
+  lspconfig.pyright.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = flags,
+  }
+
+  lspconfig.rust_analyzer.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = flags,
+  }
+
+  lspconfig.tsserver.setup {
     capabilities = capabilities,
     on_attach = on_attach,
     flags = flags,
