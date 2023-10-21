@@ -74,7 +74,6 @@ vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
 if vim.g.neovide then
   vim.o.guifont = "Hack Nerd Font Mono,Source Code Pro:h13"
   vim.g.neovide_cursor_animate_in_insert_mode = false
-  vim.g.neovide_hide_mouse_when_typing = true
   vim.g.neovide_input_macos_alt_is_meta = true
 end
 
