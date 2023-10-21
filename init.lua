@@ -130,6 +130,7 @@ require('packer').startup(function(use)
       'cmake --build build --config Release && ' ..
       'cmake --install build --prefix build'
   }
+  use 'nvim-telescope/telescope-file-browser.nvim'
 
   -- VSCode-like icons for Git, file types, and etc.
   -- Patched fonts are required for these icons to be rendered correctly.
@@ -142,11 +143,6 @@ require('packer').startup(function(use)
   -- A very powerful Git plugin for Vim.
   -- See http://vimcasts.org/categories/git/ for a series of awesome tutorials on fugitive.
   use 'tpope/vim-fugitive'
-
-
-  -- A pane-based file explorer.
-  -- See http://vimcasts.org/blog/2013/01/oil-and-vinegar-split-windows-and-project-drawer/
-  use 'tpope/vim-vinegar'
 
   -- Allow using readline mappings (C-d/C-e/C-f/etc) in the command line mode.
   use 'tpope/vim-rsi'
@@ -207,8 +203,7 @@ lualine.setup {
 }
 
 -- Set up undotree.
-vim.keymap.set('n', '<leader>u', ':UndotreeToggle<CR>',
-  { silent = true, noremap = true })
+vim.keymap.set('n', '<leader>u', ':UndotreeToggle<CR>', { noremap = true })
 
 -- Set up autopairs.
 local autopairs = require('nvim-autopairs')
@@ -221,23 +216,49 @@ autopairs.get_rule("'")[1].not_filetypes = { 'ocaml' }
 local telescope = require('telescope')
 telescope.setup {
   defaults = {
-    path_display = { 'truncate' },
-  }
+    path_display = { 'shorten' },
+  },
 }
 
 telescope.load_extension('fzf')
+telescope.load_extension('file_browser')
 
 -- Set up key mappings for telescope.
 local builtin = require('telescope.builtin')
--- Bind <leader>f to find files in directory.
+-- Bind <leader>f to Telescope builtins.
 -- Note: <leader> is bound to <space> at the beginning of this configuraiton.
-vim.keymap.set('n', '<leader>f', builtin.find_files, {})
--- Bind <leader>/ to grep in directory. Ripgrep is required.
-vim.keymap.set('n', '<leader>/', builtin.live_grep, {})
--- Bind <leader>b to find buffers.
-vim.keymap.set('n', '<leader>b', builtin.buffers, {})
--- Bind <leader>: to find commands.
-vim.keymap.set('n', '<leader>:', builtin.commands, {})
+vim.keymap.set('n', '<leader>ff', builtin.find_files)
+vim.keymap.set('n', '<leader>fr', builtin.oldfiles)
+vim.keymap.set('n', '<leader>fg', builtin.live_grep)
+vim.keymap.set('n', '<leader>fb', builtin.buffers)
+vim.keymap.set('n', '<leader>fh', builtin.help_tags)
+
+vim.keymap.set(
+  'n',
+  '<leader>f/',
+  ':Telescope file_browser<CR>',
+  { noremap = true }
+)
+
+vim.keymap.set(
+  'n',
+  '<leader>f.',
+  ':Telescope file_browser path=%:p:h select_buffer=true<CR>',
+  { noremap = true }
+)
+
+-- Bind LSP actions to Telescope.
+vim.keymap.set('n', 'gD', builtin.lsp_type_definitions)
+vim.keymap.set('n', 'gd', builtin.lsp_definitions)
+vim.keymap.set('n', 'gi', builtin.lsp_implementations)
+vim.keymap.set('n', 'gr', builtin.lsp_references)
+-- Show diagnostics for the current buffer.
+vim.keymap.set('n', '<leader>q', function()
+  builtin.diagnostics { bufnr = 0 }
+end)
+
+-- Show diagnostics for all open buffers.
+vim.keymap.set('n', '<leader>Q', builtin.diagnostics)
 
 -- Set up auto completion.
 local cmp = require('cmp')
@@ -295,7 +316,6 @@ cmp.setup {
   },
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
-    { name = 'buffer' },
   })
 }
 
@@ -306,6 +326,7 @@ treesitter.setup {
   sync_install = false,
   auto_install = true,
   ignore_install = {},
+  modules = {},
   highlight = {
     enable = true,
     disable = function(_, buf)
@@ -340,62 +361,38 @@ mason_lspconfig.setup {
   automatic_installation = false,
 }
 
-local opts = { noremap = true, silent = true }
 -- Bind <space>e to showing error under the cursor.
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
 -- Bind [e to jumping to the previous error.
-vim.keymap.set('n', '[e', vim.diagnostic.goto_prev, opts)
+vim.keymap.set('n', '[e', vim.diagnostic.goto_prev)
 -- Bind ]e to jumping to the next error.
-vim.keymap.set('n', ']e', vim.diagnostic.goto_next, opts)
--- Bind <space>q to showing the error list.
-vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+vim.keymap.set('n', ']e', vim.diagnostic.goto_next)
 
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-local on_attach = function(_, bufnr)
-  -- Enable completion triggered by <c-x><c-o>
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+  callback = function(event)
+    -- Enable completion triggered by <c-x><c-o>
+    vim.bo[event.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-  -- Mappings.
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
-  local bufopts = { noremap = true, silent = true, buffer = bufnr }
-  -- Bind gD to jumping to declaration of the symbol under the cursor.
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  -- Bind gd to jumping to definition of the symbol under the cursor.
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  -- Bind K to showing the documentation for the symbol under the cursor.
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  -- Bind gi to jumping to the implementation of the symbol under the cursor.
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  -- Bind <leader>k to showing the signature of the symbol under the curosr.
-  vim.keymap.set('n', '<leader>k', vim.lsp.buf.signature_help, bufopts)
-  -- Some less-used key bindings for workspace folder management.
-  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-  vim.keymap.set('n', '<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, bufopts)
-  -- Bind <leader>rn to renaming the symbol.
-  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
-  -- Bind <leader>ca to showing code actions.
-  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
-  -- Bind gr to showing references.
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  -- Bind <leader>= to formatting the whole document.
-  vim.keymap.set('n', '<leader>=', function()
-    vim.lsp.buf.format { async = true }
-  end, bufopts)
-end
+    -- Bind K to showing the documentation for the symbol under the cursor.
+    local bufopts = { buffer = event.buf }
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+    vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, bufopts)
 
-local flags = {
-  debounce_text_changes = 150,
-}
+    -- Bind <leader>= to formatting the whole document.
+    vim.keymap.set('n', '<leader>=', function()
+      vim.lsp.buf.format { async = true }
+    end, bufopts)
+  end
+})
 
 -- Set up Lua LSP for Neovim.
 lspconfig.lua_ls.setup {
   capabilities = capabilities,
-  on_attach = on_attach,
-  flags = flags,
   settings = {
     Lua = {
       runtime = {
@@ -416,38 +413,26 @@ lspconfig.lua_ls.setup {
 
 lspconfig.bashls.setup {
   capabilities = capabilities,
-  on_attach = on_attach,
-  flags = flags,
 }
 
 lspconfig.jsonls.setup {
   capabilities = capabilities,
-  on_attach = on_attach,
-  flags = flags,
 }
 
 lspconfig.ocamllsp.setup {
   capabilities = capabilities,
-  on_attach = on_attach,
-  flags = flags,
 }
 
 lspconfig.pyright.setup {
   capabilities = capabilities,
-  on_attach = on_attach,
-  flags = flags,
 }
 
 lspconfig.rust_analyzer.setup {
   capabilities = capabilities,
-  on_attach = on_attach,
-  flags = flags,
 }
 
 lspconfig.tsserver.setup {
   capabilities = capabilities,
-  on_attach = on_attach,
-  flags = flags,
 }
 
 -- Add new language servers here.
