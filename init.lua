@@ -374,9 +374,6 @@ vim.keymap.set('n', ']e', vim.diagnostic.goto_next)
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
   callback = function(event)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.bo[event.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-
     local bufopts = { buffer = event.buf }
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
     vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
@@ -385,7 +382,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', ',f', function()
       vim.lsp.buf.format { async = true }
     end, bufopts)
-
   end
 })
 
