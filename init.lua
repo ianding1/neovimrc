@@ -210,9 +210,21 @@ autopairs.get_rule("'")[1].not_filetypes = { 'ocaml' }
 
 -- Set up telescope.
 local telescope = require('telescope')
+local fb_actions = telescope.extensions.file_browser.actions
+
 telescope.setup {
   defaults = {
     path_display = { 'shorten' },
+  },
+  extensions = {
+    file_browser = {
+      mappings = {
+        ["n"] = {
+          -- map `-` to go to parent dir for consistency.
+          ["-"] = fb_actions.backspace,
+        }
+      },
+    },
   },
 }
 
