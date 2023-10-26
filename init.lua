@@ -161,6 +161,7 @@ require('packer').startup(function(use)
   use 'neovim/nvim-lspconfig'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/nvim-cmp'
+  use 'hrsh7th/cmp-nvim-lsp-signature-help'
   use 'saadparwaiz1/cmp_luasnip'
   use 'onsails/lspkind.nvim'
   use 'L3MON4D3/LuaSnip'
@@ -215,14 +216,18 @@ autopairs.get_rule("'")[1].not_filetypes = { 'ocaml' }
 
 -- Set up telescope.
 local telescope = require('telescope')
+local themes = require('telescope.themes')
 local fb_actions = telescope.extensions.file_browser.actions
 
 telescope.setup {
-  defaults = {
-    path_display = { 'shorten' },
+  defaults = themes.get_ivy {
+    path_display = {
+      truncate = 0,  -- No additional gap between path and edge
+    },
   },
   extensions = {
     file_browser = {
+      initial_mode = 'normal',
       mappings = {
         ["n"] = {
           -- map `-` to go to parent dir for consistency.
@@ -277,20 +282,16 @@ vim.keymap.set('n', '<space>D', builtin.diagnostics)
 local cmp = require('cmp')
 local luasnip = require('luasnip')
 local lspkind = require('lspkind')
-local devicons = require('nvim-web-devicons')
 cmp.setup {
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body)
     end,
   },
-  -- Set up key mappings for the completion popup window.
-  mapping = cmp.mapping.preset.insert({
-    -- Bind <C-f> to scrolling the documentation window down.
-    ['<C-f>'] = cmp.mapping.scroll_docs(-4),
-    -- Bind <C-b> to scrolling the documentation window up.
-    ['<C-b>'] = cmp.mapping.scroll_docs(4),
-    -- Bind <CR> to confirming completion.
+  mapping = cmp.mapping.preset.insert {
+    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    ['<C-c>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm { select = true },
     -- Bind <Tab> to selecting the next candidate.
     ['<Tab>'] = cmp.mapping(function(fallback)
@@ -312,24 +313,18 @@ cmp.setup {
         fallback()
       end
     end, { 'i', 's' }),
-  }),
-  formatting = {
-    -- Add icons to the completion popup window.
-    format = function(entry, vim_item)
-      if vim.tbl_contains({ 'path' }, entry.source.name) then
-        local icon, hl_group = devicons.get_icon(entry:get_completion_item().label)
-        if icon then
-          vim_item.kind = icon
-          vim_item.kind_hl_group = hl_group
-          return vim_item
-        end
-      end
-      return lspkind.cmp_format({ with_text = false })(entry, vim_item)
-    end
   },
-  sources = cmp.config.sources({
+  formatting = {
+    format = lspkind.cmp_format {
+      mode = 'symbol',
+      maxwidth = 50,
+      ellipsis_char = '...',
+    },
+  },
+  sources = cmp.config.sources {
     { name = 'nvim_lsp' },
-  })
+    { name = 'nvim_lsp_signature_help' },
+  }
 }
 
 -- Set up treesitter.
@@ -353,9 +348,6 @@ treesitter.setup {
     -- Disable Vim's regex-based syntax highlighting when treesitter is enabled.
     additional_vim_regex_highlighting = false,
   },
-  indent = {
-    enable = true,
-  },
 }
 
 -- Set up folding with treesitter.
@@ -376,17 +368,11 @@ mason_lspconfig.setup {
 
 -- Make the original `,` accessible via `,,`.
 -- Original `,`: repeat the last `ftFT` in the opposite direction.
--- It is used much less frequently than `;` personally so I repurposed it as
--- the prefix key for LSP commands.
 vim.keymap.set({ 'n', 'v' }, ',,', ',', { noremap = true })
 
--- Bind <space>e to showing error under the cursor.
--- e for error.
-vim.keymap.set('n', ',e', vim.diagnostic.open_float)
--- Bind [e to jumping to the previous error.
-vim.keymap.set('n', '[e', vim.diagnostic.goto_prev)
--- Bind ]e to jumping to the next error.
-vim.keymap.set('n', ']e', vim.diagnostic.goto_next)
+vim.keymap.set('n', ',d', vim.diagnostic.open_float)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
@@ -395,7 +381,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
     vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
     vim.keymap.set('n', ',rn', vim.lsp.buf.rename, bufopts)
-    vim.keymap.set({ 'n', 'v' }, ';a', vim.lsp.buf.code_action, bufopts)
+    vim.keymap.set({ 'n', 'v' }, ',a', vim.lsp.buf.code_action, bufopts)
     vim.keymap.set('n', ',f', function()
       vim.lsp.buf.format { async = true }
     end, bufopts)
