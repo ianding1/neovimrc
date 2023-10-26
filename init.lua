@@ -160,7 +160,6 @@ if packer_bootstrap then
 end
 
 -- Set color scheme to carbonfox, a variant of nightfox.
-vim.o.background = 'dark'
 vim.cmd('colorscheme carbonfox')
 
 -- Set up lualine theme.
