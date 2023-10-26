@@ -40,6 +40,15 @@ vim.o.clipboard = 'unnamed'
 vim.o.splitbelow = true
 vim.o.splitright = true
 
+-- Enable linematch in diff mode (added in Neovim 0.9)
+vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
+
+-- Enable global status line.
+vim.o.laststatus = 3
+
+-- Always show a sign column.
+vim.o.signcolumn = 'yes'
+
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <C-v><Esc>.
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
