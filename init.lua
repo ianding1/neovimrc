@@ -4,6 +4,10 @@ vim.o.termguicolors = true
 -- Use spaces instead of tabs.
 vim.o.expandtab = true
 
+-- Use 2 spaces by default.
+vim.o.shiftwidth = 2
+vim.o.softtabstop = 2
+
 -- Show a visual line under the cursor.
 vim.o.cursorline = true
 
@@ -53,6 +57,24 @@ vim.o.signcolumn = 'yes'
 -- To send <Esc> to the terminal, press <C-v><Esc>.
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
 vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
+
+-- Set up diagnostic signs.
+local diagnostic_signs = {
+  { name = 'DiagnosticSignError', text = '' },
+  { name = 'DiagnosticSignWarn', text = '' },
+  { name = 'DiagnosticSignHint', text = '' },
+  { name = 'DiagnosticSignInfo', text = '' },
+}
+
+for _, sign in ipairs(diagnostic_signs) do
+  vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = '' })
+end
+
+vim.diagnostic.config {
+  signs = {
+    active = diagnostic_signs,
+  }
+}
 
 -- Neovide configuration.
 if vim.g.neovide then
@@ -372,7 +394,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local bufopts = { buffer = event.buf }
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
     vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-    vim.keymap.set('n', ';rn', vim.lsp.buf.rename, bufopts)
+    vim.keymap.set('n', ',rn', vim.lsp.buf.rename, bufopts)
     vim.keymap.set({ 'n', 'v' }, ';a', vim.lsp.buf.code_action, bufopts)
     vim.keymap.set('n', ',f', function()
       vim.lsp.buf.format { async = true }
