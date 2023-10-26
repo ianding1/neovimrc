@@ -4,26 +4,10 @@ vim.o.termguicolors = true
 -- Use spaces instead of tabs.
 vim.o.expandtab = true
 
--- Set indentation to 2 spaces.
-vim.o.shiftwidth = 2
-vim.o.softtabstop = 2
-
 -- Show a visual line under the cursor.
 vim.o.cursorline = true
 
--- Enable auto-completion for Vim commands.
-vim.o.wildmenu = true
-vim.o.wildmode = 'full'
-
--- Enable incremental search and highlight matches.
-vim.o.incsearch = true
-vim.o.hlsearch = true
-
--- Make backspace fully functional.
-vim.o.backspace = 'indent,eol,start'
-
--- Disable backup and swap files.
-vim.o.backup = false
+-- Disable write backup and swap files.
 vim.o.writebackup = false
 vim.o.swapfile = false
 
@@ -49,21 +33,12 @@ end
 -- Don't wrap lines.
 vim.o.wrap = false
 
--- Hide the buffer when switching out.
-vim.o.hidden = true
-
--- Preview the substitution.
-vim.o.inccommand = 'nosplit'
-
 -- Use the system clipboard as default.
 vim.o.clipboard = 'unnamed'
 
 -- Split the window on below (horizontally) or right (vertically).
 vim.o.splitbelow = true
 vim.o.splitright = true
-
--- Set completion options.
-vim.o.completeopt = 'menu,menuone,noselect'
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <C-v><Esc>.
