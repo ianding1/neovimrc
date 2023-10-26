@@ -77,11 +77,9 @@ vim.diagnostic.config {
 }
 
 -- Neovide configuration.
-if vim.g.neovide then
-  vim.o.guifont = "Hack Nerd Font Mono,Source Code Pro:h13"
-  vim.g.neovide_cursor_animate_in_insert_mode = false
-  vim.g.neovide_input_macos_alt_is_meta = true
-end
+vim.o.guifont = "Hack Nerd Font Mono,Source Code Pro:h13"
+vim.g.neovide_cursor_animate_in_insert_mode = false
+vim.g.neovide_input_macos_alt_is_meta = true
 
 -- Plugin configuration.
 
