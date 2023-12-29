@@ -38,7 +38,16 @@ end
 vim.o.wrap = false
 
 -- Use the system clipboard as default.
-vim.o.clipboard = 'unnamed'
+-- Trick: Neovide sets vim.g.clipboard properly to allow copy/pasting
+-- between the local UI client and the remote server. However, for it
+-- to work, the clipboard must be (re)loaded after Neovide updates this
+-- option. We delay the configuration of `clipboard` to UIEnter so that
+-- the clipboard is only loaded after Neovide is attached to the server.
+vim.api.nvim_create_autocmd("UIEnter", {
+  callback = function()
+    vim.o.clipboard = 'unnamed'
+  end,
+})
 
 -- Split the window on below (horizontally) or right (vertically).
 vim.o.splitbelow = true
@@ -77,7 +86,7 @@ vim.diagnostic.config {
 }
 
 -- Neovide configuration.
-vim.o.guifont = "Hack Nerd Font Mono,Source Code Pro:h13"
+vim.o.guifont = "Hack Nerd Font Mono:h13"
 vim.g.neovide_cursor_animate_in_insert_mode = false
 vim.g.neovide_input_macos_alt_is_meta = true
 
