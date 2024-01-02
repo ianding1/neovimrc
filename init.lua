@@ -168,7 +168,6 @@ require('packer').startup(function(use)
   use 'neovim/nvim-lspconfig'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/nvim-cmp'
-  use 'hrsh7th/cmp-nvim-lsp-signature-help'
   use 'saadparwaiz1/cmp_luasnip'
   use 'onsails/lspkind.nvim'
   use 'L3MON4D3/LuaSnip'
@@ -330,7 +329,6 @@ cmp.setup {
   },
   sources = cmp.config.sources {
     { name = 'nvim_lsp' },
-    { name = 'nvim_lsp_signature_help' },
   }
 }
 
@@ -386,7 +384,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(event)
     local bufopts = { buffer = event.buf }
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+    vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help, bufopts)
     vim.keymap.set('n', ',rn', vim.lsp.buf.rename, bufopts)
     vim.keymap.set({ 'n', 'v' }, ',a', vim.lsp.buf.code_action, bufopts)
     vim.keymap.set('n', ',f', function()
