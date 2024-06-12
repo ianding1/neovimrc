@@ -71,7 +71,7 @@ vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
 local diagnostic_signs = {
   { name = 'DiagnosticSignError', text = '' },
   { name = 'DiagnosticSignWarn', text = '' },
-  { name = 'DiagnosticSignHint', text = '' },
+  { name = 'DiagnosticSignHint', text = '󰋗' },
   { name = 'DiagnosticSignInfo', text = '' },
 }
 
@@ -84,11 +84,6 @@ vim.diagnostic.config {
     active = diagnostic_signs,
   }
 }
-
--- Neovide configuration.
-vim.o.guifont = "Hack Nerd Font Mono:h13"
-vim.g.neovide_cursor_animate_in_insert_mode = false
-vim.g.neovide_input_macos_alt_is_meta = true
 
 -- Plugin configuration.
 
@@ -222,14 +217,20 @@ autopairs.get_rule("'")[1].not_filetypes = { 'ocaml' }
 
 -- Set up telescope.
 local telescope = require('telescope')
-local themes = require('telescope.themes')
 local fb_actions = telescope.extensions.file_browser.actions
 
 telescope.setup {
-  defaults = themes.get_ivy {
-    path_display = {
-      truncate = 0,  -- No additional gap between path and edge
-    },
+  defaults = {
+    layout_strategy = 'center',
+    results_title = false,
+    sorting_strategy = 'ascending',
+    path_display = { 'truncate' },
+    layout_config = {
+      center = {
+        width = 0.9,
+        height = 0.9,
+      },
+    }
   },
   extensions = {
     file_browser = {
