@@ -37,22 +37,6 @@ end
 -- Don't wrap lines.
 vim.o.wrap = false
 
--- Use the system clipboard as default.
--- Trick: Neovide sets vim.g.clipboard properly to allow copy/pasting
--- between the local UI client and the remote server. However, for it
--- to work, the clipboard must be (re)loaded after Neovide updates this
--- option. We delay the configuration of `clipboard` to UIEnter so that
--- the clipboard is only loaded after Neovide is attached to the server.
-vim.api.nvim_create_autocmd("UIEnter", {
-  callback = function()
-    vim.o.clipboard = 'unnamed'
-  end,
-})
-
--- Split the window on below (horizontally) or right (vertically).
-vim.o.splitbelow = true
-vim.o.splitright = true
-
 -- Enable linematch in diff mode (added in Neovim 0.9)
 vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
 
@@ -166,6 +150,7 @@ require('packer').startup(function(use)
   use 'saadparwaiz1/cmp_luasnip'
   use 'onsails/lspkind.nvim'
   use 'L3MON4D3/LuaSnip'
+  use 'nvimdev/lspsaga.nvim'
 
   -- Syntax highlighting based off of treesitter, a generic parser generator tool that supports a variety
   -- of programming languages.
@@ -221,14 +206,13 @@ local fb_actions = telescope.extensions.file_browser.actions
 
 telescope.setup {
   defaults = {
-    layout_strategy = 'center',
-    results_title = false,
+    layout_strategy = 'vertical',
     sorting_strategy = 'ascending',
     path_display = { 'truncate' },
     layout_config = {
-      center = {
-        width = 0.9,
-        height = 0.9,
+      vertical = {
+        prompt_position = 'top',
+        mirror = true,
       },
     }
   },
@@ -336,7 +320,7 @@ cmp.setup {
 -- Set up treesitter.
 local treesitter = require('nvim-treesitter.configs')
 treesitter.setup {
-  ensure_installed = { 'c', 'lua', 'vim', 'vimdoc' },
+  ensure_installed = { 'c', 'lua', 'vim', 'vimdoc', 'markdown', 'markdown_inline' },
   sync_install = false,
   auto_install = true,
   ignore_install = {},
@@ -346,7 +330,7 @@ treesitter.setup {
     disable = function(_, buf)
       -- Disable treesitter when the file size is larger than 1 MB.
       local max_filesize = 1024 * 1024
-      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
       if ok and stats and stats.size > max_filesize then
         return true
       end
@@ -376,21 +360,18 @@ mason_lspconfig.setup {
 -- Original `,`: repeat the last `ftFT` in the opposite direction.
 vim.keymap.set({ 'n', 'v' }, ',,', ',', { noremap = true })
 
-vim.keymap.set('n', ',d', vim.diagnostic.open_float)
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+vim.keymap.set('n', ',d', '<Cmd>Lspsaga show_cursor_diagnostics<CR>')
+vim.keymap.set('n', '[d', '<Cmd>Lspsaga diagnostic_jump_next<CR>')
+vim.keymap.set('n', ']d', '<Cmd>Lspsaga diagnostic_jump_prev<CR>')
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
   callback = function(event)
     local bufopts = { buffer = event.buf }
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+    vim.keymap.set('n', 'K', '<Cmd>Lspsaga hover_doc<CR>', bufopts)
     vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help, bufopts)
-    vim.keymap.set('n', ',rn', vim.lsp.buf.rename, bufopts)
-    vim.keymap.set({ 'n', 'v' }, ',a', vim.lsp.buf.code_action, bufopts)
-    vim.keymap.set('n', ',f', function()
-      vim.lsp.buf.format { async = true }
-    end, bufopts)
+    vim.keymap.set('n', ',rn', '<Cmd>Lspsaga rename<CR>', bufopts)
+    vim.keymap.set({ 'n', 'v' }, ',a', '<Cmd>Lspsaga code_action<CR>', bufopts)
   end
 })
 
@@ -427,3 +408,9 @@ mason_lspconfig.setup_handlers {
   end
 }
 
+-- Configure LSP Saga
+require('lspsaga').setup {
+  lightbulb = {
+    enable = false,
+  }
+}
