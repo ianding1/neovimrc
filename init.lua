@@ -166,11 +166,18 @@ lualine.setup {
     lualine_c = {
       { 'filename', path = 1 }
     },
-    lualine_x = { 'diff', 'diagnostics' },
+    lualine_x = { 'diagnostics', 'diff' },
     lualine_y = {
-      'encoding',
+      {
+        'filetype',
+        icon_only = true,
+        padding = {
+          left = 1,
+          right = 0,
+        },
+      },
       'fileformat',
-      { 'filetype', icon_only = true }
+      'encoding',
     },
     lualine_z = { 'progress', 'location' },
   },
