@@ -407,7 +407,7 @@ mason_lspconfig.setup_handlers {
 
 -- Configure LSP Saga
 require('lspsaga').setup {
-  breadcrumbs = {
+  symbol_in_winbar = {
     enable = false,
   },
   lightbulb = {
