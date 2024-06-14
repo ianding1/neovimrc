@@ -175,14 +175,14 @@ lualine.setup {
   },
   sections = {
     lualine_a = { 'mode' },
-    lualine_b = {},
-    lualine_c = {
+    lualine_b = {
       {
         'filename',
         path = 1,
         shorting_target = 5,
       }
     },
+    lualine_c = {},
     lualine_x = {},
     lualine_y = {'progress'},
     lualine_z = {'location'}
