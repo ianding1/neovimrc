@@ -18,14 +18,14 @@ vim.o.swapfile = false
 -- Enable mouse in the terminal.
 vim.o.mouse = 'a'
 
--- Show the line number.
-vim.o.number = true
-
 -- Always show 5 lines above or below the cursor.
 vim.o.scrolloff = 5
 
 -- Hide the mode prompt.
 vim.o.showmode = false
+
+-- Disable sign column.
+vim.o.signcolumn = 'no'
 
 -- Persist the undo records on the disk.
 if vim.fn.has('persistent_undo') == 1 then
@@ -37,37 +37,19 @@ end
 -- Don't wrap lines.
 vim.o.wrap = false
 
+-- Use system clipboard.
+vim.o.clipboard = 'unnamedplus'
+
 -- Enable linematch in diff mode (added in Neovim 0.9)
 vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
 
--- Enable global status line.
-vim.o.laststatus = 3
-
--- Always show a sign column.
-vim.o.signcolumn = 'yes'
+-- Always show status line
+vim.o.laststatus = 2
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <C-v><Esc>.
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
 vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
-
--- Set up diagnostic signs.
-local diagnostic_signs = {
-  { name = 'DiagnosticSignError', text = '' },
-  { name = 'DiagnosticSignWarn', text = '' },
-  { name = 'DiagnosticSignHint', text = '󰋗' },
-  { name = 'DiagnosticSignInfo', text = '' },
-}
-
-for _, sign in ipairs(diagnostic_signs) do
-  vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = '' })
-end
-
-vim.diagnostic.config {
-  signs = {
-    active = diagnostic_signs,
-  }
-}
 
 -- Plugin configuration.
 
@@ -103,9 +85,6 @@ require('packer').startup(function(use)
   -- Pretty status line written in Lua.
   use 'nvim-lualine/lualine.nvim'
 
-  -- Show git signs.
-  use 'lewis6991/gitsigns.nvim'
-
   -- Powerful fuzzy finder written in Lua.
   -- See https://github.com/nvim-telescope/telescope.nvim
   use 'nvim-telescope/telescope.nvim'
@@ -131,9 +110,6 @@ require('packer').startup(function(use)
 
   -- Allow using readline mappings (C-d/C-e/C-f/etc) in the command line mode.
   use 'tpope/vim-rsi'
-
-  -- Code commenting plugin.
-  use 'tomtom/tcomment_vim'
 
   -- Below are the plugins to configure LSP and auto completion.
   --
@@ -183,12 +159,50 @@ vim.cmd('colorscheme carbonfox')
 -- Set up lualine theme.
 local lualine = require('lualine')
 lualine.setup {
-  options = { theme = 'auto' }
+  options = { theme = 'auto' },
+  tabline = {
+    lualine_a = {},
+    lualine_b = {
+      {
+        'tabs',
+        mode = 2,
+        use_mode_colors = true,
+      }
+    },
+    lualine_x = { 'branch', 'diff', 'diagnostics' },
+    lualine_y = { 'filetype' },
+    lualine_z = { 'encoding', 'fileformat' },
+  },
+  sections = {
+    lualine_a = { 'mode' },
+    lualine_b = {},
+    lualine_c = {
+      {
+        'filename',
+        path = 1,
+        shorting_target = 5,
+      }
+    },
+    lualine_x = {},
+    lualine_y = {'progress'},
+    lualine_z = {'location'}
+  },
+  inactive_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = {
+      {
+        'filename',
+        newfile_status = true,
+        path = 1,
+        shorting_target = 5,
+      }
+    },
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = {},
+  },
 }
-
--- Set up gitsigns.
-local gitsigns = require('gitsigns')
-gitsigns.setup {}
 
 -- Set up undotree.
 vim.keymap.set('n', '<space>u', ':UndotreeToggle<CR>', { noremap = true })
@@ -242,12 +256,6 @@ vim.keymap.set('n', '<space>g', builtin.live_grep)
 vim.keymap.set('n', '<space>b', builtin.buffers)
 vim.keymap.set('n', '<space>h', builtin.help_tags)
 
-vim.keymap.set(
-  'n',
-  '<space>cd',  -- cd for "current directory"
-  ':Telescope file_browser<CR>',
-  { noremap = true }
-)
 
 vim.keymap.set(
   'n',
@@ -356,24 +364,13 @@ mason_lspconfig.setup {
   automatic_installation = false,
 }
 
--- Make the original `,` accessible via `,,`.
--- Original `,`: repeat the last `ftFT` in the opposite direction.
-vim.keymap.set({ 'n', 'v' }, ',,', ',', { noremap = true })
-
-vim.keymap.set('n', ',d', '<Cmd>Lspsaga show_cursor_diagnostics<CR>')
+vim.keymap.set('n', '<space>jd', '<Cmd>Lspsaga show_cursor_diagnostics<CR>')
 vim.keymap.set('n', '[d', '<Cmd>Lspsaga diagnostic_jump_next<CR>')
 vim.keymap.set('n', ']d', '<Cmd>Lspsaga diagnostic_jump_prev<CR>')
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-  callback = function(event)
-    local bufopts = { buffer = event.buf }
-    vim.keymap.set('n', 'K', '<Cmd>Lspsaga hover_doc<CR>', bufopts)
-    vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help, bufopts)
-    vim.keymap.set('n', ',rn', '<Cmd>Lspsaga rename<CR>', bufopts)
-    vim.keymap.set({ 'n', 'v' }, ',a', '<Cmd>Lspsaga code_action<CR>', bufopts)
-  end
-})
+vim.keymap.set('n', 'K', '<Cmd>Lspsaga hover_doc<CR>')
+vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help)
+vim.keymap.set('n', '<space>jr', '<Cmd>Lspsaga rename<CR>')
+vim.keymap.set({ 'n', 'v' }, '<space>ja', '<Cmd>Lspsaga code_action<CR>')
 
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
@@ -410,7 +407,10 @@ mason_lspconfig.setup_handlers {
 
 -- Configure LSP Saga
 require('lspsaga').setup {
+  breadcrumbs = {
+    enable = false,
+  },
   lightbulb = {
     enable = false,
-  }
+  },
 }
