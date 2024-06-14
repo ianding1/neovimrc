@@ -19,7 +19,7 @@ vim.o.swapfile = false
 vim.o.mouse = 'a'
 
 -- Always show 5 lines above or below the cursor.
-vim.o.scrolloff = 5
+vim.o.scrolloff = 3
 
 -- Hide the mode prompt.
 vim.o.showmode = false
@@ -44,7 +44,7 @@ vim.o.clipboard = 'unnamedplus'
 vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
 
 -- Always show status line
-vim.o.laststatus = 2
+vim.o.laststatus = 3
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <C-v><Esc>.
@@ -160,47 +160,19 @@ vim.cmd('colorscheme carbonfox')
 local lualine = require('lualine')
 lualine.setup {
   options = { theme = 'auto' },
-  tabline = {
-    lualine_a = {},
-    lualine_b = {
-      {
-        'tabs',
-        mode = 2,
-        use_mode_colors = true,
-      }
-    },
-    lualine_x = { 'branch', 'diff', 'diagnostics' },
-    lualine_y = { 'filetype' },
-    lualine_z = { 'encoding', 'fileformat' },
-  },
   sections = {
     lualine_a = { 'mode' },
-    lualine_b = {
-      {
-        'filename',
-        path = 1,
-        shorting_target = 5,
-      }
-    },
-    lualine_c = {},
-    lualine_x = {},
-    lualine_y = {'progress'},
-    lualine_z = {'location'}
-  },
-  inactive_sections = {
-    lualine_a = {},
-    lualine_b = {},
+    lualine_b = { 'branch' },
     lualine_c = {
-      {
-        'filename',
-        newfile_status = true,
-        path = 1,
-        shorting_target = 5,
-      }
+      { 'filename', path = 1 }
     },
-    lualine_x = {},
-    lualine_y = {},
-    lualine_z = {},
+    lualine_x = { 'diff', 'diagnostics' },
+    lualine_y = {
+      'encoding',
+      'fileformat',
+      { 'filetype', icon_only = true }
+    },
+    lualine_z = { 'progress', 'location' },
   },
 }
 
