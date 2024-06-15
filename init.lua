@@ -233,6 +233,7 @@ telescope.load_extension("file_browser")
 
 -- Set up key mappings for telescope.
 local builtin = require("telescope.builtin")
+
 -- Bind <space>f to Telescope builtins.
 -- Note: <space> is bound to <space> at the beginning of this configuraiton.
 vim.keymap.set("n", "<space>f", builtin.find_files)
@@ -396,6 +397,13 @@ require("lspsaga").setup({
   },
   lightbulb = {
     enable = false,
+  },
+  rename = {
+    keys = {
+      quit = "<Esc>",
+      exec = "<CR>",
+      select = "<Tab>",
+    },
   },
 })
 
