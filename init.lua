@@ -139,6 +139,9 @@ require('packer').startup(function(use)
     end,
   }
 
+  -- Enhanced Asciidoc syntax.
+  use 'habamax/vim-asciidoctor'
+
   -- Run :PackerSync if it is the first time.
   -- You still need to run :PackerSync from time to time to keep all the plugins
   -- up to date.
