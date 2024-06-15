@@ -349,7 +349,7 @@ mason_lspconfig.setup({
   automatic_installation = false,
 })
 
-vim.keymap.set("n", "<space>jd", "<Cmd>Lspsaga show_cursor_diagnostics<CR>")
+vim.keymap.set("n", "<space>jd", "<Cmd>Lspsaga show_line_diagnostics<CR>")
 vim.keymap.set("n", "[d", "<Cmd>Lspsaga diagnostic_jump_next<CR>")
 vim.keymap.set("n", "]d", "<Cmd>Lspsaga diagnostic_jump_prev<CR>")
 vim.keymap.set("n", "K", "<Cmd>Lspsaga hover_doc<CR>")
