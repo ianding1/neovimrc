@@ -4,7 +4,7 @@ vim.o.termguicolors = true
 -- Use spaces instead of tabs.
 vim.o.expandtab = true
 
--- Use 2 spaces by default.
+-- Use 4 spaces by default.
 vim.o.shiftwidth = 2
 vim.o.softtabstop = 2
 
@@ -16,7 +16,7 @@ vim.o.writebackup = false
 vim.o.swapfile = false
 
 -- Enable mouse in the terminal.
-vim.o.mouse = 'a'
+vim.o.mouse = "a"
 
 -- Always show 5 lines above or below the cursor.
 vim.o.scrolloff = 3
@@ -25,12 +25,12 @@ vim.o.scrolloff = 3
 vim.o.showmode = false
 
 -- Disable sign column.
-vim.o.signcolumn = 'no'
+vim.o.signcolumn = "no"
 
 -- Persist the undo records on the disk.
-if vim.fn.has('persistent_undo') == 1 then
-  vim.fn.system('mkdir -p $HOME/.cache/vim-undo')
-  vim.o.undodir = os.getenv("HOME") .. '/.cache/vim-undo'
+if vim.fn.has("persistent_undo") == 1 then
+  vim.fn.system("mkdir -p $HOME/.cache/vim-undo")
+  vim.o.undodir = os.getenv("HOME") .. "/.cache/vim-undo"
   vim.o.undofile = true
 end
 
@@ -38,7 +38,7 @@ end
 vim.o.wrap = false
 
 -- Use system clipboard.
-vim.o.clipboard = 'unnamedplus'
+vim.o.clipboard = "unnamedplus"
 
 -- Enable linematch in diff mode (added in Neovim 0.9)
 vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
@@ -57,10 +57,10 @@ vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
 -- been installed in your system.
 local ensure_packer = function()
   local fn = vim.fn
-  local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+  local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
   if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path })
-    vim.cmd [[packadd packer.nvim]]
+    fn.system({ "git", "clone", "--depth", "1", "https://github.com/wbthomason/packer.nvim", install_path })
+    vim.cmd([[packadd packer.nvim]])
     return true
   end
   return false
@@ -70,46 +70,46 @@ end
 local packer_bootstrap = ensure_packer()
 
 -- Plugin list.
-require('packer').startup(function(use)
+require("packer").startup(function(use)
   -- The package manager itself.
-  use 'wbthomason/packer.nvim'
+  use("wbthomason/packer.nvim")
   -- The _de-facto_ standard library for Neovim. Used by many other plugins.
-  use 'nvim-lua/plenary.nvim'
+  use("nvim-lua/plenary.nvim")
 
   -- Nightfox color scheme.
-  use 'EdenEast/nightfox.nvim'
+  use("EdenEast/nightfox.nvim")
 
   -- Undotree UI. Visualize the undo history as a tree.
-  use 'mbbill/undotree'
+  use("mbbill/undotree")
 
   -- Pretty status line written in Lua.
-  use 'nvim-lualine/lualine.nvim'
+  use("nvim-lualine/lualine.nvim")
 
   -- Powerful fuzzy finder written in Lua.
   -- See https://github.com/nvim-telescope/telescope.nvim
-  use 'nvim-telescope/telescope.nvim'
-  use {
-    'nvim-telescope/telescope-fzf-native.nvim',
-    run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && ' ..
-        'cmake --build build --config Release && ' ..
-        'cmake --install build --prefix build'
-  }
-  use 'nvim-telescope/telescope-file-browser.nvim'
+  use("nvim-telescope/telescope.nvim")
+  use({
+    "nvim-telescope/telescope-fzf-native.nvim",
+    run = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && "
+      .. "cmake --build build --config Release && "
+      .. "cmake --install build --prefix build",
+  })
+  use("nvim-telescope/telescope-file-browser.nvim")
 
   -- VSCode-like icons for Git, file types, and etc.
   -- Patched fonts are required for these icons to be rendered correctly.
   -- I use https://www.nerdfonts.com/ but others should work too.
-  use 'nvim-tree/nvim-web-devicons'
+  use("nvim-tree/nvim-web-devicons")
 
   -- Auto close parentheses, brackets and tags.
-  use 'windwp/nvim-autopairs'
+  use("windwp/nvim-autopairs")
 
   -- A very powerful Git plugin for Vim.
   -- See http://vimcasts.org/categories/git/ for a series of awesome tutorials on fugitive.
-  use 'tpope/vim-fugitive'
+  use("tpope/vim-fugitive")
 
   -- Allow using readline mappings (C-d/C-e/C-f/etc) in the command line mode.
-  use 'tpope/vim-rsi'
+  use("tpope/vim-rsi")
 
   -- Below are the plugins to configure LSP and auto completion.
   --
@@ -118,164 +118,166 @@ require('packer').startup(function(use)
   -- LSP support, and has maintained an active community till today.
   --
   -- I don't use snippets personally but Neovim LSP requires a snippet engine.
-  use 'williamboman/mason.nvim'
-  use 'williamboman/mason-lspconfig.nvim'
-  use 'neovim/nvim-lspconfig'
-  use 'hrsh7th/cmp-nvim-lsp'
-  use 'hrsh7th/nvim-cmp'
-  use 'saadparwaiz1/cmp_luasnip'
-  use 'onsails/lspkind.nvim'
-  use 'L3MON4D3/LuaSnip'
-  use 'nvimdev/lspsaga.nvim'
+  use("williamboman/mason.nvim")
+  use("williamboman/mason-lspconfig.nvim")
+  use("neovim/nvim-lspconfig")
+  use("hrsh7th/cmp-nvim-lsp")
+  use("hrsh7th/nvim-cmp")
+  use("saadparwaiz1/cmp_luasnip")
+  use("onsails/lspkind.nvim")
+  use("L3MON4D3/LuaSnip")
+  use("nvimdev/lspsaga.nvim")
 
   -- Syntax highlighting based off of treesitter, a generic parser generator tool that supports a variety
   -- of programming languages.
-  use {
-    'nvim-treesitter/nvim-treesitter',
+  use({
+    "nvim-treesitter/nvim-treesitter",
     run = function()
-      local installer = require('nvim-treesitter.install')
-      local ts_update = installer.update { with_sync = true }
+      local installer = require("nvim-treesitter.install")
+      local ts_update = installer.update({ with_sync = true })
       ts_update()
     end,
-  }
+  })
 
   -- Enhanced Asciidoc syntax.
-  use 'habamax/vim-asciidoctor'
+  use("habamax/vim-asciidoctor")
+
+  -- Formatter.
+  use("stevearc/conform.nvim")
 
   -- Run :PackerSync if it is the first time.
   -- You still need to run :PackerSync from time to time to keep all the plugins
   -- up to date.
   if packer_bootstrap then
-    require('packer').sync()
+    require("packer").sync()
   end
 end)
 
 -- Stop here if it is the first time.
 if packer_bootstrap then
-  print('Please restart Neovim to load the plugins just installed.')
+  print("Please restart Neovim to load the plugins just installed.")
   return
 end
 
 -- Set color scheme to carbonfox, a variant of nightfox.
-vim.cmd('colorscheme carbonfox')
+vim.cmd("colorscheme carbonfox")
 
 -- Set up lualine theme.
-local lualine = require('lualine')
-lualine.setup {
-  options = { theme = 'auto' },
+local lualine = require("lualine")
+lualine.setup({
+  options = { theme = "auto" },
   sections = {
-    lualine_a = { 'mode' },
-    lualine_b = { 'branch' },
+    lualine_a = { "mode" },
+    lualine_b = { "branch" },
     lualine_c = {
-      { 'filename', path = 1 }
+      { "filename", path = 1 },
     },
-    lualine_x = { 'diagnostics', 'diff' },
+    lualine_x = { "diagnostics", "diff" },
     lualine_y = {
       {
-        'filetype',
+        "filetype",
         icon_only = true,
         padding = {
           left = 1,
           right = 0,
         },
       },
-      'fileformat',
-      'encoding',
+      "fileformat",
+      "encoding",
     },
-    lualine_z = { 'progress', 'location' },
+    lualine_z = { "progress", "location" },
   },
-}
+})
 
 -- Set up undotree.
-vim.keymap.set('n', '<space>u', ':UndotreeToggle<CR>', { noremap = true })
+vim.keymap.set("n", "<space>u", ":UndotreeToggle<CR>", { noremap = true })
 
 -- Set up autopairs.
-local autopairs = require('nvim-autopairs')
-autopairs.setup {}
+local autopairs = require("nvim-autopairs")
+autopairs.setup({})
 
 -- Disable closing single quotes on ocaml files.
-autopairs.get_rule("'")[1].not_filetypes = { 'ocaml' }
+autopairs.get_rule("'")[1].not_filetypes = { "ocaml" }
 
 -- Set up telescope.
-local telescope = require('telescope')
+local telescope = require("telescope")
 local fb_actions = telescope.extensions.file_browser.actions
 
-telescope.setup {
+telescope.setup({
   defaults = {
-    layout_strategy = 'vertical',
-    sorting_strategy = 'ascending',
-    path_display = { 'truncate' },
+    layout_strategy = "vertical",
+    sorting_strategy = "ascending",
+    path_display = { "truncate" },
     layout_config = {
       vertical = {
-        prompt_position = 'top',
+        prompt_position = "top",
         mirror = true,
       },
-    }
+    },
   },
   extensions = {
     file_browser = {
-      initial_mode = 'normal',
+      initial_mode = "normal",
       mappings = {
         ["n"] = {
           -- map `-` to go to parent dir for consistency.
           ["-"] = fb_actions.backspace,
-        }
+        },
       },
     },
   },
-}
+})
 
-telescope.load_extension('fzf')
-telescope.load_extension('file_browser')
+telescope.load_extension("fzf")
+telescope.load_extension("file_browser")
 
 -- Set up key mappings for telescope.
-local builtin = require('telescope.builtin')
+local builtin = require("telescope.builtin")
 -- Bind <space>f to Telescope builtins.
 -- Note: <space> is bound to <space> at the beginning of this configuraiton.
-vim.keymap.set('n', '<space>f', builtin.find_files)
-vim.keymap.set('n', '<space>r', builtin.oldfiles)  -- r for recent
-vim.keymap.set('n', '<space>g', builtin.live_grep)
-vim.keymap.set('n', '<space>b', builtin.buffers)
-vim.keymap.set('n', '<space>h', builtin.help_tags)
-
+vim.keymap.set("n", "<space>f", builtin.find_files)
+vim.keymap.set("n", "<space>r", builtin.oldfiles) -- r for recent
+vim.keymap.set("n", "<space>g", builtin.live_grep)
+vim.keymap.set("n", "<space>b", builtin.buffers)
+vim.keymap.set("n", "<space>h", builtin.help_tags)
 
 vim.keymap.set(
-  'n',
-  '-',  -- - is bound to "go to parent directory" in vinegar.vim
-  ':Telescope file_browser path=%:p:h select_buffer=true<CR>',
+  "n",
+  "-", -- - is bound to "go to parent directory" in vinegar.vim
+  ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
   { noremap = true }
 )
 
 -- Bind LSP actions to Telescope.
-vim.keymap.set('n', 'gD', builtin.lsp_type_definitions)
-vim.keymap.set('n', 'gd', builtin.lsp_definitions)
-vim.keymap.set('n', 'gi', builtin.lsp_implementations)
-vim.keymap.set('n', 'gr', builtin.lsp_references)
+vim.keymap.set("n", "gD", builtin.lsp_type_definitions)
+vim.keymap.set("n", "gd", builtin.lsp_definitions)
+vim.keymap.set("n", "gi", builtin.lsp_implementations)
+vim.keymap.set("n", "gr", builtin.lsp_references)
 -- Show diagnostics for the current buffer.
-vim.keymap.set('n', '<space>d', function()  -- d for diagnostics
-  builtin.diagnostics { bufnr = 0 }
+vim.keymap.set("n", "<space>d", function() -- d for diagnostics
+  builtin.diagnostics({ bufnr = 0 })
 end)
 
 -- Show diagnostics for all open buffers.
-vim.keymap.set('n', '<space>D', builtin.diagnostics)
+vim.keymap.set("n", "<space>D", builtin.diagnostics)
 
 -- Set up auto completion.
-local cmp = require('cmp')
-local luasnip = require('luasnip')
-local lspkind = require('lspkind')
-cmp.setup {
+local cmp = require("cmp")
+local luasnip = require("luasnip")
+local lspkind = require("lspkind")
+cmp.setup({
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body)
     end,
   },
-  mapping = cmp.mapping.preset.insert {
-    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-d>'] = cmp.mapping.scroll_docs(4),
-    ['<C-c>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm { select = true },
+  mapping = cmp.mapping.preset.insert({
+    ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-d>"] = cmp.mapping.scroll_docs(4),
+    ["<C-c>"] = cmp.mapping.abort(),
+    ["<CR>"] = cmp.mapping.confirm({ select = true }),
     -- Bind <Tab> to selecting the next candidate.
-    ['<Tab>'] = cmp.mapping(function(fallback)
+    ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.expand_or_jumpable() then
@@ -283,9 +285,9 @@ cmp.setup {
       else
         fallback()
       end
-    end, { 'i', 's' }),
+    end, { "i", "s" }),
     -- Bind <Super-Tab> to selecting the previous candidate.
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
       elseif luasnip.jumpable(-1) then
@@ -293,24 +295,24 @@ cmp.setup {
       else
         fallback()
       end
-    end, { 'i', 's' }),
-  },
+    end, { "i", "s" }),
+  }),
   formatting = {
-    format = lspkind.cmp_format {
-      mode = 'symbol',
+    format = lspkind.cmp_format({
+      mode = "symbol",
       maxwidth = 50,
-      ellipsis_char = '...',
-    },
+      ellipsis_char = "...",
+    }),
   },
-  sources = cmp.config.sources {
-    { name = 'nvim_lsp' },
-  }
-}
+  sources = cmp.config.sources({
+    { name = "nvim_lsp" },
+  }),
+})
 
 -- Set up treesitter.
-local treesitter = require('nvim-treesitter.configs')
-treesitter.setup {
-  ensure_installed = { 'c', 'lua', 'vim', 'vimdoc', 'markdown', 'markdown_inline' },
+local treesitter = require("nvim-treesitter.configs")
+treesitter.setup({
+  ensure_installed = { "c", "lua", "vim", "vimdoc", "markdown", "markdown_inline" },
   sync_install = false,
   auto_install = true,
   ignore_install = {},
@@ -328,71 +330,85 @@ treesitter.setup {
     -- Disable Vim's regex-based syntax highlighting when treesitter is enabled.
     additional_vim_regex_highlighting = false,
   },
-}
+})
 
 -- Set up folding with treesitter.
 -- See :h folding for how to use Vim folding.
-vim.o.foldmethod = 'expr'
-vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.o.foldmethod = "expr"
+vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldenable = false
 
 -- Set up LSP.
-local mason = require('mason')
-local mason_lspconfig = require('mason-lspconfig')
-local lspconfig = require('lspconfig')
+local mason = require("mason")
+local mason_lspconfig = require("mason-lspconfig")
+local lspconfig = require("lspconfig")
 mason.setup()
-mason_lspconfig.setup {
-  ensure_installed = { 'lua_ls' },
+mason_lspconfig.setup({
+  ensure_installed = { "lua_ls" },
   automatic_installation = false,
-}
+})
 
-vim.keymap.set('n', '<space>jd', '<Cmd>Lspsaga show_cursor_diagnostics<CR>')
-vim.keymap.set('n', '[d', '<Cmd>Lspsaga diagnostic_jump_next<CR>')
-vim.keymap.set('n', ']d', '<Cmd>Lspsaga diagnostic_jump_prev<CR>')
-vim.keymap.set('n', 'K', '<Cmd>Lspsaga hover_doc<CR>')
-vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help)
-vim.keymap.set('n', '<space>jr', '<Cmd>Lspsaga rename<CR>')
-vim.keymap.set({ 'n', 'v' }, '<space>ja', '<Cmd>Lspsaga code_action<CR>')
+vim.keymap.set("n", "<space>jd", "<Cmd>Lspsaga show_cursor_diagnostics<CR>")
+vim.keymap.set("n", "[d", "<Cmd>Lspsaga diagnostic_jump_next<CR>")
+vim.keymap.set("n", "]d", "<Cmd>Lspsaga diagnostic_jump_prev<CR>")
+vim.keymap.set("n", "K", "<Cmd>Lspsaga hover_doc<CR>")
+vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help)
+vim.keymap.set("n", "<space>jr", "<Cmd>Lspsaga rename<CR>")
+vim.keymap.set({ "n", "v" }, "<space>ja", "<Cmd>Lspsaga code_action<CR>")
 
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 -- Automatically set up LSP servers installed via mason.
-mason_lspconfig.setup_handlers {
+mason_lspconfig.setup_handlers({
   -- Default set up handler.
   function(server_name)
-    lspconfig[server_name].setup {
+    lspconfig[server_name].setup({
       capabilities = capabilities,
-    }
+    })
   end,
   lua_ls = function()
-    lspconfig.lua_ls.setup {
+    lspconfig.lua_ls.setup({
       capabilities = capabilities,
       settings = {
         Lua = {
           runtime = {
-            version = 'LuaJIT',
+            version = "LuaJIT",
           },
           diagnostics = {
-            globals = { 'vim' },
+            globals = { "vim" },
           },
           workspace = {
-            library = vim.api.nvim_get_runtime_file('', true),
+            library = vim.api.nvim_get_runtime_file("", true),
           },
           telemetry = {
             enable = false,
-          }
-        }
-      }
-    }
-  end
-}
+          },
+        },
+      },
+    })
+  end,
+})
 
 -- Configure LSP Saga
-require('lspsaga').setup {
+require("lspsaga").setup({
   symbol_in_winbar = {
     enable = false,
   },
   lightbulb = {
     enable = false,
   },
-}
+})
+
+-- Configure Formatter
+require("conform").setup({
+  format_on_save = {
+    timeout_ms = 500,
+    lsp_fallback = true,
+  },
+  formatters_by_ft = {
+    lua = { "stylua" },
+    python = { "black" },
+  },
+})
+
+vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
