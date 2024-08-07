@@ -139,8 +139,8 @@ require("packer").startup(function(use)
     end,
   })
 
-  -- Enhanced Asciidoc syntax.
-  use("habamax/vim-asciidoctor")
+  -- Folding.
+  use({ "kevinhwang91/nvim-ufo", requires = "kevinhwang91/promise-async" })
 
   -- Formatter.
   use("stevearc/conform.nvim")
@@ -333,11 +333,15 @@ treesitter.setup({
   },
 })
 
--- Set up folding with treesitter.
--- See :h folding for how to use Vim folding.
-vim.o.foldmethod = "expr"
-vim.o.foldexpr = "nvim_treesitter#foldexpr()"
-vim.o.foldenable = false
+-- Configure folding.
+vim.o.foldlevel = 99
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+
+local ufo = require("ufo")
+vim.keymap.set("n", "zR", ufo.openAllFolds)
+vim.keymap.set("n", "zM", ufo.closeAllFolds)
+ufo.setup()
 
 -- Set up LSP.
 local mason = require("mason")
@@ -358,6 +362,10 @@ vim.keymap.set("n", "<space>jr", "<Cmd>Lspsaga rename<CR>")
 vim.keymap.set({ "n", "v" }, "<space>ja", "<Cmd>Lspsaga code_action<CR>")
 
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
+capabilities.textDocument.foldingRange = {
+  dynamicRegistration = false,
+  lineFoldingOnly = true,
+}
 
 -- Automatically set up LSP servers installed via mason.
 mason_lspconfig.setup_handlers({
