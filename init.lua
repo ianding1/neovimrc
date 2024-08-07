@@ -82,8 +82,8 @@ require("packer").startup(function(use)
   use({
     "nvim-telescope/telescope-fzf-native.nvim",
     run = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && "
-      .. "cmake --build build --config Release && "
-      .. "cmake --install build --prefix build",
+        .. "cmake --build build --config Release && "
+        .. "cmake --install build --prefix build",
   })
   use("nvim-telescope/telescope-file-browser.nvim")
 
@@ -117,7 +117,6 @@ require("packer").startup(function(use)
   use("saadparwaiz1/cmp_luasnip")
   use("onsails/lspkind.nvim")
   use("L3MON4D3/LuaSnip")
-  use("nvimdev/lspsaga.nvim")
 
   -- Syntax highlighting based off of treesitter, a generic parser generator tool that supports a variety
   -- of programming languages.
@@ -201,10 +200,8 @@ local builtin = require("telescope.builtin")
 -- Bind <space>f to Telescope builtins.
 -- Note: <space> is bound to <space> at the beginning of this configuraiton.
 vim.keymap.set("n", "<space>f", builtin.find_files)
-vim.keymap.set("n", "<space>r", builtin.oldfiles) -- r for recent
 vim.keymap.set("n", "<space>g", builtin.live_grep)
 vim.keymap.set("n", "<space>b", builtin.buffers)
-vim.keymap.set("n", "<space>h", builtin.help_tags)
 
 vim.keymap.set(
   "n",
@@ -217,7 +214,11 @@ vim.keymap.set(
 vim.keymap.set("n", "gD", builtin.lsp_type_definitions)
 vim.keymap.set("n", "gd", builtin.lsp_definitions)
 vim.keymap.set("n", "gi", builtin.lsp_implementations)
-vim.keymap.set("n", "gr", builtin.lsp_references)
+vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help)
+vim.keymap.set("n", "grd", vim.diagnostic.open_float)
+vim.keymap.set("n", "grn", vim.lsp.buf.rename)
+vim.keymap.set("n", "gra", vim.lsp.buf.code_action)
+
 -- Show diagnostics for the current buffer.
 vim.keymap.set("n", "<space>d", function() -- d for diagnostics
   builtin.diagnostics({ bufnr = 0 })
@@ -225,6 +226,8 @@ end)
 
 -- Show diagnostics for all open buffers.
 vim.keymap.set("n", "<space>D", builtin.diagnostics)
+
+
 
 -- Set up auto completion.
 local cmp = require("cmp")
@@ -317,14 +320,6 @@ mason_lspconfig.setup({
   automatic_installation = false,
 })
 
-vim.keymap.set("n", "<space>jd", "<Cmd>Lspsaga show_line_diagnostics<CR>")
-vim.keymap.set("n", "[d", "<Cmd>Lspsaga diagnostic_jump_next<CR>")
-vim.keymap.set("n", "]d", "<Cmd>Lspsaga diagnostic_jump_prev<CR>")
-vim.keymap.set("n", "K", "<Cmd>Lspsaga hover_doc<CR>")
-vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help)
-vim.keymap.set("n", "<space>jr", "<Cmd>Lspsaga rename<CR>")
-vim.keymap.set({ "n", "v" }, "<space>ja", "<Cmd>Lspsaga code_action<CR>")
-
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 capabilities.textDocument.foldingRange = {
   dynamicRegistration = false,
@@ -360,23 +355,6 @@ mason_lspconfig.setup_handlers({
       },
     })
   end,
-})
-
--- Configure LSP Saga
-require("lspsaga").setup({
-  symbol_in_winbar = {
-    enable = false,
-  },
-  lightbulb = {
-    enable = false,
-  },
-  rename = {
-    keys = {
-      quit = "<Esc>",
-      exec = "<CR>",
-      select = "<Tab>",
-    },
-  },
 })
 
 -- Configure Formatter
