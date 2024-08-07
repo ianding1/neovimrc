@@ -21,9 +21,6 @@ vim.o.mouse = "a"
 -- Always show 5 lines above or below the cursor.
 vim.o.scrolloff = 3
 
--- Hide the mode prompt.
-vim.o.showmode = false
-
 -- Disable sign column.
 vim.o.signcolumn = "no"
 
@@ -42,9 +39,6 @@ vim.o.clipboard = "unnamedplus"
 
 -- Enable linematch in diff mode (added in Neovim 0.9)
 vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
-
--- Always show status line
-vim.o.laststatus = 3
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <C-v><Esc>.
@@ -81,9 +75,6 @@ require("packer").startup(function(use)
 
   -- Undotree UI. Visualize the undo history as a tree.
   use("mbbill/undotree")
-
-  -- Pretty status line written in Lua.
-  use("nvim-lualine/lualine.nvim")
 
   -- Powerful fuzzy finder written in Lua.
   -- See https://github.com/nvim-telescope/telescope.nvim
@@ -161,33 +152,6 @@ end
 
 -- Set color scheme to carbonfox, a variant of nightfox.
 vim.cmd("colorscheme carbonfox")
-
--- Set up lualine theme.
-local lualine = require("lualine")
-lualine.setup({
-  options = { theme = "auto" },
-  sections = {
-    lualine_a = { "mode" },
-    lualine_b = { "branch" },
-    lualine_c = {
-      { "filename", path = 1 },
-    },
-    lualine_x = { "diagnostics", "diff" },
-    lualine_y = {
-      {
-        "filetype",
-        icon_only = true,
-        padding = {
-          left = 1,
-          right = 0,
-        },
-      },
-      "fileformat",
-      "encoding",
-    },
-    lualine_z = { "progress", "location" },
-  },
-})
 
 -- Set up undotree.
 vim.keymap.set("n", "<space>u", ":UndotreeToggle<CR>", { noremap = true })
