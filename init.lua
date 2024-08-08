@@ -79,16 +79,9 @@ require("packer").startup(function(use)
   -- Undotree UI. Visualize the undo history as a tree.
   use("mbbill/undotree")
 
-  -- Powerful fuzzy finder written in Lua.
-  -- See https://github.com/nvim-telescope/telescope.nvim
-  use("nvim-telescope/telescope.nvim")
-  use({
-    "nvim-telescope/telescope-fzf-native.nvim",
-    run = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && "
-      .. "cmake --build build --config Release && "
-      .. "cmake --install build --prefix build",
-  })
-  use("nvim-telescope/telescope-file-browser.nvim")
+  -- Powerful fuzzy finder.
+  use({ "junegunn/fzf", run = "./install --bin" })
+  use("ibhagwan/fzf-lua")
 
   -- VSCode-like icons for Git, file types, and etc.
   -- Patched fonts are required for these icons to be rendered correctly.
@@ -165,70 +158,23 @@ autopairs.setup({})
 -- Disable closing single quotes on ocaml files.
 autopairs.get_rule("'")[1].not_filetypes = { "ocaml" }
 
--- Set up telescope.
-local telescope = require("telescope")
-local fb_actions = telescope.extensions.file_browser.actions
+-- Set up FZF.
+local fzf = require("fzf-lua")
+fzf.setup()
 
-telescope.setup({
-  defaults = {
-    layout_strategy = "vertical",
-    sorting_strategy = "ascending",
-    path_display = { "truncate" },
-    layout_config = {
-      vertical = {
-        prompt_position = "top",
-        mirror = true,
-      },
-    },
-  },
-  extensions = {
-    file_browser = {
-      initial_mode = "normal",
-      mappings = {
-        ["n"] = {
-          -- map `-` to go to parent dir for consistency.
-          ["-"] = fb_actions.backspace,
-        },
-      },
-    },
-  },
-})
-
-telescope.load_extension("fzf")
-telescope.load_extension("file_browser")
-
--- Set up key mappings for telescope.
-local builtin = require("telescope.builtin")
-
--- Bind <space>f to Telescope builtins.
--- Note: <space> is bound to <space> at the beginning of this configuraiton.
-vim.keymap.set("n", "<space>f", builtin.find_files)
-vim.keymap.set("n", "<space>g", builtin.live_grep)
-vim.keymap.set("n", "<space>b", builtin.buffers)
-
-vim.keymap.set(
-  "n",
-  "-", -- - is bound to "go to parent directory" in vinegar.vim
-  ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
-  { noremap = true }
-)
+vim.keymap.set("n", "<C-p>", fzf.files)
+vim.keymap.set("n", "<C-b>", fzf.buffers)
+vim.keymap.set("n", "<C-g>", fzf.grep)
+vim.keymap.set("n", "<C-r>", fzf.resume)
 
 -- Bind LSP actions to Telescope.
-vim.keymap.set("n", "gD", builtin.lsp_type_definitions)
-vim.keymap.set("n", "gd", builtin.lsp_definitions)
-vim.keymap.set("n", "gi", builtin.lsp_implementations)
+vim.keymap.set("n", "gD", fzf.lsp_typedefs)
+vim.keymap.set("n", "gd", fzf.lsp_definitions)
+vim.keymap.set("n", "gi", fzf.lsp_implementations)
 vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help)
-vim.keymap.set("n", "grd", vim.diagnostic.open_float)
-vim.keymap.set("n", "grn", vim.lsp.buf.rename)
-vim.keymap.set("n", "gra", vim.lsp.buf.code_action)
-
--- Show diagnostics for the current buffer.
-vim.keymap.set("n", "<space>d", function() -- d for diagnostics
-  builtin.diagnostics({ bufnr = 0 })
-end)
-
--- Show diagnostics for all open buffers.
-vim.keymap.set("n", "<space>D", builtin.diagnostics)
+vim.keymap.set("n", "<space>d", vim.diagnostic.open_float)
+vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename)
+vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action)
 
 -- Set up auto completion.
 local cmp = require("cmp")
