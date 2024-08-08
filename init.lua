@@ -24,6 +24,9 @@ vim.o.scrolloff = 3
 -- Disable sign column.
 vim.o.signcolumn = "no"
 
+-- Hide intro at Vim startup.
+vim.o.shortmess = vim.o.shortmess .. "I"
+
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
   vim.fn.system("mkdir -p $HOME/.cache/vim-undo")
@@ -82,8 +85,8 @@ require("packer").startup(function(use)
   use({
     "nvim-telescope/telescope-fzf-native.nvim",
     run = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && "
-        .. "cmake --build build --config Release && "
-        .. "cmake --install build --prefix build",
+      .. "cmake --build build --config Release && "
+      .. "cmake --install build --prefix build",
   })
   use("nvim-telescope/telescope-file-browser.nvim")
 
@@ -226,8 +229,6 @@ end)
 
 -- Show diagnostics for all open buffers.
 vim.keymap.set("n", "<space>D", builtin.diagnostics)
-
-
 
 -- Set up auto completion.
 local cmp = require("cmp")
