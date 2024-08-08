@@ -163,11 +163,10 @@ local fzf = require("fzf-lua")
 fzf.setup({
   winopts = {
     preview = {
-      layout = 'vertical',
+      layout = "vertical",
     },
   },
-  files = { cwd_prompt = false,
-  },
+  files = { cwd_prompt = false },
 })
 
 vim.keymap.set("n", "<C-p>", fzf.files)
