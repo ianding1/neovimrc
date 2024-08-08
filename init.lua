@@ -160,7 +160,15 @@ autopairs.get_rule("'")[1].not_filetypes = { "ocaml" }
 
 -- Set up FZF.
 local fzf = require("fzf-lua")
-fzf.setup()
+fzf.setup({
+  winopts = {
+    preview = {
+      layout = 'vertical',
+    },
+  },
+  files = { cwd_prompt = false,
+  },
+})
 
 vim.keymap.set("n", "<C-p>", fzf.files)
 vim.keymap.set("n", "<C-b>", fzf.buffers)
