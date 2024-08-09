@@ -27,6 +27,10 @@ vim.o.signcolumn = "no"
 -- Hide intro at Vim startup.
 vim.o.shortmess = vim.o.shortmess .. "I"
 
+-- Split below and right.
+vim.o.splitbelow = true
+vim.o.splitright = true
+
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
   vim.fn.system("mkdir -p $HOME/.cache/vim-undo")
@@ -78,6 +82,9 @@ require("packer").startup(function(use)
 
   -- Undotree UI. Visualize the undo history as a tree.
   use("mbbill/undotree")
+
+  -- File manager.
+  use("stevearc/oil.nvim")
 
   -- Powerful fuzzy finder.
   use({ "junegunn/fzf", run = "./install --bin" })
@@ -158,6 +165,11 @@ autopairs.setup({})
 -- Disable closing single quotes on ocaml files.
 autopairs.get_rule("'")[1].not_filetypes = { "ocaml" }
 
+-- Set up oil.
+local oil = require("oil")
+oil.setup()
+vim.keymap.set("n", "-", "<Cmd>Oil<CR>")
+
 -- Set up FZF.
 local fzf = require("fzf-lua")
 fzf.setup({
@@ -169,17 +181,17 @@ fzf.setup({
   files = { cwd_prompt = false },
 })
 
-vim.keymap.set("n", "<C-p>", fzf.files)
-vim.keymap.set("n", "<C-b>", fzf.buffers)
-vim.keymap.set("n", "<C-g>", fzf.grep)
-vim.keymap.set("n", "<C-r>", fzf.resume)
+vim.keymap.set("n", "<space>f", fzf.files)
+vim.keymap.set("n", "<space>b", fzf.buffers)
+vim.keymap.set("n", "<space>g", fzf.grep)
+vim.keymap.set("n", "<space>re", fzf.resume)
 
--- Bind LSP actions to Telescope.
+-- Bind LSP actions to FZF.
 vim.keymap.set("n", "gD", fzf.lsp_typedefs)
 vim.keymap.set("n", "gd", fzf.lsp_definitions)
 vim.keymap.set("n", "gi", fzf.lsp_implementations)
-vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help)
-vim.keymap.set("n", "<space>d", vim.diagnostic.open_float)
+vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help)
+vim.keymap.set("n", "<space>e", vim.diagnostic.open_float)
 vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename)
 vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action)
 
