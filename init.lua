@@ -183,7 +183,7 @@ fzf.setup({
 
 vim.keymap.set("n", "<space>f", fzf.files)
 vim.keymap.set("n", "<space>b", fzf.buffers)
-vim.keymap.set("n", "<space>g", fzf.grep)
+vim.keymap.set("n", "<space>g", fzf.live_grep_glob)
 vim.keymap.set("n", "<space>re", fzf.resume)
 
 -- Bind LSP actions to FZF.
