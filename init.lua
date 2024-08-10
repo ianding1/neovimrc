@@ -86,6 +86,10 @@ require("packer").startup(function(use)
   -- File manager.
   use("stevearc/oil.nvim")
 
+  -- Enhance the writing experience.
+  use("preservim/vim-pencil")
+  use("junegunn/goyo.vim")
+
   -- Powerful fuzzy finder.
   use({ "junegunn/fzf", run = "./install --bin" })
   use("ibhagwan/fzf-lua")
@@ -108,8 +112,7 @@ require("packer").startup(function(use)
   -- Below are the plugins to configure LSP and auto completion.
   --
   -- This configuration uses Neovim's native LSP API. You are encouraged to also check out
-  -- coc.nvim, which was created before Neovim LSP was added, closed in the gap for Vim
-  -- LSP support, and has maintained an active community till today.
+  -- coc.nvim, which was created before Neovim LSP was added, closed in the gap for Vim LSP support, and has maintained an active community till today.
   --
   -- I don't use snippets personally but Neovim LSP requires a snippet engine.
   use("williamboman/mason.nvim")
@@ -165,6 +168,16 @@ autopairs.setup({})
 -- Disable closing single quotes on ocaml files.
 autopairs.get_rule("'")[1].not_filetypes = { "ocaml" }
 
+-- Set up pencil.
+vim.keymap.set("n", "<space>pp", "<Cmd>PencilToggle<CR>")
+vim.keymap.set("n", "<space>ph", "<Cmd>PencilHard<CR>")
+vim.keymap.set("n", "<space>ps", "<Cmd>PencilSoft<CR>")
+vim.keymap.set("n", "<space>po", "<Cmd>PencilOff<CR>")
+
+-- Set up Goyo.
+vim.cmd([[let g:goyo_height = '95%']]) -- Use vim.cmd to avoid warning.
+vim.keymap.set("n", "<space>g", "<Cmd>Goyo<CR>")
+
 -- Set up oil.
 local oil = require("oil")
 oil.setup()
@@ -183,7 +196,7 @@ fzf.setup({
 
 vim.keymap.set("n", "<space>f", fzf.files)
 vim.keymap.set("n", "<space>b", fzf.buffers)
-vim.keymap.set("n", "<space>g", fzf.live_grep_glob)
+vim.keymap.set("n", "<space>/", fzf.live_grep_glob)
 vim.keymap.set("n", "<space>re", fzf.resume)
 
 -- Bind LSP actions to FZF.
