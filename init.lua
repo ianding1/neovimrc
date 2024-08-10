@@ -52,6 +52,12 @@ vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
 vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
 
+-- Copy/paste for MacOS.
+vim.keymap.set("v", "<D-c>", '"+y') -- Copy
+vim.keymap.set({ "n", "v", "s", "x", "o", "i", "l", "c", "t" }, "<D-v>", function() -- Paste
+  vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
+end, { noremap = true, silent = true })
+
 -- Plugin configuration.
 
 -- ensure_packer is a function that installs packer.nvim for you if it has not
