@@ -88,7 +88,7 @@ require("packer").startup(function(use)
 
   -- Enhance the writing experience.
   use("preservim/vim-pencil")
-  use("junegunn/goyo.vim")
+  use("folke/zen-mode.nvim")
 
   -- Powerful fuzzy finder.
   use({ "junegunn/fzf", run = "./install --bin" })
@@ -174,9 +174,15 @@ vim.keymap.set("n", "<space>ph", "<Cmd>PencilHard<CR>")
 vim.keymap.set("n", "<space>ps", "<Cmd>PencilSoft<CR>")
 vim.keymap.set("n", "<space>po", "<Cmd>PencilOff<CR>")
 
--- Set up Goyo.
-vim.cmd([[let g:goyo_height = '95%']]) -- Use vim.cmd to avoid warning.
-vim.keymap.set("n", "<space>g", "<Cmd>Goyo<CR>")
+-- Set up Zen mode.
+-- Uses home row keys j/k.
+local zen_mode = require("zen-mode")
+vim.keymap.set("n", "<space>j", function()
+  zen_mode.toggle({
+    window = { width = 80 },
+  })
+end)
+vim.keymap.set("n", "<space>k", zen_mode.toggle)
 
 -- Set up oil.
 local oil = require("oil")
@@ -194,9 +200,11 @@ fzf.setup({
   files = { cwd_prompt = false },
 })
 
+-- File/buffer/glob fuzzy search.
+-- Uses home row keys s/d/f.
 vim.keymap.set("n", "<space>f", fzf.files)
-vim.keymap.set("n", "<space>b", fzf.buffers)
-vim.keymap.set("n", "<space>/", fzf.live_grep_glob)
+vim.keymap.set("n", "<space>d", fzf.buffers)
+vim.keymap.set("n", "<space>s", fzf.live_grep_glob)
 vim.keymap.set("n", "<space>re", fzf.resume)
 
 -- Bind LSP actions to FZF.
