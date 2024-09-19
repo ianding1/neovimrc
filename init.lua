@@ -58,6 +58,10 @@ vim.keymap.set({ "n", "v", "s", "x", "o", "i", "l", "c", "t" }, "<D-v>", functio
   vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
 end, { noremap = true, silent = true })
 
+-- Disable some animations in Neovide.
+vim.g.neovide_cursor_animate_command_line = false
+vim.g.neovide_cursor_animate_in_insert_mode = false
+
 -- Plugin configuration.
 
 -- ensure_packer is a function that installs packer.nvim for you if it has not
@@ -83,8 +87,8 @@ require("packer").startup(function(use)
   -- The _de-facto_ standard library for Neovim. Used by many other plugins.
   use("nvim-lua/plenary.nvim")
 
-  -- Nightfox color scheme.
-  use("EdenEast/nightfox.nvim")
+  -- Color scheme.
+  use("rebelot/kanagawa.nvim")
 
   -- Undotree UI. Visualize the undo history as a tree.
   use("mbbill/undotree")
@@ -161,8 +165,8 @@ if packer_bootstrap then
   return
 end
 
--- Set color scheme to carbonfox, a variant of nightfox.
-vim.cmd("colorscheme carbonfox")
+-- Set color scheme to kanagawa (the dark variant).
+vim.cmd("colorscheme kanagawa-dragon")
 
 -- Set up undotree.
 vim.keymap.set("n", "<space>u", ":UndotreeToggle<CR>", { noremap = true })
@@ -359,6 +363,7 @@ require("conform").setup({
   formatters_by_ft = {
     lua = { "stylua" },
     python = { "black" },
+    typescript = { "prettierd", "prettier", stop_after_first = true },
   },
 })
 
