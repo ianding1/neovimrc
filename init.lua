@@ -125,6 +125,16 @@ require("packer").startup(function(use)
       vim.keymap.set("n", "<space>ph", "<Cmd>PencilHard<CR>")
       vim.keymap.set("n", "<space>ps", "<Cmd>PencilSoft<CR>")
       vim.keymap.set("n", "<space>po", "<Cmd>PencilOff<CR>")
+
+      -- Set autocommands for specific file types.
+      local text_augroup = vim.api.nvim_create_augroup("PencilTextAugroup", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "markdown", "text" },
+        callback = function()
+          vim.fn["pencil#init"]({ wrap = "soft" })
+        end,
+        group = text_augroup,
+      })
     end,
   })
 
