@@ -94,9 +94,9 @@ require("packer").startup(function(use)
 
   -- Color scheme.
   use({
-    "rebelot/kanagawa.nvim",
+    "AlexvZyl/nordic.nvim",
     config = function()
-      vim.cmd("colorscheme kanagawa-dragon")
+      require("nordic").load()
     end,
   })
 
