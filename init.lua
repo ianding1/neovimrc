@@ -94,16 +94,9 @@ require("packer").startup(function(use)
 
   -- Color scheme.
   use({
-    "AlexvZyl/nordic.nvim",
+    "bluz71/vim-moonfly-colors",
     config = function()
-      local nordic = require("nordic")
-      nordic.setup({
-        after_palette = function(palette)
-          palette.bg = palette.black0
-          palette.bg_statusline = palette.black2
-        end,
-      })
-      nordic.load()
+      vim.cmd([[colorscheme moonfly]])
     end,
   })
 
