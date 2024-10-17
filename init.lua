@@ -98,9 +98,10 @@ require("packer").startup(function(use)
     config = function()
       local nordic = require("nordic")
       nordic.setup({
-        transparent = {
-          bg = true,
-        },
+        after_palette = function(palette)
+          palette.bg = palette.black0
+          palette.bg_statusline = palette.black2
+        end,
       })
       nordic.load()
     end,
