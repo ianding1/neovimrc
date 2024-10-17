@@ -96,7 +96,13 @@ require("packer").startup(function(use)
   use({
     "AlexvZyl/nordic.nvim",
     config = function()
-      require("nordic").load()
+      local nordic = require("nordic")
+      nordic.setup({
+        transparent = {
+          bg = true,
+        },
+      })
+      nordic.load()
     end,
   })
 
