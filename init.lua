@@ -94,9 +94,9 @@ require("packer").startup(function(use)
 
   -- Color scheme.
   use({
-    "bluz71/vim-moonfly-colors",
+    "EdenEast/nightfox.nvim",
     config = function()
-      vim.cmd([[colorscheme moonfly]])
+      vim.cmd("colorscheme carbonfox")
     end,
   })
 
