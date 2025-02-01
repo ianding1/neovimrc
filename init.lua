@@ -391,6 +391,11 @@ require("packer").startup(function(use)
     end,
   })
 
+  -- Show terminal ASCII colors.
+  use({
+    "powerman/vim-plugin-AnsiEsc",
+  })
+
   -- Run :PackerSync if it is the first time.
   -- You still need to run :PackerSync from time to time to keep all the plugins
   -- up to date.
