@@ -58,6 +58,12 @@ vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
 vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
 
+-- Set up diagnostic sign icons.
+vim.fn.sign_define("DiagnosticSignError", { text = " ", texthl = "DiagnosticSignError" })
+vim.fn.sign_define("DiagnosticSignWarn", { text = " ", texthl = "DiagnosticSignWarn" })
+vim.fn.sign_define("DiagnosticSignInfo", { text = " ", texthl = "DiagnosticSignInfo" })
+vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵 ", texthl = "DiagnosticSignHint" })
+
 -- Plugin configuration.
 
 -- ensure_packer is a function that installs packer.nvim for you if it has not
@@ -90,9 +96,9 @@ require("packer").startup(function(use)
 
   -- Color scheme.
   use({
-    "EdenEast/nightfox.nvim",
+    "rebelot/kanagawa.nvim",
     config = function()
-      vim.cmd("colorscheme carbonfox")
+      vim.cmd("colorscheme kanagawa")
     end,
   })
 
@@ -106,44 +112,51 @@ require("packer").startup(function(use)
 
   -- File manager.
   use({
-    "stevearc/oil.nvim",
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    requires = { "MunifTanjim/nui.nvim" },
     config = function()
-      require("oil").setup()
-      vim.keymap.set("n", "-", "<Cmd>Oil<CR>")
+      require("neo-tree").setup()
+      vim.keymap.set("n", "<space>j", "<Cmd>Neotree toggle filesystem<CR>", keymap_opts)
+      vim.keymap.set("n", "<space>k", "<Cmd>Neotree toggle buffers<CR>", keymap_opts)
+      vim.keymap.set("n", "<space>l", "<Cmd>Neotree toggle git_status<CR>", keymap_opts)
     end,
   })
 
-  -- Enhance the writing experience.
+  -- Quick navigation between commonly accessed files.
   use({
-    "preservim/vim-pencil",
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    requires = { { "nvim-lua/plenary.nvim" } },
     config = function()
-      vim.keymap.set("n", "<space>pp", "<Cmd>PencilToggle<CR>")
-      vim.keymap.set("n", "<space>ph", "<Cmd>PencilHard<CR>")
-      vim.keymap.set("n", "<space>ps", "<Cmd>PencilSoft<CR>")
-      vim.keymap.set("n", "<space>po", "<Cmd>PencilOff<CR>")
-
-      -- Set autocommands for specific file types.
-      local text_augroup = vim.api.nvim_create_augroup("PencilTextAugroup", { clear = true })
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "markdown", "text" },
-        callback = function()
-          vim.fn["pencil#init"]({ wrap = "soft" })
-        end,
-        group = text_augroup,
-      })
-    end,
-  })
-
-  use({
-    "folke/zen-mode.nvim",
-    config = function()
-      local zen_mode = require("zen-mode")
-      vim.keymap.set("n", "<space>j", function()
-        zen_mode.toggle({
-          window = { width = 80 },
-        })
+      local harpoon = require("harpoon")
+      harpoon:setup()
+      vim.keymap.set("n", "<space>;", function()
+        harpoon:list():add()
       end)
-      vim.keymap.set("n", "<space>k", zen_mode.toggle)
+      vim.keymap.set("n", "<space>'", function()
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+      end)
+
+      vim.keymap.set("n", "<space>1", function()
+        harpoon:list():select(1)
+      end)
+      vim.keymap.set("n", "<space>2", function()
+        harpoon:list():select(2)
+      end)
+      vim.keymap.set("n", "<space>3", function()
+        harpoon:list():select(3)
+      end)
+      vim.keymap.set("n", "<space>4", function()
+        harpoon:list():select(4)
+      end)
+
+      vim.keymap.set("n", "<space>[", function()
+        harpoon:list():prev()
+      end)
+      vim.keymap.set("n", "<space>]", function()
+        harpoon:list():next()
+      end)
     end,
   })
 
@@ -167,16 +180,17 @@ require("packer").startup(function(use)
       vim.keymap.set("n", "<space>f", fzf.files)
       vim.keymap.set("n", "<space>d", fzf.buffers)
       vim.keymap.set("n", "<space>s", fzf.live_grep_glob)
-      vim.keymap.set("n", "<space>re", fzf.resume)
+      vim.keymap.set("n", "<space>h", fzf.lsp_document_symbols)
 
       -- Bind LSP actions to FZF.
       vim.keymap.set("n", "gD", fzf.lsp_typedefs)
       vim.keymap.set("n", "gd", fzf.lsp_definitions)
       vim.keymap.set("n", "gi", fzf.lsp_implementations)
+      vim.keymap.set("n", "gr", fzf.lsp_references)
+      vim.keymap.set("n", "gf", fzf.lsp_code_actions)
       vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help)
       vim.keymap.set("n", "<space>e", vim.diagnostic.open_float)
-      vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename)
-      vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action)
+      vim.keymap.set("n", "<space>r", vim.lsp.buf.rename)
     end,
   })
 
@@ -197,19 +211,10 @@ require("packer").startup(function(use)
     end,
   })
 
-  -- A very powerful Git plugin for Vim.
-  -- See http://vimcasts.org/categories/git/ for a series of awesome tutorials on fugitive.
-  use("tpope/vim-fugitive")
-
   -- Allow using readline mappings (C-d/C-e/C-f/etc) in the command line mode.
   use("tpope/vim-rsi")
 
-  -- Below are the plugins to configure LSP and auto completion.
-  --
-  -- This configuration uses Neovim's native LSP API. You are encouraged to also check out
-  -- coc.nvim, which was created before Neovim LSP was added, closed in the gap for Vim LSP support, and has maintained an active community till today.
-  --
-  -- I don't use snippets personally but Neovim LSP requires a snippet engine.
+  -- LSP.
   use("hrsh7th/cmp-nvim-lsp")
   use({
     "hrsh7th/nvim-cmp",
@@ -315,9 +320,14 @@ require("packer").startup(function(use)
             },
           })
         end,
+        -- Disable Mason lsp config for rust analyzer.
+        rust_analyzer = function() end,
       })
     end,
   })
+
+  -- Rust LSP enhancement.
+  use("mrcjkb/rustaceanvim")
 
   -- Syntax highlighting based off of treesitter, a generic parser generator tool that supports a variety
   -- of programming languages.
@@ -353,22 +363,6 @@ require("packer").startup(function(use)
     end,
   })
 
-  -- Folding.
-  use({
-    "kevinhwang91/nvim-ufo",
-    requires = "kevinhwang91/promise-async",
-    config = function()
-      vim.o.foldlevel = 99
-      vim.o.foldlevelstart = 99
-      vim.o.foldenable = true
-
-      local ufo = require("ufo")
-      vim.keymap.set("n", "zR", ufo.openAllFolds)
-      vim.keymap.set("n", "zM", ufo.closeAllFolds)
-      ufo.setup()
-    end,
-  })
-
   -- Formatter.
   use({
     "stevearc/conform.nvim",
@@ -387,6 +381,22 @@ require("packer").startup(function(use)
       })
 
       vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+    end,
+  })
+
+  -- Git diff tool.
+  use({
+    "sindrets/diffview.nvim",
+    config = function()
+      vim.keymap.set("n", "<space>g", "<Cmd>DiffviewOpen<CR>", keymap_opts)
+    end,
+  })
+
+  -- Git signs on the sign column.
+  use({
+    "lewis6991/gitsigns.nvim",
+    config = function()
+      require("gitsigns").setup()
     end,
   })
 
