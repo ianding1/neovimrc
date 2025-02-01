@@ -118,8 +118,6 @@ require("packer").startup(function(use)
     config = function()
       require("neo-tree").setup()
       vim.keymap.set("n", "<space>j", "<Cmd>Neotree toggle filesystem<CR>", keymap_opts)
-      vim.keymap.set("n", "<space>k", "<Cmd>Neotree toggle buffers<CR>", keymap_opts)
-      vim.keymap.set("n", "<space>l", "<Cmd>Neotree toggle git_status<CR>", keymap_opts)
     end,
   })
 
@@ -137,26 +135,18 @@ require("packer").startup(function(use)
       vim.keymap.set("n", "<space>;", function()
         harpoon.ui:toggle_quick_menu(harpoon:list())
       end)
-
-      vim.keymap.set("n", "<space>1", function()
-        harpoon:list():select(1)
-      end)
-      vim.keymap.set("n", "<space>2", function()
-        harpoon:list():select(2)
-      end)
-      vim.keymap.set("n", "<space>3", function()
-        harpoon:list():select(3)
-      end)
-      vim.keymap.set("n", "<space>4", function()
-        harpoon:list():select(4)
-      end)
-
-      vim.keymap.set("n", "<space>[", function()
+      vim.keymap.set("n", "<space>h", function()
         harpoon:list():prev()
       end)
-      vim.keymap.set("n", "<space>]", function()
+      vim.keymap.set("n", "<space>l", function()
         harpoon:list():next()
       end)
+
+      for i = 1, 9 do
+        vim.keymap.set("n", "<space>" .. i, function()
+          harpoon:list():select(i)
+        end)
+      end
     end,
   })
 
@@ -180,7 +170,7 @@ require("packer").startup(function(use)
       vim.keymap.set("n", "<space>f", fzf.files)
       vim.keymap.set("n", "<space>d", fzf.buffers)
       vim.keymap.set("n", "<space>s", fzf.live_grep_glob)
-      vim.keymap.set("n", "<space>h", fzf.lsp_document_symbols)
+      vim.keymap.set("n", "<space>k", fzf.lsp_document_symbols)
 
       -- Bind LSP actions to FZF.
       vim.keymap.set("n", "gD", fzf.lsp_typedefs)
