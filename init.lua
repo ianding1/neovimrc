@@ -37,6 +37,9 @@ vim.o.shortmess = vim.o.shortmess .. "I"
 vim.o.splitbelow = true
 vim.o.splitright = true
 
+-- Set the fill char for diff to blank.
+vim.o.fillchars = "diff: "
+
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
   vim.fn.system("mkdir -p $HOME/.cache/vim-undo")
@@ -114,7 +117,11 @@ require("packer").startup(function(use)
   use({
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
-    requires = { "MunifTanjim/nui.nvim" },
+    requires = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
     config = function()
       require("neo-tree").setup()
       vim.keymap.set("n", "<space>j", "<Cmd>Neotree toggle filesystem<CR>", keymap_opts)
@@ -135,14 +142,8 @@ require("packer").startup(function(use)
       vim.keymap.set("n", "<space>;", function()
         harpoon.ui:toggle_quick_menu(harpoon:list())
       end)
-      vim.keymap.set("n", "<space>h", function()
-        harpoon:list():prev()
-      end)
-      vim.keymap.set("n", "<space>l", function()
-        harpoon:list():next()
-      end)
 
-      for i = 1, 9 do
+      for i = 1, 5 do
         vim.keymap.set("n", "<space>" .. i, function()
           harpoon:list():select(i)
         end)
