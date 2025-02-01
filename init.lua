@@ -4,12 +4,15 @@ vim.o.termguicolors = true
 -- Use spaces instead of tabs.
 vim.o.expandtab = true
 
--- Use 4 spaces by default.
+-- Use 2 spaces by default.
 vim.o.shiftwidth = 2
 vim.o.softtabstop = 2
 
 -- Show a visual line under the cursor.
 vim.o.cursorline = true
+
+-- Ignore case by default.
+vim.o.ignorecase = true
 
 -- Disable write backup and swap files.
 vim.o.writebackup = false
@@ -21,8 +24,11 @@ vim.o.mouse = "a"
 -- Always show 5 lines above or below the cursor.
 vim.o.scrolloff = 3
 
--- Disable sign column.
-vim.o.signcolumn = "no"
+-- Show line numbers.
+vim.o.number = true
+
+-- Show sign column.
+vim.o.signcolumn = "yes"
 
 -- Hide intro at Vim startup.
 vim.o.shortmess = vim.o.shortmess .. "I"
@@ -51,16 +57,6 @@ vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
 -- To send <Esc> to the terminal, press <C-v><Esc>.
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
 vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
-
--- Copy/paste for MacOS.
-vim.keymap.set("v", "<D-c>", '"+y') -- Copy
-vim.keymap.set({ "n", "v", "s", "x", "o", "i", "l", "c", "t" }, "<D-v>", function() -- Paste
-  vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
-end, { noremap = true, silent = true })
-
--- Disable some animations in Neovide.
-vim.g.neovide_cursor_animate_command_line = false
-vim.g.neovide_cursor_animate_in_insert_mode = false
 
 -- Plugin configuration.
 
@@ -385,6 +381,7 @@ require("packer").startup(function(use)
         formatters_by_ft = {
           lua = { "stylua" },
           python = { "black" },
+          rust = { "rustfmt", lsp_format = "fallback" },
           typescript = { "prettierd", "prettier", stop_after_first = true },
         },
       })
