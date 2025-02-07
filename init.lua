@@ -127,10 +127,10 @@ require("packer").startup(function(use)
         tabline = {
           lualine_a = { "mode" },
           lualine_b = { "branch", "diff", "diagnostics" },
-          lualine_c = { { "tabs", mode = 2, show_modified_status = false } },
-          lualine_x = { "encoding", "fileformat", "filetype" },
-          lualine_y = { "progress" },
-          lualine_z = { "location" },
+          lualine_c = { { "tabs", mode = 2, show_modified_status = false }, },
+          lualine_x = { function() return require('lsp-progress').progress() end, },
+          lualine_y = { "encoding", "fileformat", "filetype" },
+          lualine_z = { "progress", "location" },
         },
         sections = {
           lualine_a = {},
@@ -372,16 +372,19 @@ require("packer").startup(function(use)
   -- Rust LSP enhancement.
   use("mrcjkb/rustaceanvim")
 
-  -- Show LSP progress in the echo area.
-  use({
-    "deathbeam/lspecho.nvim",
+  -- Show LSP progress on lualine.
+  use {
+    'linrongbin16/lsp-progress.nvim',
     config = function()
-      require("lspecho").setup({
-        echo = true,
-        delay = 3000,
+      require('lsp-progress').setup()
+      vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
+      vim.api.nvim_create_autocmd("User", {
+        group = "lualine_augroup",
+        pattern = "LspProgressStatusUpdated",
+        callback = require("lualine").refresh,
       })
-    end,
-  })
+    end
+  }
 
   -- Syntax highlighting based off of treesitter, a generic parser generator tool that supports a variety
   -- of programming languages.
