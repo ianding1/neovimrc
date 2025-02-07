@@ -67,6 +67,18 @@ vim.fn.sign_define("DiagnosticSignWarn", { text = " ", texthl = "DiagnosticSi
 vim.fn.sign_define("DiagnosticSignInfo", { text = " ", texthl = "DiagnosticSignInfo" })
 vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵 ", texthl = "DiagnosticSignHint" })
 
+-- Window and tab key bindings.
+for _, dir in pairs({'h', 'j', 'k', 'l'}) do
+  vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir, { silent = true, noremap = true })
+end
+
+vim.keymap.set("n", "<C-t>", "<Cmd>tabnew<CR>", { silent = true, noremap = true })
+vim.keymap.set("n", "tc", "<Cmd>tabclose<CR>", { silent = true, noremap = true })
+
+for i = 1, 5 do
+  vim.keymap.set("n", "t" .. i, "<Cmd>" .. i .. "tabnext<CR>", { silent = true, noremap = true })
+end
+
 -- Plugin configuration.
 
 -- ensure_packer is a function that installs packer.nvim for you if it has not
@@ -105,10 +117,10 @@ require("packer").startup(function(use)
     "nvim-lualine/lualine.nvim",
     config = function()
       local symbols = {
-        modified = "",
+        modified = "",
         readonly = "󰌾",
         unnamed = "[No Name]",
-        newfile = "",
+        newfile = "",
       }
 
       require("lualine").setup({
@@ -156,20 +168,19 @@ require("packer").startup(function(use)
     config = function()
       require("oil").setup({
         keymaps = {
-          ["g?"] = { "actions.show_help", mode = "n" },
           ["<CR>"] = "actions.select",
           ["<C-v>"] = { "actions.select", opts = { vertical = true } },
           ["<C-s>"] = { "actions.select", opts = { horizontal = true } },
           ["<C-t>"] = { "actions.select", opts = { tab = true } },
           ["<C-p>"] = "actions.preview",
           ["<C-c>"] = { "actions.close", mode = "n" },
-          ["<C-l>"] = "actions.refresh",
+          ["<M-k>"] = { "actions.show_help", mode = "n" },
+          ["<M-r>"] = "actions.refresh",
           ["-"] = { "actions.parent", mode = "n" },
           ["_"] = { "actions.open_cwd", mode = "n" },
           ["`"] = { "actions.cd", mode = "n" },
           ["~"] = { "actions.cd", opts = { scope = "tab" }, mode = "n" },
-          ["g."] = { "actions.toggle_hidden", mode = "n" },
-          ["g\\"] = { "actions.toggle_trash", mode = "n" },
+          ["<M-.>"] = { "actions.toggle_hidden", mode = "n" },
         },
       })
       vim.keymap.set("n", "-", "<Cmd>Oil<CR>", {
@@ -185,10 +196,10 @@ require("packer").startup(function(use)
     config = function()
       local harpoon = require("harpoon")
       harpoon:setup()
-      vim.keymap.set("n", "<C-m>", function()
+      vim.keymap.set("n", "M", function()
         harpoon:list():add()
       end)
-      vim.keymap.set("n", "<C-l>", function()
+      vim.keymap.set("n", "H", function()
         harpoon.ui:toggle_quick_menu(harpoon:list())
       end)
 
@@ -207,12 +218,6 @@ require("packer").startup(function(use)
     config = function()
       local fzf = require("fzf-lua")
       fzf.setup({
-        winopts = {
-          preview = {
-            layout = "vertical",
-          },
-        },
-        files = { cwd_prompt = false },
       })
 
       -- File/buffer/glob fuzzy search.
@@ -225,9 +230,9 @@ require("packer").startup(function(use)
       vim.keymap.set("n", "gd", fzf.lsp_definitions)
       vim.keymap.set("n", "gi", fzf.lsp_implementations)
       vim.keymap.set("n", "gr", fzf.lsp_references)
+      vim.keymap.set("n", "<M-d>", vim.diagnostic.open_float)
       vim.keymap.set("n", "<M-CR>", fzf.lsp_code_actions)
-      vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help)
-      vim.keymap.set("n", "g?", vim.diagnostic.open_float)
+      vim.keymap.set("i", "<M-k>", vim.lsp.buf.signature_help)
       vim.keymap.set("n", "<M-r>", vim.lsp.buf.rename)
     end,
   })
@@ -366,6 +371,17 @@ require("packer").startup(function(use)
 
   -- Rust LSP enhancement.
   use("mrcjkb/rustaceanvim")
+
+  -- Show LSP progress in the echo area.
+  use({
+    "deathbeam/lspecho.nvim",
+    config = function()
+      require("lspecho").setup({
+        echo = true,
+        delay = 3000,
+      })
+    end,
+  })
 
   -- Syntax highlighting based off of treesitter, a generic parser generator tool that supports a variety
   -- of programming languages.
