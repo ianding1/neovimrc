@@ -54,7 +54,7 @@ vim.o.wrap = false
 vim.o.clipboard = "unnamedplus"
 
 -- Enable linematch in diff mode (added in Neovim 0.9)
-vim.opt.diffopt = vim.opt.diffopt + "linematch:60"
+vim.opt.diffopt = vim.opt.diffopt + "linematch:60" + "context:999"
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <C-v><Esc>.
@@ -85,11 +85,6 @@ end
 -- Make sure packer.nvim has been installed.
 local packer_bootstrap = ensure_packer()
 
-local keymap_opts = {
-  noremap = true,
-  silent = true,
-}
-
 -- Plugin list.
 require("packer").startup(function(use)
   -- The package manager itself.
@@ -105,26 +100,81 @@ require("packer").startup(function(use)
     end,
   })
 
+  -- Status line.
+  use({
+    "nvim-lualine/lualine.nvim",
+    config = function()
+      local symbols = {
+        modified = "",
+        readonly = "󰌾",
+        unnamed = "[No Name]",
+        newfile = "",
+      }
+
+      require("lualine").setup({
+        tabline = {
+          lualine_a = { "mode" },
+          lualine_b = { "branch", "diff", "diagnostics" },
+          lualine_c = { { "tabs", mode = 2, show_modified_status = false } },
+          lualine_x = { "encoding", "fileformat", "filetype" },
+          lualine_y = { "progress" },
+          lualine_z = { "location" },
+        },
+        sections = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = { { "filename", path = 1, symbols = symbols } },
+          lualine_x = {},
+          lualine_y = {},
+          lualine_z = {},
+        },
+        inactive_sections = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = { { "filename", path = 1, symbols = symbols } },
+          lualine_x = {},
+          lualine_y = {},
+          lualine_z = {},
+        },
+      })
+    end,
+  })
+
   -- Undotree UI. Visualize the undo history as a tree.
   use({
     "mbbill/undotree",
     config = function()
-      vim.keymap.set("n", "<space>u", "<Cmd>UndotreeToggle<CR>", keymap_opts)
+      vim.keymap.set("n", "U", "<Cmd>UndotreeToggle<CR>", {
+        desc = "Toggle Undo tree",
+      })
     end,
   })
 
   -- File manager.
   use({
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
-    requires = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "MunifTanjim/nui.nvim",
-    },
+    "stevearc/oil.nvim",
     config = function()
-      require("neo-tree").setup()
-      vim.keymap.set("n", "<space>j", "<Cmd>Neotree toggle filesystem<CR>", keymap_opts)
+      require("oil").setup({
+        keymaps = {
+          ["g?"] = { "actions.show_help", mode = "n" },
+          ["<CR>"] = "actions.select",
+          ["<C-v>"] = { "actions.select", opts = { vertical = true } },
+          ["<C-s>"] = { "actions.select", opts = { horizontal = true } },
+          ["<C-t>"] = { "actions.select", opts = { tab = true } },
+          ["<C-p>"] = "actions.preview",
+          ["<C-c>"] = { "actions.close", mode = "n" },
+          ["<C-l>"] = "actions.refresh",
+          ["-"] = { "actions.parent", mode = "n" },
+          ["_"] = { "actions.open_cwd", mode = "n" },
+          ["`"] = { "actions.cd", mode = "n" },
+          ["~"] = { "actions.cd", opts = { scope = "tab" }, mode = "n" },
+          ["g."] = { "actions.toggle_hidden", mode = "n" },
+          ["g\\"] = { "actions.toggle_trash", mode = "n" },
+        },
+      })
+      vim.keymap.set("n", "-", "<Cmd>Oil<CR>", {
+        desc = "Open parent directory",
+      })
     end,
   })
 
@@ -132,19 +182,18 @@ require("packer").startup(function(use)
   use({
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
-    requires = { { "nvim-lua/plenary.nvim" } },
     config = function()
       local harpoon = require("harpoon")
       harpoon:setup()
-      vim.keymap.set("n", "<space>'", function()
+      vim.keymap.set("n", "<C-m>", function()
         harpoon:list():add()
       end)
-      vim.keymap.set("n", "<space>;", function()
+      vim.keymap.set("n", "<C-l>", function()
         harpoon.ui:toggle_quick_menu(harpoon:list())
       end)
 
       for i = 1, 5 do
-        vim.keymap.set("n", "<space>" .. i, function()
+        vim.keymap.set("n", "]" .. i, function()
           harpoon:list():select(i)
         end)
       end
@@ -167,21 +216,19 @@ require("packer").startup(function(use)
       })
 
       -- File/buffer/glob fuzzy search.
-      -- Uses home row keys s/d/f.
-      vim.keymap.set("n", "<space>f", fzf.files)
-      vim.keymap.set("n", "<space>d", fzf.buffers)
-      vim.keymap.set("n", "<space>s", fzf.live_grep_glob)
-      vim.keymap.set("n", "<space>k", fzf.lsp_document_symbols)
+      vim.keymap.set("n", "<C-f>", fzf.files)
+      vim.keymap.set("n", "<C-b>", fzf.buffers)
+      vim.keymap.set("n", "<C-s>", fzf.live_grep_glob)
 
       -- Bind LSP actions to FZF.
       vim.keymap.set("n", "gD", fzf.lsp_typedefs)
       vim.keymap.set("n", "gd", fzf.lsp_definitions)
       vim.keymap.set("n", "gi", fzf.lsp_implementations)
       vim.keymap.set("n", "gr", fzf.lsp_references)
-      vim.keymap.set("n", "gf", fzf.lsp_code_actions)
+      vim.keymap.set("n", "<M-CR>", fzf.lsp_code_actions)
       vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help)
-      vim.keymap.set("n", "<space>e", vim.diagnostic.open_float)
-      vim.keymap.set("n", "<space>r", vim.lsp.buf.rename)
+      vim.keymap.set("n", "g?", vim.diagnostic.open_float)
+      vim.keymap.set("n", "<M-r>", vim.lsp.buf.rename)
     end,
   })
 
@@ -379,7 +426,9 @@ require("packer").startup(function(use)
   use({
     "sindrets/diffview.nvim",
     config = function()
-      vim.keymap.set("n", "<space>g", "<Cmd>DiffviewOpen<CR>", keymap_opts)
+      vim.keymap.set("n", "<C-g>", "<Cmd>DiffviewOpen<CR>", {
+        desc = "Show Git diff view",
+      })
     end,
   })
 
