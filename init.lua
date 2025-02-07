@@ -376,7 +376,21 @@ require("packer").startup(function(use)
   use {
     'linrongbin16/lsp-progress.nvim',
     config = function()
-      require('lsp-progress').setup()
+      local api = require("lsp-progress.api")
+      require('lsp-progress').setup({
+        format = function(client_messages)
+          local ready_sign = " lsp"
+          local busy_sign = "󰔚 lsp"
+          if #client_messages > 0 then
+              return busy_sign .. " " .. table.concat(client_messages, " ")
+          end
+          if #api.lsp_clients() > 0 then
+              return ready_sign
+          end
+          return ""
+      end,
+      })
+
       vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
       vim.api.nvim_create_autocmd("User", {
         group = "lualine_augroup",
