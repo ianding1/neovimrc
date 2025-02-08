@@ -262,60 +262,112 @@ require("packer").startup(function(use)
 
   -- LSP.
   use("hrsh7th/cmp-nvim-lsp")
+  use("hrsh7th/cmp-buffer")
+  use("hrsh7th/cmp-path")
+  use("hrsh7th/cmp-cmdline")
+  use("L3MON4D3/LuaSnip")
+  use("saadparwaiz1/cmp_luasnip")
   use({
     "hrsh7th/nvim-cmp",
     config = function()
       local cmp = require("cmp")
       local luasnip = require("luasnip")
-      local lspkind = require("lspkind")
+
       cmp.setup({
+        completion = {
+          completeopt = "menu,menuone,noinsert",
+        },
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
           end,
         },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-u>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-d>"] = cmp.mapping.scroll_docs(4),
-          ["<C-c>"] = cmp.mapping.abort(),
-          ["<CR>"] = cmp.mapping.confirm({ select = true }),
-          -- Bind <Tab> to selecting the next candidate.
+        mapping = {
+          ["<C-y>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
+          ["<C-e>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
+          ["<C-n>"] = cmp.mapping(function()
+            if cmp.visible() then
+              cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
+            else
+              cmp.complete()
+            end
+          end, { "i", "c" }),
+          ["<C-p>"] = cmp.mapping(function()
+            if cmp.visible() then
+              cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
+            else
+              cmp.complete()
+            end
+          end, { "i", "c" }),
           ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
+              cmp.confirm({ select = true })
+            elseif luasnip.locally_jumpable(1) then
+              luasnip.jump(1)
             else
               fallback()
             end
-          end, { "i", "s" }),
-          -- Bind <Super-Tab> to selecting the previous candidate.
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-        }),
+          end, { "i", "c" }),
+          ["<C-c>"] = cmp.mapping(cmp.mapping.abort(), { "i", "c" }),
+        },
+        window = {
+          completion = {
+            col_offset = -2,
+            side_padding = 1,
+          },
+        },
         formatting = {
-          format = lspkind.cmp_format({
-            mode = "symbol",
-            maxwidth = 50,
-            ellipsis_char = "...",
-          }),
+          fields = { "kind", "abbr", "menu" },
+          format = require("lspkind").cmp_format({ mode = "symbol", maxwidth = 50, ellipsis_char = "..." }),
         },
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
+          { name = "luasnip" },
+        }, {
+          { name = "buffer" },
         }),
+      })
+
+      cmp.setup.cmdline({ "/", "?" }, {
+        window = {
+          completion = {
+            col_offset = -1,
+            side_padding = 1,
+          },
+        },
+        formatting = {
+          fields = { "abbr", "menu" },
+          format = require("lspkind").cmp_format({ maxwidth = 50, ellipsis_char = "..." }),
+        },
+        sources = {
+          { name = "buffer" },
+        },
+      })
+
+      cmp.setup.cmdline(":", {
+        window = {
+          completion = {
+            col_offset = -1,
+            side_padding = 1,
+          },
+        },
+        sources = cmp.config.sources({
+          { name = "path" },
+        }, {
+          { name = "cmdline" },
+        }),
+        matching = { disallow_symbol_nonprefix_matching = false },
       })
     end,
   })
-  use("saadparwaiz1/cmp_luasnip")
-  use("onsails/lspkind.nvim")
-  use("L3MON4D3/LuaSnip")
+  use({
+    "onsails/lspkind.nvim",
+    config = function()
+      require("lspkind").setup({
+        preset = "codicons",
+      })
+    end,
+  })
 
   use("williamboman/mason.nvim")
   use("williamboman/mason-lspconfig.nvim")
