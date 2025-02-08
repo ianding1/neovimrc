@@ -68,16 +68,16 @@ vim.fn.sign_define("DiagnosticSignInfo", { text = " ", texthl = "DiagnosticSi
 vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵 ", texthl = "DiagnosticSignHint" })
 
 -- Window and tab key bindings.
-for _, dir in pairs({'h', 'j', 'k', 'l'}) do
+for _, dir in pairs({ "h", "j", "k", "l" }) do
   vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir, { silent = true, noremap = true })
 end
 
 vim.keymap.set("n", "<C-t>", "<Cmd>tabnew<CR>", { silent = true, noremap = true })
-vim.keymap.set("n", "tc", "<Cmd>tabclose<CR>", { silent = true, noremap = true })
+vim.keymap.set("n", "<C-x>", "<Cmd>tabclose<CR>", { silent = true, noremap = true })
 
-for i = 1, 5 do
-  vim.keymap.set("n", "t" .. i, "<Cmd>" .. i .. "tabnext<CR>", { silent = true, noremap = true })
-end
+-- Remap + and _ to ctrl-a and ctrl-x to allow us to map the tmux prefix key to ctrl-a.
+vim.keymap.set({ "n", "v" }, "+", "<C-a>", { silent = true, noremap = true })
+vim.keymap.set({ "n", "v" }, "_", "<C-x>", { silent = true, noremap = true })
 
 -- Plugin configuration.
 
@@ -127,8 +127,12 @@ require("packer").startup(function(use)
         tabline = {
           lualine_a = { "mode" },
           lualine_b = { "branch", "diff", "diagnostics" },
-          lualine_c = { { "tabs", mode = 2, show_modified_status = false }, },
-          lualine_x = { function() return require('lsp-progress').progress() end, },
+          lualine_c = { { "tabs", mode = 2, show_modified_status = false } },
+          lualine_x = {
+            function()
+              return require("lsp-progress").progress()
+            end,
+          },
           lualine_y = { "encoding", "fileformat", "filetype" },
           lualine_z = { "progress", "location" },
         },
@@ -217,8 +221,7 @@ require("packer").startup(function(use)
     requires = { { "junegunn/fzf", run = "./install --bin" } },
     config = function()
       local fzf = require("fzf-lua")
-      fzf.setup({
-      })
+      fzf.setup({})
 
       -- File/buffer/glob fuzzy search.
       vim.keymap.set("n", "<C-f>", fzf.files)
@@ -230,9 +233,9 @@ require("packer").startup(function(use)
       vim.keymap.set("n", "gd", fzf.lsp_definitions)
       vim.keymap.set("n", "gi", fzf.lsp_implementations)
       vim.keymap.set("n", "gr", fzf.lsp_references)
+      vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help)
       vim.keymap.set("n", "<M-d>", vim.diagnostic.open_float)
       vim.keymap.set("n", "<M-CR>", fzf.lsp_code_actions)
-      vim.keymap.set("i", "<M-k>", vim.lsp.buf.signature_help)
       vim.keymap.set("n", "<M-r>", vim.lsp.buf.rename)
     end,
   })
@@ -373,22 +376,22 @@ require("packer").startup(function(use)
   use("mrcjkb/rustaceanvim")
 
   -- Show LSP progress on lualine.
-  use {
-    'linrongbin16/lsp-progress.nvim',
+  use({
+    "linrongbin16/lsp-progress.nvim",
     config = function()
       local api = require("lsp-progress.api")
-      require('lsp-progress').setup({
+      require("lsp-progress").setup({
         format = function(client_messages)
           local ready_sign = " lsp"
           local busy_sign = "󰔚 lsp"
           if #client_messages > 0 then
-              return busy_sign .. " " .. table.concat(client_messages, " ")
+            return busy_sign .. " " .. table.concat(client_messages, " ")
           end
           if #api.lsp_clients() > 0 then
-              return ready_sign
+            return ready_sign
           end
           return ""
-      end,
+        end,
       })
 
       vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
@@ -397,8 +400,8 @@ require("packer").startup(function(use)
         pattern = "LspProgressStatusUpdated",
         callback = require("lualine").refresh,
       })
-    end
-  }
+    end,
+  })
 
   -- Syntax highlighting based off of treesitter, a generic parser generator tool that supports a variety
   -- of programming languages.
