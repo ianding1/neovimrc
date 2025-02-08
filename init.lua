@@ -79,6 +79,10 @@ vim.keymap.set("n", "<C-x>", "<Cmd>tabclose<CR>", { silent = true, noremap = tru
 vim.keymap.set({ "n", "v" }, "+", "<C-a>", { silent = true, noremap = true })
 vim.keymap.set({ "n", "v" }, "_", "<C-x>", { silent = true, noremap = true })
 
+-- Use [q and ]q to navigate in the quickfix list.
+vim.keymap.set("n", "]q", "<Cmd>cnext<CR>", { silent = true, noremap = true })
+vim.keymap.set("n", "[q", "<Cmd>cprevious<CR>", { silent = true, noremap = true })
+
 -- Plugin configuration.
 
 -- ensure_packer is a function that installs packer.nvim for you if it has not
@@ -176,15 +180,15 @@ require("packer").startup(function(use)
           ["<C-v>"] = { "actions.select", opts = { vertical = true } },
           ["<C-s>"] = { "actions.select", opts = { horizontal = true } },
           ["<C-t>"] = { "actions.select", opts = { tab = true } },
-          ["<C-p>"] = "actions.preview",
           ["<C-c>"] = { "actions.close", mode = "n" },
           ["<M-k>"] = { "actions.show_help", mode = "n" },
+          ["<M-p>"] = "actions.preview",
           ["<M-r>"] = "actions.refresh",
           ["-"] = { "actions.parent", mode = "n" },
           ["_"] = { "actions.open_cwd", mode = "n" },
           ["`"] = { "actions.cd", mode = "n" },
           ["~"] = { "actions.cd", opts = { scope = "tab" }, mode = "n" },
-          ["<M-.>"] = { "actions.toggle_hidden", mode = "n" },
+          ["<M-h>"] = { "actions.toggle_hidden", mode = "n" },
         },
       })
       vim.keymap.set("n", "-", "<Cmd>Oil<CR>", {
@@ -221,7 +225,48 @@ require("packer").startup(function(use)
     requires = { { "junegunn/fzf", run = "./install --bin" } },
     config = function()
       local fzf = require("fzf-lua")
-      fzf.setup({})
+
+      fzf.setup({
+        winopts = {
+          preview = {
+            layout = "vertical",
+          },
+        },
+        files = {
+          cwd_prompt = false,
+        },
+        keymap = {
+          builtin = {
+            ["<M-Esc>"] = "hide",
+            ["<M-k>"] = "toggle-help",
+            ["<M-p>"] = "toggle-preview",
+            ["<M-d>"] = "preview-page-down",
+            ["<M-u>"] = "preview-page-up",
+            ["<M-e>"] = "preview-down",
+            ["<M-y>"] = "preview-up",
+          },
+          fzf = {
+            ["ctrl-d"] = "half-page-down",
+            ["ctrl-u"] = "half-page-up",
+            ["ctrl-a"] = "beginning-of-line",
+            ["ctrl-e"] = "end-of-line",
+            ["alt-a"] = "toggle-all",
+            ["alt-g"] = "first",
+            ["alt-G"] = "last",
+          },
+        },
+        actions = {
+          files = {
+            ["enter"] = fzf.actions.file_edit_or_qf,
+            ["ctrl-s"] = fzf.actions.file_split,
+            ["ctrl-v"] = fzf.actions.file_vsplit,
+            ["ctrl-t"] = fzf.actions.file_tabedit,
+            ["alt-i"] = fzf.actions.toggle_ignore,
+            ["alt-h"] = fzf.actions.toggle_hidden,
+            ["alt-f"] = fzf.actions.toggle_follow,
+          },
+        },
+      })
 
       -- File/buffer/glob fuzzy search.
       vim.keymap.set("n", "<C-f>", fzf.files)
