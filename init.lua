@@ -174,13 +174,15 @@ require("packer").startup(function(use)
   use({
     "stevearc/oil.nvim",
     config = function()
-      require("oil").setup({
+      local oil = require("oil")
+      oil.setup({
         keymaps = {
           ["<CR>"] = "actions.select",
           ["<C-v>"] = { "actions.select", opts = { vertical = true } },
           ["<C-s>"] = { "actions.select", opts = { horizontal = true } },
           ["<C-t>"] = { "actions.select", opts = { tab = true } },
           ["<C-c>"] = { "actions.close", mode = "n" },
+          ["<Esc>"] = { "actions.close", mode = "n" },
           ["<M-k>"] = { "actions.show_help", mode = "n" },
           ["<M-p>"] = "actions.preview",
           ["<M-r>"] = "actions.refresh",
@@ -190,8 +192,17 @@ require("packer").startup(function(use)
           ["~"] = { "actions.cd", opts = { scope = "tab" }, mode = "n" },
           ["<M-h>"] = { "actions.toggle_hidden", mode = "n" },
         },
+        view_options = {
+          show_hidden = true,
+        },
+        float = {
+          max_width = 0.80,
+          max_height = 0.85,
+        },
       })
-      vim.keymap.set("n", "-", "<Cmd>Oil<CR>", {
+      vim.keymap.set("n", "-", function()
+        oil.open_float(".")
+      end, {
         desc = "Open parent directory",
       })
     end,
