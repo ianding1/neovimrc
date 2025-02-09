@@ -278,10 +278,9 @@ require("packer").startup(function(use)
       vim.keymap.set("n", "gd", fzf.lsp_definitions)
       vim.keymap.set("n", "gi", fzf.lsp_implementations)
       vim.keymap.set("n", "gr", fzf.lsp_references)
-      vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help)
       vim.keymap.set("n", "<M-d>", vim.diagnostic.open_float)
-      vim.keymap.set("n", "<M-CR>", fzf.lsp_code_actions)
-      vim.keymap.set("n", "<M-r>", vim.lsp.buf.rename)
+      vim.keymap.set({ "n", "i" }, "<M-CR>", fzf.lsp_code_actions)
+      vim.keymap.set({ "n", "i" }, "<M-r>", vim.lsp.buf.rename)
     end,
   })
 
@@ -310,13 +309,13 @@ require("packer").startup(function(use)
   use("hrsh7th/cmp-buffer")
   use("hrsh7th/cmp-path")
   use("hrsh7th/cmp-cmdline")
-  use("L3MON4D3/LuaSnip")
-  use("saadparwaiz1/cmp_luasnip")
+  use("hrsh7th/cmp-nvim-lsp-signature-help")
+  use("dcampos/nvim-snippy")
   use({
     "hrsh7th/nvim-cmp",
     config = function()
       local cmp = require("cmp")
-      local luasnip = require("luasnip")
+      local snippy = require("snippy")
 
       cmp.setup({
         completion = {
@@ -324,20 +323,20 @@ require("packer").startup(function(use)
         },
         snippet = {
           expand = function(args)
-            luasnip.lsp_expand(args.body)
+            snippy.expand_snippet(args.body)
           end,
         },
         mapping = {
           ["<C-y>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
           ["<C-e>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
-          ["<C-n>"] = cmp.mapping(function()
+          ["<C-j>"] = cmp.mapping(function()
             if cmp.visible() then
               cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
             else
               cmp.complete()
             end
           end, { "i", "c" }),
-          ["<C-p>"] = cmp.mapping(function()
+          ["<C-k>"] = cmp.mapping(function()
             if cmp.visible() then
               cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
             else
@@ -347,8 +346,8 @@ require("packer").startup(function(use)
           ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.confirm({ select = true })
-            elseif luasnip.locally_jumpable(1) then
-              luasnip.jump(1)
+            elseif snippy.can_jump(1) then
+              snippy.next()
             else
               fallback()
             end
@@ -367,7 +366,7 @@ require("packer").startup(function(use)
         },
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
-          { name = "luasnip" },
+          { name = "nvim_lsp_signature_help" },
         }, {
           { name = "buffer" },
         }),
