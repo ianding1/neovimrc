@@ -300,13 +300,12 @@ require("packer").startup(function(use)
     config = function()
       require("blink.cmp").setup({
         keymap = { preset = "super-tab" },
-        appearance = {
-          use_nvim_cmp_as_default = true,
-          nerd_font_variant = "mono",
+        appearance = { use_nvim_cmp_as_default = true },
+        completion = {
+          documentation = { auto_show = true, auto_show_delay_ms = 500 },
+          trigger = { show_in_snippet = false },
         },
-        sources = {
-          default = { "lsp", "path", "buffer" },
-        },
+        signature = { enabled = true },
       })
     end,
   })
