@@ -296,7 +296,7 @@ require("packer").startup(function(use)
   -- LSP.
   use({
     "saghen/blink.cmp",
-    tag = "v0.11.0",
+    run = "cargo build --release",
     config = function()
       require("blink.cmp").setup({
         keymap = { preset = "super-tab" },
