@@ -294,110 +294,19 @@ require("packer").startup(function(use)
   use("tpope/vim-rsi")
 
   -- LSP.
-  use("hrsh7th/cmp-nvim-lsp")
-  use("hrsh7th/cmp-buffer")
-  use("hrsh7th/cmp-path")
-  use("hrsh7th/cmp-cmdline")
-  use("hrsh7th/cmp-nvim-lsp-signature-help")
-  use("dcampos/nvim-snippy")
   use({
-    "hrsh7th/nvim-cmp",
+    "saghen/blink.cmp",
+    tag = "v0.11.0",
     config = function()
-      local cmp = require("cmp")
-      local snippy = require("snippy")
-
-      cmp.setup({
-        completion = {
-          completeopt = "menu,menuone,noinsert",
-        },
-        snippet = {
-          expand = function(args)
-            snippy.expand_snippet(args.body)
-          end,
-        },
-        mapping = {
-          ["<C-y>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
-          ["<C-e>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
-          ["<C-j>"] = cmp.mapping(function()
-            if cmp.visible() then
-              cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
-            else
-              cmp.complete()
-            end
-          end, { "i", "c" }),
-          ["<C-k>"] = cmp.mapping(function()
-            if cmp.visible() then
-              cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
-            else
-              cmp.complete()
-            end
-          end, { "i", "c" }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.confirm({ select = true })
-            elseif snippy.can_jump(1) then
-              snippy.next()
-            else
-              fallback()
-            end
-          end, { "i", "c" }),
-          ["<C-c>"] = cmp.mapping(cmp.mapping.abort(), { "i", "c" }),
-        },
-        window = {
-          completion = {
-            col_offset = -2,
-            side_padding = 1,
-          },
-        },
-        formatting = {
-          fields = { "kind", "abbr", "menu" },
-          format = require("lspkind").cmp_format({ mode = "symbol", maxwidth = 50, ellipsis_char = "..." }),
-        },
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "nvim_lsp_signature_help" },
-        }, {
-          { name = "buffer" },
-        }),
-      })
-
-      cmp.setup.cmdline({ "/", "?" }, {
-        window = {
-          completion = {
-            col_offset = -1,
-            side_padding = 1,
-          },
-        },
-        formatting = {
-          fields = { "abbr", "menu" },
-          format = require("lspkind").cmp_format({ maxwidth = 50, ellipsis_char = "..." }),
+      require("blink.cmp").setup({
+        keymap = { preset = "super-tab" },
+        appearance = {
+          use_nvim_cmp_as_default = true,
+          nerd_font_variant = "mono",
         },
         sources = {
-          { name = "buffer" },
+          default = { "lsp", "path", "buffer" },
         },
-      })
-
-      cmp.setup.cmdline(":", {
-        window = {
-          completion = {
-            col_offset = -1,
-            side_padding = 1,
-          },
-        },
-        sources = cmp.config.sources({
-          { name = "path" },
-        }, {
-          { name = "cmdline" },
-        }),
-        matching = { disallow_symbol_nonprefix_matching = false },
-      })
-    end,
-  })
-  use({
-    "onsails/lspkind.nvim",
-    config = function()
-      require("lspkind").setup({
-        preset = "codicons",
       })
     end,
   })
@@ -416,11 +325,7 @@ require("packer").startup(function(use)
         automatic_installation = false,
       })
 
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      capabilities.textDocument.foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true,
-      }
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- Automatically set up LSP servers installed via mason.
       mason_lspconfig.setup_handlers({
