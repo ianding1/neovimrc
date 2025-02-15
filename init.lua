@@ -222,8 +222,8 @@ require("packer").startup(function(use)
             ["<C-b>"] = "preview-page-up",
           },
           fzf = {
-            ["ctrl-f"] = "half-page-down",
-            ["ctrl-b"] = "half-page-up",
+            ["ctrl-d"] = "half-page-down",
+            ["ctrl-u"] = "half-page-up",
             ["ctrl-a"] = "beginning-of-line",
             ["ctrl-e"] = "end-of-line",
             ["alt-a"] = "toggle-all",
