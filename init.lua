@@ -31,14 +31,14 @@ vim.o.number = true
 vim.o.signcolumn = "yes"
 
 -- Hide intro at Vim startup.
-vim.o.shortmess = vim.o.shortmess .. "I"
+vim.opt.shortmess:append("I")
 
 -- Split below and right.
 vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.o.fillchars = "diff: "
+vim.opt.fillchars = { diff = " " }
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
@@ -54,12 +54,13 @@ vim.o.wrap = false
 vim.o.clipboard = "unnamedplus"
 
 -- Enable linematch in diff mode (added in Neovim 0.9)
-vim.opt.diffopt = vim.opt.diffopt + "linematch:60" + "context:999"
+vim.opt.diffopt:append("linematch:60")
+vim.opt.diffopt:append("context:999")
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
--- To send <Esc> to the terminal, press <C-v><Esc>.
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
-vim.keymap.set("t", "<C-v><Esc>", "<Esc>", { silent = true, noremap = true })
+-- To send <Esc> to the terminal, press <M-Esc>.
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
+vim.keymap.set("t", "<M-Esc>", "<Esc>")
 
 -- Set up diagnostic sign icons.
 vim.fn.sign_define("DiagnosticSignError", { text = " ", texthl = "DiagnosticSignError" })
@@ -68,20 +69,17 @@ vim.fn.sign_define("DiagnosticSignInfo", { text = " ", texthl = "DiagnosticSi
 vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵 ", texthl = "DiagnosticSignHint" })
 
 -- Window and tab key bindings.
-for _, dir in pairs({ "h", "j", "k", "l" }) do
-  vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir, { silent = true, noremap = true })
+for _, dir in ipairs({ "h", "j", "k", "l" }) do
+  vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir)
 end
 
-vim.keymap.set("n", "<C-t>", "<Cmd>tabnew<CR>", { silent = true, noremap = true })
-vim.keymap.set("n", "<C-x>", "<Cmd>tabclose<CR>", { silent = true, noremap = true })
+-- Key bindings to open and close tabpages.
+vim.keymap.set("n", "<C-t>", "<Cmd>tabnew<CR>")
+vim.keymap.set("n", "<C-x>", "<Cmd>tabclose<CR>")
 
--- Remap + and _ to ctrl-a and ctrl-x to allow us to map the tmux prefix key to ctrl-a.
-vim.keymap.set({ "n", "v" }, "+", "<C-a>", { silent = true, noremap = true })
-vim.keymap.set({ "n", "v" }, "_", "<C-x>", { silent = true, noremap = true })
-
--- Use [q and ]q to navigate in the quickfix list.
-vim.keymap.set("n", "]q", "<Cmd>cnext<CR>", { silent = true, noremap = true })
-vim.keymap.set("n", "[q", "<Cmd>cprevious<CR>", { silent = true, noremap = true })
+-- Quickfix navigation.
+vim.keymap.set("n", "]q", "<Cmd>cnext<CR>")
+vim.keymap.set("n", "[q", "<Cmd>cprevious<CR>")
 
 -- Plugin configuration.
 
