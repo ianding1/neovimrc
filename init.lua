@@ -164,9 +164,7 @@ require("packer").startup(function(use)
   use({
     "mbbill/undotree",
     config = function()
-      vim.keymap.set("n", "U", "<Cmd>UndotreeToggle<CR>", {
-        desc = "Toggle Undo tree",
-      })
+      vim.keymap.set("n", "U", "<Cmd>UndotreeToggle<CR>")
     end,
   })
 
@@ -183,13 +181,9 @@ require("packer").startup(function(use)
           ["<C-t>"] = { "actions.select", opts = { tab = true } },
           ["<C-c>"] = { "actions.close", mode = "n" },
           ["<Esc>"] = { "actions.close", mode = "n" },
-          ["<M-k>"] = { "actions.show_help", mode = "n" },
-          ["<M-p>"] = "actions.preview",
-          ["<M-r>"] = "actions.refresh",
+          ["g?"] = { "actions.show_help", mode = "n" },
           ["-"] = { "actions.parent", mode = "n" },
           ["_"] = { "actions.open_cwd", mode = "n" },
-          ["`"] = { "actions.cd", mode = "n" },
-          ["~"] = { "actions.cd", opts = { scope = "tab" }, mode = "n" },
           ["<M-h>"] = { "actions.toggle_hidden", mode = "n" },
         },
         view_options = {
@@ -202,9 +196,7 @@ require("packer").startup(function(use)
       })
       vim.keymap.set("n", "-", function()
         oil.open_float(".")
-      end, {
-        desc = "Open parent directory",
-      })
+      end)
     end,
   })
 
@@ -226,22 +218,15 @@ require("packer").startup(function(use)
         },
         keymap = {
           builtin = {
-            ["<M-Esc>"] = "hide",
-            ["<M-k>"] = "toggle-help",
-            ["<M-p>"] = "toggle-preview",
-            ["<M-d>"] = "preview-page-down",
-            ["<M-u>"] = "preview-page-up",
-            ["<M-e>"] = "preview-down",
-            ["<M-y>"] = "preview-up",
+            ["<C-f>"] = "preview-page-down",
+            ["<C-b>"] = "preview-page-up",
           },
           fzf = {
-            ["ctrl-d"] = "half-page-down",
-            ["ctrl-u"] = "half-page-up",
+            ["ctrl-f"] = "half-page-down",
+            ["ctrl-b"] = "half-page-up",
             ["ctrl-a"] = "beginning-of-line",
             ["ctrl-e"] = "end-of-line",
             ["alt-a"] = "toggle-all",
-            ["alt-g"] = "first",
-            ["alt-G"] = "last",
           },
         },
         actions = {
@@ -260,16 +245,17 @@ require("packer").startup(function(use)
       -- File/buffer/glob fuzzy search.
       vim.keymap.set("n", "<C-f>", fzf.files)
       vim.keymap.set("n", "<C-b>", fzf.buffers)
-      vim.keymap.set("n", "<C-s>", fzf.live_grep_glob)
+      vim.keymap.set("n", "<C-g>", fzf.live_grep_glob)
 
       -- Bind LSP actions to FZF.
-      vim.keymap.set("n", "gD", fzf.lsp_typedefs)
       vim.keymap.set("n", "gd", fzf.lsp_definitions)
-      vim.keymap.set("n", "gi", fzf.lsp_implementations)
       vim.keymap.set("n", "gr", fzf.lsp_references)
+      vim.keymap.set("n", "gI", fzf.lsp_implementations)
+      vim.keymap.set("n", "gy", fzf.lsp_typedefs)
+      vim.keymap.set("n", "gD", fzf.lsp_declarations)
       vim.keymap.set("n", "<M-d>", vim.diagnostic.open_float)
       vim.keymap.set({ "n", "i" }, "<M-CR>", fzf.lsp_code_actions)
-      vim.keymap.set({ "n", "i" }, "<M-r>", vim.lsp.buf.rename)
+      vim.keymap.set({ "n", "i" }, "gR", vim.lsp.buf.rename)
     end,
   })
 
@@ -450,9 +436,8 @@ require("packer").startup(function(use)
   use({
     "sindrets/diffview.nvim",
     config = function()
-      vim.keymap.set("n", "<C-g>", "<Cmd>DiffviewOpen<CR>", {
-        desc = "Show Git diff view",
-      })
+      vim.keymap.set("n", "<space>gs", "<Cmd>DiffviewOpen<CR>")
+      vim.keymap.set("n", "<space>gh", "<Cmd>DiffviewFileHistory<CR>")
     end,
   })
 
