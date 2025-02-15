@@ -96,16 +96,19 @@ for _, dir in ipairs({ "h", "j", "k", "l" }) do
 end
 
 -- Key bindings to open and close tabpages.
-vim.keymap.set("n", "<C-t>", "<Cmd>tabnew<CR>")
-vim.keymap.set("n", "<C-x>", "<Cmd>tabclose<CR>")
+vim.keymap.set("n", "<C-t>", "<cmd>tabnew<cr>")
+vim.keymap.set("n", "<C-x>", "<cmd>tabclose<cr>")
 
 -- Quickfix navigation.
-vim.keymap.set("n", "]q", "<Cmd>cnext<CR>")
-vim.keymap.set("n", "[q", "<Cmd>cprevious<CR>")
+vim.keymap.set("n", "]q", "<cmd>cnext<cr>")
+vim.keymap.set("n", "[q", "<cmd>cprevious<cr>")
 
 -- LSP key bindings.
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
 vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename)
+
+-- Lazy.nvim UI.
+vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
 
 require("lazy").setup({
   spec = {
@@ -222,7 +225,6 @@ require("lazy").setup({
         { "gI",     "<cmd>FzfLua lsp_implementations<cr>" },
         { "gy",     "<cmd>FzfLua lsp_typedefs<cr>" },
         { "gD",     "<cmd>FzfLua lsp_declarations<cr>" },
-        { "gD",     "<cmd>FzfLua lsp_declarations<cr>" },
         { "<M-cr>", "<cmd>FzfLua lsp_code_actions<cr>" },
       },
       opts = function()
@@ -304,7 +306,7 @@ require("lazy").setup({
     {
       "williamboman/mason.nvim",
       keys = {
-        { "<leader>cm", "<cmd>Mason<cr>" },
+        { "<leader>m", "<cmd>Mason<cr>" },
       },
       build = ":MasonUpdate",
       opts = {},
@@ -446,8 +448,8 @@ require("lazy").setup({
     {
       "sindrets/diffview.nvim",
       keys = {
-        { "<space>gs", "<Cmd>DiffviewOpen<CR>" },
-        { "<space>gh", "<Cmd>DiffviewFileHistory<CR>" },
+        { "<space>gs", "<cmd>DiffviewOpen<cr>" },
+        { "<space>gh", "<cmd>DiffviewFileHistory<cr>" },
       },
     },
     {
