@@ -6,7 +6,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out,                            "WarningMsg" },
+      { out, "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
     vim.fn.getchar()
@@ -60,7 +60,7 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = " " }
+vim.opt.fillchars = { diff = "╱" }
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
@@ -85,10 +85,16 @@ vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 vim.keymap.set("t", "<M-Esc>", "<Esc>")
 
 -- Set up diagnostic sign icons.
-vim.fn.sign_define("DiagnosticSignError", { text = " ", texthl = "DiagnosticSignError" })
-vim.fn.sign_define("DiagnosticSignWarn", { text = " ", texthl = "DiagnosticSignWarn" })
-vim.fn.sign_define("DiagnosticSignInfo", { text = " ", texthl = "DiagnosticSignInfo" })
-vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵 ", texthl = "DiagnosticSignHint" })
+vim.diagnostic.config({
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = " ",
+      [vim.diagnostic.severity.WARN] = " ",
+      [vim.diagnostic.severity.INFO] = " ",
+      [vim.diagnostic.severity.HINT] = "󰌵 ",
+    },
+  },
+})
 
 -- Window and tab key bindings.
 for _, dir in ipairs({ "h", "j", "k", "l" }) do
@@ -131,10 +137,10 @@ require("lazy").setup({
       "nvim-lualine/lualine.nvim",
       opts = function()
         local symbols = {
-          modified = "",
-          readonly = "󰌾",
+          modified = " ",
+          readonly = "󰌾 ",
           unnamed = "[No Name]",
-          newfile = "",
+          newfile = " ",
         }
         return {
           tabline = {
@@ -214,16 +220,16 @@ require("lazy").setup({
       },
       keys = {
         -- File, buffer, greps.
-        { "<C-f>",  "<cmd>FzfLua files<cr>" },
-        { "<C-b>",  "<cmd>FzfLua buffers<cr>" },
-        { "<C-g>",  "<cmd>FzfLua live_grep_glob<cr>" },
+        { "<C-f>", "<cmd>FzfLua files<cr>" },
+        { "<C-b>", "<cmd>FzfLua buffers<cr>" },
+        { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
 
         -- LSP actions.
-        { "gd",     "<cmd>FzfLua lsp_definitions<cr>" },
-        { "gr",     "<cmd>FzfLua lsp_references<cr>" },
-        { "gI",     "<cmd>FzfLua lsp_implementations<cr>" },
-        { "gy",     "<cmd>FzfLua lsp_typedefs<cr>" },
-        { "gD",     "<cmd>FzfLua lsp_declarations<cr>" },
+        { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
+        { "gr", "<cmd>FzfLua lsp_references<cr>" },
+        { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
+        { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
+        { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
         { "<M-cr>", "<cmd>FzfLua lsp_code_actions<cr>" },
       },
       opts = function()
@@ -285,6 +291,9 @@ require("lazy").setup({
       version = "*",
       build = "cargo build --release",
       opts = {
+        appearance = {
+          nerd_font_variant = "normal",
+        },
         keymap = {
           preset = "super-tab",
         },
@@ -394,7 +403,18 @@ require("lazy").setup({
       "nvim-treesitter/nvim-treesitter",
       build = ":TSUpdate",
       opts = {
-        ensure_installed = { "c", "lua", "vim", "vimdoc", "markdown", "markdown_inline" },
+        ensure_installed = {
+          "c",
+          "diff",
+          "gitcommit",
+          "gitignore",
+          "json",
+          "lua",
+          "vim",
+          "vimdoc",
+          "markdown",
+          "markdown_inline",
+        },
         sync_install = false,
         auto_install = true,
         incremental_selection = {
@@ -449,6 +469,9 @@ require("lazy").setup({
       keys = {
         { "<space>gs", "<cmd>DiffviewOpen<cr>" },
         { "<space>gh", "<cmd>DiffviewFileHistory<cr>" },
+      },
+      opts = {
+        enhanced_diff_hl = true,
       },
     },
     {
