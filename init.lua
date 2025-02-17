@@ -125,10 +125,6 @@ require("lazy").setup({
         vim.cmd.colorscheme("kanagawa")
       end,
     },
-    -- {
-    --   "nvim-lua/plenary.nvim",
-    --   lazy = true,
-    -- },
     {
       "nvim-tree/nvim-web-devicons",
       lazy = true,
