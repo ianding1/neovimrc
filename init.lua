@@ -182,7 +182,7 @@ require("lazy").setup({
         {
           "-",
           function()
-            require("oil").open_float(".")
+            require("oil").open_float()
           end,
         },
       },
@@ -367,6 +367,22 @@ require("lazy").setup({
     {
       "mrcjkb/rustaceanvim",
       ft = { "rust" },
+      opts = {
+        server = {
+          default_settings = {
+            ["rust-analyzer"] = {
+              completion = {
+                callable = {
+                  snippets = "add_parentheses",
+                },
+              },
+            },
+          },
+        },
+      },
+      config = function(_, opts)
+        vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
+      end,
     },
     {
       "linrongbin16/lsp-progress.nvim",
