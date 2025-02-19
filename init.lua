@@ -6,7 +6,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out,                            "WarningMsg" },
+      { out, "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
     vim.fn.getchar()
@@ -77,7 +77,9 @@ vim.o.clipboard = "unnamedplus"
 
 -- Enable linematch in diff mode (added in Neovim 0.9)
 vim.opt.diffopt:append("linematch:60")
-vim.opt.diffopt:append("context:999")
+
+-- Disable fold column in the diff mode.
+vim.opt.diffopt:append("foldcolumn:0")
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
@@ -216,16 +218,16 @@ require("lazy").setup({
       },
       keys = {
         -- File, buffer, greps.
-        { "<C-f>",  "<cmd>FzfLua files<cr>" },
-        { "<C-b>",  "<cmd>FzfLua buffers<cr>" },
-        { "<C-g>",  "<cmd>FzfLua live_grep_glob<cr>" },
+        { "<C-f>", "<cmd>FzfLua files<cr>" },
+        { "<C-b>", "<cmd>FzfLua buffers<cr>" },
+        { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
 
         -- LSP actions.
-        { "gd",     "<cmd>FzfLua lsp_definitions<cr>" },
-        { "gr",     "<cmd>FzfLua lsp_references<cr>" },
-        { "gI",     "<cmd>FzfLua lsp_implementations<cr>" },
-        { "gy",     "<cmd>FzfLua lsp_typedefs<cr>" },
-        { "gD",     "<cmd>FzfLua lsp_declarations<cr>" },
+        { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
+        { "gr", "<cmd>FzfLua lsp_references<cr>" },
+        { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
+        { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
+        { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
         { "<M-cr>", "<cmd>FzfLua lsp_code_actions<cr>" },
       },
       opts = function()
