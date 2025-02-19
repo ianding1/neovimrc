@@ -6,7 +6,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
+      { out,                            "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
     vim.fn.getchar()
@@ -216,16 +216,16 @@ require("lazy").setup({
       },
       keys = {
         -- File, buffer, greps.
-        { "<C-f>", "<cmd>FzfLua files<cr>" },
-        { "<C-b>", "<cmd>FzfLua buffers<cr>" },
-        { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
+        { "<C-f>",  "<cmd>FzfLua files<cr>" },
+        { "<C-b>",  "<cmd>FzfLua buffers<cr>" },
+        { "<C-g>",  "<cmd>FzfLua live_grep_glob<cr>" },
 
         -- LSP actions.
-        { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
-        { "gr", "<cmd>FzfLua lsp_references<cr>" },
-        { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
-        { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
-        { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
+        { "gd",     "<cmd>FzfLua lsp_definitions<cr>" },
+        { "gr",     "<cmd>FzfLua lsp_references<cr>" },
+        { "gI",     "<cmd>FzfLua lsp_implementations<cr>" },
+        { "gy",     "<cmd>FzfLua lsp_typedefs<cr>" },
+        { "gD",     "<cmd>FzfLua lsp_declarations<cr>" },
         { "<M-cr>", "<cmd>FzfLua lsp_code_actions<cr>" },
       },
       opts = function()
@@ -273,8 +273,8 @@ require("lazy").setup({
       config = function(_, opts)
         local autopairs = require("nvim-autopairs")
         autopairs.setup(opts)
-        -- Disable closing single quotes on ocaml files.
-        autopairs.get_rule("'")[1].not_filetypes = { "ocaml" }
+        -- Disable closing single quotes on ocaml and rust files.
+        autopairs.get_rule("'")[1].not_filetypes = { "ocaml", "rust" }
       end,
     },
     {
@@ -493,8 +493,6 @@ require("lazy").setup({
     },
   },
   checker = {
-    -- Check for update every day.
-    enabled = true,
-    frequency = 60 * 60 * 24,
+    enabled = false,
   },
 })
