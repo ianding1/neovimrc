@@ -60,7 +60,7 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱", foldopen = "", foldclose = "" }
+vim.opt.fillchars = { diff = "╱", foldopen = "", foldclose = "" }
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
@@ -458,16 +458,27 @@ require("lazy").setup({
     {
       "stevearc/conform.nvim",
       event = "VeryLazy",
+      keys = {
+        {
+          "<leader>f",
+          function()
+            require("conform").format()
+          end,
+          mode = { "n", "v" },
+        },
+      },
       opts = {
-        format_on_save = {
-          timeout_ms = 500,
-          lsp_fallback = true,
+        default_format_opts = {
+          timeout_ms = 3000,
+          async = false,
+          quiet = false,
+          lsp_format = "fallback",
         },
         formatters_by_ft = {
           lua = { "stylua" },
           python = { "black" },
-          rust = { "rustfmt", lsp_format = "fallback" },
-          typescript = { "prettierd", "prettier", stop_after_first = true },
+          rust = { "rustfmt" },
+          typescript = { "prettierd" },
         },
       },
       config = function(_, opts)
