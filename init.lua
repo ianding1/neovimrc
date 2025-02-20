@@ -60,7 +60,7 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱" }
+vim.opt.fillchars = { diff = "╱", foldopen = "", foldclose = "" }
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
@@ -77,9 +77,6 @@ vim.o.clipboard = "unnamedplus"
 
 -- Enable linematch in diff mode (added in Neovim 0.9)
 vim.opt.diffopt:append("linematch:60")
-
--- Disable fold column in the diff mode.
-vim.opt.diffopt:append("foldcolumn:0")
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
