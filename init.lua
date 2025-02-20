@@ -368,6 +368,9 @@ require("lazy").setup({
       ft = { "rust" },
       opts = {
         server = {
+          on_attach = function(_, bufnr)
+            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+          end,
           default_settings = {
             ["rust-analyzer"] = {
               completion = {
@@ -474,6 +477,9 @@ require("lazy").setup({
           quiet = false,
           lsp_format = "fallback",
         },
+        format_on_save = {
+          enabled = true,
+        },
         formatters_by_ft = {
           lua = { "stylua" },
           python = { "black" },
@@ -492,9 +498,14 @@ require("lazy").setup({
         { "<space>gs", "<cmd>DiffviewOpen<cr>" },
         { "<space>gh", "<cmd>DiffviewFileHistory<cr>" },
       },
-      opts = {
-        enhanced_diff_hl = true,
-      },
+      opts = function()
+        return {
+          enhanced_diff_hl = true,
+        }
+      end,
+      config = function(_, opts)
+        require("diffview").setup(opts)
+      end,
     },
     {
       "lewis6991/gitsigns.nvim",
