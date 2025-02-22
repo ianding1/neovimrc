@@ -507,6 +507,7 @@ require("lazy").setup({
       opts = function()
         return {
           enhanced_diff_hl = true,
+          keymaps = require("config.diffview_keymap"),
         }
       end,
       config = function(_, opts)
