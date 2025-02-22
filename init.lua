@@ -100,17 +100,13 @@ for _, dir in ipairs({ "h", "j", "k", "l" }) do
   vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir)
 end
 
--- Key bindings to open and close tabpages.
-vim.keymap.set("n", "<C-t>", "<cmd>tabnew<cr>")
-vim.keymap.set("n", "<C-x>", "<cmd>tabclose<cr>")
-
 -- Quickfix navigation.
 vim.keymap.set("n", "]q", "<cmd>cnext<cr>")
 vim.keymap.set("n", "[q", "<cmd>cprevious<cr>")
 
 -- LSP key bindings.
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
-vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename)
+vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float)
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename)
 
 -- Lazy.nvim UI.
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
@@ -216,16 +212,24 @@ require("lazy").setup({
       keys = {
         -- File, buffer, greps.
         { "<C-f>", "<cmd>FzfLua files<cr>" },
-        { "<C-b>", "<cmd>FzfLua buffers<cr>" },
+        { "<C-b>", "<cmd>FzfLua blines<cr>" },
         { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
+        { "<leader>ff", "<cmd>FzfLua files<cr>" },
+        { "<leader>fb", "<cmd>FzfLua buffers<cr>" },
+        { "<leader>fg", "<cmd>FzfLua live_grep_glob<cr>" },
+        { "<leader>fl", "<cmd>FzfLua blines<cr>" },
+        { "<leader>fR", "<cmd>FzfLua resume<cr>" },
+        { "<leader>fr", "<cmd>FzfLua registers<cr>" },
+        { "<leader>fd", "<cmd>FzfLua lsp_document_diagnostics<cr>" },
+        { "<leader>fD", "<cmd>FzfLua lsp_workspace_diagnostics<cr>" },
 
         -- LSP actions.
-        { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
-        { "gr", "<cmd>FzfLua lsp_references<cr>" },
-        { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
-        { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
-        { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
-        { "<M-cr>", "<cmd>FzfLua lsp_code_actions<cr>" },
+        { "<leader>jd", "<cmd>FzfLua lsp_definitions<cr>" },
+        { "<leader>jr", "<cmd>FzfLua lsp_references<cr>" },
+        { "<leader>ji", "<cmd>FzfLua lsp_implementations<cr>" },
+        { "<leader>jt", "<cmd>FzfLua lsp_typedefs<cr>" },
+        { "<leader>jD", "<cmd>FzfLua lsp_declarations<cr>" },
+        { "<leader>ca", "<cmd>FzfLua lsp_code_actions<cr>" },
       },
       opts = function()
         local actions = require("fzf-lua").actions
@@ -258,7 +262,6 @@ require("lazy").setup({
               ["ctrl-v"] = actions.file_vsplit,
               ["ctrl-t"] = actions.file_tabedit,
               ["alt-i"] = actions.toggle_ignore,
-              ["alt-h"] = actions.toggle_hidden,
               ["alt-f"] = actions.toggle_follow,
             },
           },
@@ -463,7 +466,7 @@ require("lazy").setup({
       event = "VeryLazy",
       keys = {
         {
-          "<leader>f",
+          "<leader>cf",
           function()
             require("conform").format()
           end,
@@ -495,8 +498,11 @@ require("lazy").setup({
     {
       "sindrets/diffview.nvim",
       keys = {
-        { "<space>gs", "<cmd>DiffviewOpen<cr>" },
-        { "<space>gh", "<cmd>DiffviewFileHistory<cr>" },
+        { "<space>gg", "<cmd>DiffviewOpen<cr>" },
+        { "<space>gh", "<cmd>DiffviewOpen HEAD<cr>" },
+        { "<space>gr", "<cmd>DiffviewFileHistory<cr>" },
+        { "<space>gf", "<cmd>DiffviewFileHistory %<cr>" },
+        { "<space>gc", "<cmd>DiffviewClose<cr>" },
       },
       opts = function()
         return {
