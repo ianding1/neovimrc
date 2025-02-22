@@ -100,6 +100,8 @@ for _, dir in ipairs({ "h", "j", "k", "l" }) do
   vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir)
 end
 
+vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
+
 -- Quickfix navigation.
 vim.keymap.set("n", "]q", "<cmd>cnext<cr>")
 vim.keymap.set("n", "[q", "<cmd>cprevious<cr>")
@@ -214,14 +216,7 @@ require("lazy").setup({
         { "<C-f>", "<cmd>FzfLua files<cr>" },
         { "<C-b>", "<cmd>FzfLua blines<cr>" },
         { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
-        { "<leader>ff", "<cmd>FzfLua files<cr>" },
-        { "<leader>fb", "<cmd>FzfLua buffers<cr>" },
-        { "<leader>fg", "<cmd>FzfLua live_grep_glob<cr>" },
-        { "<leader>fl", "<cmd>FzfLua blines<cr>" },
-        { "<leader>fR", "<cmd>FzfLua resume<cr>" },
-        { "<leader>fr", "<cmd>FzfLua registers<cr>" },
-        { "<leader>fd", "<cmd>FzfLua lsp_document_diagnostics<cr>" },
-        { "<leader>fD", "<cmd>FzfLua lsp_workspace_diagnostics<cr>" },
+        { "<leader>f", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
 
         -- LSP actions.
         { "<leader>jd", "<cmd>FzfLua lsp_definitions<cr>" },
@@ -498,11 +493,8 @@ require("lazy").setup({
     {
       "sindrets/diffview.nvim",
       keys = {
-        { "<space>gg", "<cmd>DiffviewOpen<cr>" },
-        { "<space>gh", "<cmd>DiffviewOpen HEAD<cr>" },
-        { "<space>gr", "<cmd>DiffviewFileHistory<cr>" },
-        { "<space>gf", "<cmd>DiffviewFileHistory %<cr>" },
-        { "<space>gc", "<cmd>DiffviewClose<cr>" },
+        { "<leader>g", "<cmd>call feedkeys(':DiffviewOpen ', 'tn')<cr>" },
+        { "<leader>h", "<cmd>call feedkeys(':DiffviewFileHistory ', 'tn')<cr>" },
       },
       opts = function()
         return {
