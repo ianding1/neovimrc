@@ -517,13 +517,6 @@ require("lazy").setup({
         },
       },
     },
-    {
-      "akinsho/git-conflict.nvim",
-      version = "v2.1.0",
-      opts = {
-        disable_diagnostics = true,
-      },
-    },
   },
   checker = {
     enabled = false,
