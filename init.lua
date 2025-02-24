@@ -78,6 +78,9 @@ vim.o.clipboard = "unnamedplus"
 -- Enable linematch in diff mode (added in Neovim 0.9)
 vim.opt.diffopt:append("linematch:60")
 
+-- Start diff mode with vertical splits.
+vim.opt.diffopt:append("vertical")
+
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
@@ -491,25 +494,35 @@ require("lazy").setup({
       end,
     },
     {
-      "sindrets/diffview.nvim",
-      keys = {
-        { "<leader>g", "<cmd>call feedkeys(':DiffviewOpen ', 'tn')<cr>" },
-        { "<leader>h", "<cmd>call feedkeys(':DiffviewFileHistory ', 'tn')<cr>" },
-      },
-      opts = function()
-        return {
-          enhanced_diff_hl = true,
-          keymaps = require("config.diffview_keymap"),
-        }
-      end,
-      config = function(_, opts)
-        require("diffview").setup(opts)
-      end,
-    },
-    {
       "lewis6991/gitsigns.nvim",
       event = "VeryLazy",
-      opts = {},
+      keys = {
+        { "<leader>gd", "<cmd>Gitsigns diffthis<cr>" },
+        { "<leader>gq", "<cmd>Gitsigns setqflist<cr>" },
+        { "<leader>gs", "<cmd>Gitsigns stage_hunk<cr>" },
+        { "<leader>gS", "<cmd>Gitsigns stage_buffer<cr>" },
+        { "<leader>gu", "<cmd>Gitsigns reset_hunk<cr>" },
+        { "<leader>gU", "<cmd>Gitsigns reset_buffer<cr>" },
+        { "<leader>gp", "<cmd>Gitsigns preview_hunk<cr>" },
+        { "<leader>gb", "<cmd>Gitsigns blame<cr>" },
+        { "<leader>gg", "<cmd>call feedkeys(':Gitsigns ', 'tn')<cr>" },
+        { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
+        { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
+        { "[H", "<cmd>Gitsigns nav_hunk first<cr>" },
+        { "]H", "<cmd>Gitsigns nav_hunk last<cr>" },
+      },
+      opts = {
+        preview_config = {
+          border = "rounded",
+        },
+      },
+    },
+    {
+      "akinsho/git-conflict.nvim",
+      version = "v2.1.0",
+      opts = {
+        disable_diagnostics = true,
+      },
     },
   },
   checker = {
