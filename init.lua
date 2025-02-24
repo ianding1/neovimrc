@@ -497,19 +497,55 @@ require("lazy").setup({
       "lewis6991/gitsigns.nvim",
       event = "VeryLazy",
       keys = {
-        { "<leader>gd", "<cmd>Gitsigns diffthis<cr>" },
-        { "<leader>gq", "<cmd>Gitsigns setqflist<cr>" },
-        { "<leader>gs", "<cmd>Gitsigns stage_hunk<cr>" },
-        { "<leader>gS", "<cmd>Gitsigns stage_buffer<cr>" },
-        { "<leader>gu", "<cmd>Gitsigns reset_hunk<cr>" },
-        { "<leader>gU", "<cmd>Gitsigns reset_buffer<cr>" },
-        { "<leader>gp", "<cmd>Gitsigns preview_hunk<cr>" },
-        { "<leader>gb", "<cmd>Gitsigns blame<cr>" },
-        { "<leader>gg", "<cmd>call feedkeys(':Gitsigns ', 'tn')<cr>" },
-        { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
-        { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
-        { "[H", "<cmd>Gitsigns nav_hunk first<cr>" },
-        { "]H", "<cmd>Gitsigns nav_hunk last<cr>" },
+        { "<leader>dd", "<cmd>Gitsigns diffthis<cr>" },
+        { "<leader>dq", "<cmd>Gitsigns setqflist<cr>" },
+        {
+          "<leader>dQ",
+          function()
+            require("gitsigns").setqflist("all")
+          end,
+        },
+        { "<leader>ds", "<cmd>Gitsigns stage_hunk<cr>" },
+        {
+          "<leader>ds",
+          function()
+            require("gitsigns").stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+          end,
+          mode = "v",
+        },
+        { "<leader>dS", "<cmd>Gitsigns stage_buffer<cr>" },
+        { "<leader>dr", "<cmd>Gitsigns reset_hunk<cr>" },
+        {
+          "<leader>dr",
+          function()
+            require("gitsigns").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+          end,
+          mode = "v",
+        },
+        { "<leader>dR", "<cmd>Gitsigns reset_buffer<cr>" },
+        { "<leader>dp", "<cmd>Gitsigns preview_hunk<cr>" },
+        { "<leader>db", "<cmd>Gitsigns blame<cr>" },
+        { "<leader>g", "<cmd>call feedkeys(':Gitsigns ', 'tn')<cr>" },
+        {
+          "[c",
+          function()
+            if vim.wo.diff then
+              vim.cmd.normal({ "[c", bang = true })
+            else
+              require("gitsigns").nav_hunk("prev")
+            end
+          end,
+        },
+        {
+          "]c",
+          function()
+            if vim.wo.diff then
+              vim.cmd.normal({ "]c", bang = true })
+            else
+              require("gitsigns").nav_hunk("next")
+            end
+          end,
+        },
       },
       opts = {
         preview_config = {
