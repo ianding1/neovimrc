@@ -530,6 +530,9 @@ require("lazy").setup({
     {
       "tpope/vim-fugitive",
       event = "VeryLazy",
+      keys = {
+        { "<leader>gd", "<cmd>Gdiffsplit<cr>" },
+      },
     },
   },
   checker = {
