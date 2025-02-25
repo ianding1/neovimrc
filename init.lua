@@ -81,6 +81,9 @@ vim.opt.diffopt:append("linematch:60")
 -- Start diff mode with vertical splits.
 vim.opt.diffopt:append("vertical")
 
+-- Set the fold column in diff mode to 1.
+vim.opt.diffopt:append("foldcolumn:1")
+
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
@@ -532,7 +535,19 @@ require("lazy").setup({
       event = "VeryLazy",
       keys = {
         { "<leader>gd", "<cmd>Gdiffsplit<cr>" },
+        { "<leader>gs", "<cmd>tab Git<cr>" },
       },
+      config = function()
+        vim.api.nvim_create_augroup("fugitive_commit_augroup", { clear = true })
+        vim.api.nvim_create_autocmd("User", {
+          group = "fugitive_commit_augroup",
+          pattern = "FugitiveCommit",
+          callback = function()
+            vim.wo.foldmethod = "syntax"
+            vim.wo.foldcolumn = "auto:1"
+          end,
+        })
+      end,
     },
   },
   checker = {
