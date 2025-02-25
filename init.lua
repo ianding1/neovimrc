@@ -497,61 +497,39 @@ require("lazy").setup({
       "lewis6991/gitsigns.nvim",
       event = "VeryLazy",
       keys = {
-        { "<leader>dd", "<cmd>Gitsigns diffthis<cr>" },
-        { "<leader>dq", "<cmd>Gitsigns setqflist<cr>" },
+        { "<leader>hq", "<cmd>Gitsigns setqflist<cr>" },
+        { "<leader>hs", "<cmd>Gitsigns stage_hunk<cr>" },
         {
-          "<leader>dQ",
-          function()
-            require("gitsigns").setqflist("all")
-          end,
-        },
-        { "<leader>ds", "<cmd>Gitsigns stage_hunk<cr>" },
-        {
-          "<leader>ds",
+          "<leader>hs",
           function()
             require("gitsigns").stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
           end,
           mode = "v",
         },
-        { "<leader>dS", "<cmd>Gitsigns stage_buffer<cr>" },
-        { "<leader>dr", "<cmd>Gitsigns reset_hunk<cr>" },
+        { "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>" },
+        { "<leader>hx", "<cmd>Gitsigns reset_hunk<cr>" },
         {
-          "<leader>dr",
+          "<leader>hx",
           function()
             require("gitsigns").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
           end,
           mode = "v",
         },
-        { "<leader>dR", "<cmd>Gitsigns reset_buffer<cr>" },
-        { "<leader>dp", "<cmd>Gitsigns preview_hunk<cr>" },
-        { "<leader>db", "<cmd>Gitsigns blame<cr>" },
-        { "<leader>g", "<cmd>call feedkeys(':Gitsigns ', 'tn')<cr>" },
-        {
-          "[c",
-          function()
-            if vim.wo.diff then
-              vim.cmd.normal({ "[c", bang = true })
-            else
-              require("gitsigns").nav_hunk("prev")
-            end
-          end,
-        },
-        {
-          "]c",
-          function()
-            if vim.wo.diff then
-              vim.cmd.normal({ "]c", bang = true })
-            else
-              require("gitsigns").nav_hunk("next")
-            end
-          end,
-        },
+        { "<leader>hX", "<cmd>Gitsigns reset_buffer<cr>" },
+        { "<leader>hp", "<cmd>Gitsigns preview_hunk<cr>" },
+        { "<leader>hb", "<cmd>Gitsigns blame<cr>" },
+        { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
+        { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
       },
       opts = {
         preview_config = {
           border = "rounded",
         },
       },
+    },
+    {
+      "tpope/vim-fugitive",
+      event = "VeryLazy",
     },
   },
   checker = {
