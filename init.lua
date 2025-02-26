@@ -114,7 +114,7 @@ vim.keymap.set("n", "[q", "<cmd>cprevious<cr>")
 
 -- LSP key bindings.
 vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float)
-vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename)
+vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename)
 
 -- Lazy.nvim UI.
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
@@ -225,11 +225,11 @@ require("lazy").setup({
         { "<leader>f", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
 
         -- LSP actions.
-        { "<leader>jd", "<cmd>FzfLua lsp_definitions<cr>" },
-        { "<leader>jr", "<cmd>FzfLua lsp_references<cr>" },
-        { "<leader>ji", "<cmd>FzfLua lsp_implementations<cr>" },
-        { "<leader>jt", "<cmd>FzfLua lsp_typedefs<cr>" },
-        { "<leader>jD", "<cmd>FzfLua lsp_declarations<cr>" },
+        { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
+        { "gr", "<cmd>FzfLua lsp_references<cr>" },
+        { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
+        { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
+        { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
         { "<leader>ca", "<cmd>FzfLua lsp_code_actions<cr>" },
       },
       opts = function()
@@ -582,6 +582,43 @@ require("lazy").setup({
           },
         }
       end,
+    },
+    {
+      "MagicDuck/grug-far.nvim",
+      keys = {
+        {
+          "<leader>rr",
+          function()
+            require("grug-far").open()
+          end,
+        },
+        {
+          "<leader>r*",
+          function()
+            require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
+          end,
+        },
+        {
+          "<leader>r%",
+          function()
+            require("grug-far").open({ prefills = { paths = vim.fn.expand("%") } })
+          end,
+        },
+        {
+          "<leader>rv",
+          function()
+            require("grug-far").with_visual_selection({ prefills = { paths = vim.fn.expand("%") } })
+          end,
+        },
+      },
+      opts = {
+        icons = {
+          resultsChangeIndicator = "┃",
+          resultsAddedIndicator = "┃",
+          resultsRemovedIndicator = "┃",
+          resultsDiffSeparatorIndicator = "┊",
+        },
+      },
     },
   },
   checker = {
