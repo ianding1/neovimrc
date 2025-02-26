@@ -193,7 +193,7 @@ require("lazy").setup({
         keymaps = {
           ["<cr>"] = "actions.select",
           ["<C-v>"] = { "actions.select", opts = { vertical = true } },
-          ["<C-s>"] = { "actions.select", opts = { horizontal = true } },
+          ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
           ["<C-t>"] = { "actions.select", opts = { tab = true } },
           ["<C-c>"] = { "actions.close", mode = "n" },
           ["<esc>"] = { "actions.close", mode = "n" },
@@ -547,6 +547,40 @@ require("lazy").setup({
             vim.wo.foldcolumn = "auto:1"
           end,
         })
+      end,
+    },
+    {
+      "kevinhwang91/nvim-bqf",
+      ft = "qf",
+      dependencies = { "ibhagwan/fzf-lua" },
+      opts = function()
+        local bqf_pv_timer = nil
+        return {
+          filter = {
+            fzf = {
+              extra_opts = { "--bind", "alt-a:toggle-all" },
+            },
+          },
+          preview = {
+            winblend = 0,
+            should_preview_cb = function(bufnr, qwinid)
+              local bufname = vim.api.nvim_buf_get_name(bufnr)
+              if bufname:match("^fugitive://") and not vim.api.nvim_buf_is_loaded(bufnr) then
+                if bqf_pv_timer and bqf_pv_timer:get_due_in() > 0 then
+                  bqf_pv_timer:stop()
+                  bqf_pv_timer = nil
+                end
+                bqf_pv_timer = vim.defer_fn(function()
+                  vim.api.nvim_buf_call(bufnr, function()
+                    vim.cmd(("do fugitive BufReadCmd %s"):format(bufname))
+                  end)
+                  require("bqf.preview.handler").open(qwinid, nil, true)
+                end, 60)
+              end
+              return true
+            end,
+          },
+        }
       end,
     },
   },
