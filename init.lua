@@ -60,7 +60,7 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱", foldopen = "", foldclose = "" }
+vim.opt.fillchars = { diff = "╱", foldopen = "▼", foldclose = "▶" }
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
@@ -156,8 +156,8 @@ require("lazy").setup({
           },
           sections = {
             lualine_a = {},
-            lualine_b = {},
-            lualine_c = { { "filename", path = 1, symbols = symbols } },
+            lualine_b = { { "filename", path = 1, symbols = symbols } },
+            lualine_c = {},
             lualine_x = {},
             lualine_y = {},
             lualine_z = {},
@@ -182,12 +182,7 @@ require("lazy").setup({
     {
       "stevearc/oil.nvim",
       keys = {
-        {
-          "-",
-          function()
-            require("oil").open_float()
-          end,
-        },
+        { "-", "<cmd>Oil<cr>" },
       },
       opts = {
         keymaps = {
@@ -534,8 +529,7 @@ require("lazy").setup({
       "tpope/vim-fugitive",
       event = "VeryLazy",
       keys = {
-        { "<leader>gd", "<cmd>Gdiffsplit<cr>" },
-        { "<leader>gs", "<cmd>tab Git<cr>" },
+        { "<leader>g", "<cmd>tab Git<cr>" },
       },
       config = function()
         vim.api.nvim_create_augroup("fugitive_commit_augroup", { clear = true })
@@ -587,27 +581,9 @@ require("lazy").setup({
       "MagicDuck/grug-far.nvim",
       keys = {
         {
-          "<leader>rr",
+          "<leader>r",
           function()
             require("grug-far").open()
-          end,
-        },
-        {
-          "<leader>r*",
-          function()
-            require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
-          end,
-        },
-        {
-          "<leader>r%",
-          function()
-            require("grug-far").open({ prefills = { paths = vim.fn.expand("%") } })
-          end,
-        },
-        {
-          "<leader>rv",
-          function()
-            require("grug-far").with_visual_selection({ prefills = { paths = vim.fn.expand("%") } })
           end,
         },
       },
