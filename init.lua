@@ -142,6 +142,7 @@ require("lazy").setup({
           newfile = " ",
         }
         return {
+          extensions = { "quickfix" },
           tabline = {
             lualine_a = { "mode" },
             lualine_b = { "branch", "diff", "diagnostics" },
