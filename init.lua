@@ -113,11 +113,11 @@ vim.keymap.set("n", "}", "<cmd>cnext<cr>")
 vim.keymap.set("n", "{", "<cmd>cprevious<cr>")
 
 -- Quickfix filling.
-vim.keymap.set("n", "<leader>cd", "<cmd>cnext<cr>")
+vim.keymap.set("n", "<leader>qd", "<cmd>lua vim.diagnostic.setqflist()<cr>")
 
 -- LSP key bindings.
-vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float)
-vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename)
+vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float)
+vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename)
 
 -- Lazy.nvim UI.
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
@@ -229,7 +229,7 @@ require("lazy").setup({
         { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
         { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
         { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
-        { "<leader>ca", "<cmd>FzfLua lsp_code_actions<cr>" },
+        { "<leader>a", "<cmd>FzfLua lsp_code_actions<cr>" },
       },
       opts = function()
         local actions = require("fzf-lua").actions
@@ -252,7 +252,7 @@ require("lazy").setup({
               ["ctrl-u"] = "half-page-up",
               ["ctrl-a"] = "beginning-of-line",
               ["ctrl-e"] = "end-of-line",
-              ["alt-a"] = "toggle-all",
+              ["ctrl-q"] = "toggle-all",
             },
           },
           actions = {
@@ -261,8 +261,8 @@ require("lazy").setup({
               ["ctrl-s"] = actions.file_split,
               ["ctrl-v"] = actions.file_vsplit,
               ["ctrl-t"] = actions.file_tabedit,
-              ["alt-i"] = actions.toggle_ignore,
-              ["alt-f"] = actions.toggle_follow,
+              ["ctrl-i"] = actions.toggle_ignore,
+              ["ctrl-f"] = actions.toggle_follow,
             },
           },
         }
@@ -464,15 +464,6 @@ require("lazy").setup({
     {
       "stevearc/conform.nvim",
       event = "VeryLazy",
-      keys = {
-        {
-          "<leader>cf",
-          function()
-            require("conform").format()
-          end,
-          mode = { "n", "v" },
-        },
-      },
       opts = {
         default_format_opts = {
           timeout_ms = 3000,
@@ -548,26 +539,10 @@ require("lazy").setup({
       end,
     },
     {
-      "stevearc/quicker.nvim",
-      event = "VeryLazy",
-      opts = {
-        type_icons = {
-          E = " ",
-          W = " ",
-          I = " ",
-          N = " ",
-          H = "󰌵 ",
-        },
-        keys = {
-          { "gr", "<cmd>Refresh<cr>" },
-        },
-      },
-    },
-    {
       "MagicDuck/grug-far.nvim",
       keys = {
         {
-          "<leader>r",
+          "<leader>R",
           function()
             require("grug-far").open()
           end,
