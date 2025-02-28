@@ -109,8 +109,11 @@ end
 vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
 
 -- Quickfix navigation.
-vim.keymap.set("n", "]q", "<cmd>cnext<cr>")
-vim.keymap.set("n", "[q", "<cmd>cprevious<cr>")
+vim.keymap.set("n", "}", "<cmd>cnext<cr>")
+vim.keymap.set("n", "{", "<cmd>cprevious<cr>")
+
+-- Quickfix filling.
+vim.keymap.set("n", "<leader>cd", "<cmd>cnext<cr>")
 
 -- LSP key bindings.
 vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float)
@@ -177,7 +180,7 @@ require("lazy").setup({
     {
       "mbbill/undotree",
       keys = {
-        { "<leader>u", "<cmd>UndotreeToggle<cr>" },
+        { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" },
       },
     },
     {
@@ -192,9 +195,9 @@ require("lazy").setup({
           ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
           ["<C-t>"] = { "actions.select", opts = { tab = true } },
           ["gq"] = { "actions.close", mode = "n" },
+          ["gr"] = { "actions.refresh", mode = "n" },
           ["g?"] = { "actions.show_help", mode = "n" },
           ["-"] = { "actions.parent", mode = "n" },
-          ["_"] = { "actions.open_cwd", mode = "n" },
           ["<M-h>"] = { "actions.toggle_hidden", mode = "n" },
         },
         use_default_keymaps = false,
@@ -545,38 +548,20 @@ require("lazy").setup({
       end,
     },
     {
-      "kevinhwang91/nvim-bqf",
-      ft = "qf",
-      dependencies = { "ibhagwan/fzf-lua" },
-      opts = function()
-        local bqf_pv_timer = nil
-        return {
-          filter = {
-            fzf = {
-              extra_opts = { "--bind", "alt-a:toggle-all" },
-            },
-          },
-          preview = {
-            winblend = 0,
-            should_preview_cb = function(bufnr, qwinid)
-              local bufname = vim.api.nvim_buf_get_name(bufnr)
-              if bufname:match("^fugitive://") and not vim.api.nvim_buf_is_loaded(bufnr) then
-                if bqf_pv_timer and bqf_pv_timer:get_due_in() > 0 then
-                  bqf_pv_timer:stop()
-                  bqf_pv_timer = nil
-                end
-                bqf_pv_timer = vim.defer_fn(function()
-                  vim.api.nvim_buf_call(bufnr, function()
-                    vim.cmd(("do fugitive BufReadCmd %s"):format(bufname))
-                  end)
-                  require("bqf.preview.handler").open(qwinid, nil, true)
-                end, 60)
-              end
-              return true
-            end,
-          },
-        }
-      end,
+      "stevearc/quicker.nvim",
+      event = "VeryLazy",
+      opts = {
+        type_icons = {
+          E = " ",
+          W = " ",
+          I = " ",
+          N = " ",
+          H = "󰌵 ",
+        },
+        keys = {
+          { "gr", "<cmd>Refresh<cr>" },
+        },
+      },
     },
     {
       "MagicDuck/grug-far.nvim",
