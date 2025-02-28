@@ -197,8 +197,8 @@ require("lazy").setup({
           ["gq"] = { "actions.close", mode = "n" },
           ["gr"] = { "actions.refresh", mode = "n" },
           ["g?"] = { "actions.show_help", mode = "n" },
+          ["g."] = { "actions.toggle_hidden", mode = "n" },
           ["-"] = { "actions.parent", mode = "n" },
-          ["<M-h>"] = { "actions.toggle_hidden", mode = "n" },
         },
         use_default_keymaps = false,
         view_options = {
