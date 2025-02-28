@@ -295,6 +295,12 @@ require("lazy").setup({
         keymap = {
           preset = "super-tab",
         },
+        cmdline = {
+          keymap = {
+            ["<Tab>"] = { "show", "accept" },
+          },
+          completion = { menu = { auto_show = true } },
+        },
         completion = {
           documentation = {
             auto_show = true,
