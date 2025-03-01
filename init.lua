@@ -1,17 +1,17 @@
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
+    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+    local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_echo({
+            { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+            { out, "WarningMsg" },
+            { "\nPress any key to exit..." },
+        }, true, {})
+        vim.fn.getchar()
+        os.exit(1)
+    end
 end
 
 vim.opt.rtp:prepend(lazypath)
@@ -26,9 +26,9 @@ vim.o.termguicolors = true
 -- Use spaces instead of tabs.
 vim.o.expandtab = true
 
--- Use 2 spaces by default.
-vim.o.shiftwidth = 2
-vim.o.softtabstop = 2
+-- Use 4 spaces by default.
+vim.o.shiftwidth = 4
+vim.o.softtabstop = 4
 
 -- Show a visual line under the cursor.
 vim.o.cursorline = true
@@ -60,16 +60,16 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱", foldopen = "", foldclose = "", foldsep = " " }
+vim.opt.fillchars = { diff = "╱", foldopen = "", foldclose = "", foldsep = " ", fold = " " }
 
 -- Show relative line number.
 vim.opt.relativenumber = true
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
-  vim.fn.system("mkdir -p $HOME/.cache/vim-undo")
-  vim.o.undodir = os.getenv("HOME") .. "/.cache/vim-undo"
-  vim.o.undofile = true
+    vim.fn.system("mkdir -p $HOME/.cache/vim-undo")
+    vim.o.undodir = os.getenv("HOME") .. "/.cache/vim-undo"
+    vim.o.undofile = true
 end
 
 -- Don't wrap lines.
@@ -84,9 +84,12 @@ vim.opt.diffopt:append("linematch:60")
 -- Start diff mode with vertical splits.
 vim.opt.diffopt:append("vertical")
 
+-- Set fold column to 1.
+vim.opt.diffopt:append("foldcolumn:1")
+vim.opt.foldcolumn = "auto:1"
+
 -- Enable text highlight for fold mode.
 vim.opt.foldtext = ""
-vim.opt.fillchars:append({ fold = " " })
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
@@ -95,19 +98,19 @@ vim.keymap.set("t", "<M-Esc>", "<Esc>")
 
 -- Set up diagnostic sign icons.
 vim.diagnostic.config({
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = " ",
-      [vim.diagnostic.severity.WARN] = " ",
-      [vim.diagnostic.severity.INFO] = " ",
-      [vim.diagnostic.severity.HINT] = "󰌵 ",
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = " ",
+            [vim.diagnostic.severity.WARN] = " ",
+            [vim.diagnostic.severity.INFO] = " ",
+            [vim.diagnostic.severity.HINT] = "󰌵 ",
+        },
     },
-  },
 })
 
 -- Window and tab key bindings.
 for _, dir in ipairs({ "h", "j", "k", "l" }) do
-  vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir)
+    vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir)
 end
 
 vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
@@ -127,472 +130,473 @@ vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename)
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
 
 require("lazy").setup({
-  spec = {
-    {
-      "rebelot/kanagawa.nvim",
-      priority = 1000,
-      config = function()
-        vim.cmd.colorscheme("kanagawa")
-      end,
-    },
-    {
-      "nvim-tree/nvim-web-devicons",
-      lazy = true,
-    },
-    {
-      "nvim-lualine/lualine.nvim",
-      opts = function()
-        local symbols = {
-          modified = " ",
-          readonly = "󰌾 ",
-          unnamed = "[No Name]",
-          newfile = " ",
-        }
-        return {
-          extensions = { "quickfix" },
-          tabline = {
-            lualine_a = { "mode" },
-            lualine_b = { "branch", "diff", "diagnostics" },
-            lualine_c = { { "tabs", mode = 2, show_modified_status = false } },
-            lualine_x = {
-              function()
-                return require("lsp-progress").progress()
-              end,
+    spec = {
+        {
+            "rebelot/kanagawa.nvim",
+            priority = 1000,
+            config = function()
+                vim.cmd.colorscheme("kanagawa")
+            end,
+        },
+        {
+            "nvim-tree/nvim-web-devicons",
+            lazy = true,
+        },
+        {
+            "nvim-lualine/lualine.nvim",
+            opts = function()
+                local symbols = {
+                    modified = " ",
+                    readonly = "󰌾 ",
+                    unnamed = "[No Name]",
+                    newfile = " ",
+                }
+                return {
+                    extensions = { "quickfix" },
+                    tabline = {
+                        lualine_a = { "mode" },
+                        lualine_b = { "branch", "diff", "diagnostics" },
+                        lualine_c = { { "tabs", mode = 2, show_modified_status = false } },
+                        lualine_x = {
+                            function()
+                                return require("lsp-progress").progress()
+                            end,
+                        },
+                        lualine_y = { "encoding", "fileformat", "filetype" },
+                        lualine_z = { "progress", "location" },
+                    },
+                    sections = {
+                        lualine_a = {},
+                        lualine_b = { { "filename", path = 1, symbols = symbols } },
+                        lualine_c = {},
+                        lualine_x = {},
+                        lualine_y = {},
+                        lualine_z = {},
+                    },
+                    inactive_sections = {
+                        lualine_a = {},
+                        lualine_b = {},
+                        lualine_c = { { "filename", path = 1, symbols = symbols } },
+                        lualine_x = {},
+                        lualine_y = {},
+                        lualine_z = {},
+                    },
+                }
+            end,
+        },
+        {
+            "luukvbaal/statuscol.nvim",
+            opts = function()
+                local builtin = require("statuscol.builtin")
+                return {
+                    relculright = true,
+                    segments = {
+                        { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
+                        { text = { builtin.lnumfunc }, condition = { true }, click = "v:lua.ScLa" },
+                        { text = { "%s" }, click = "v:lua.ScSa" },
+                    },
+                }
+            end,
+        },
+        {
+            "mbbill/undotree",
+            keys = {
+                { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" },
             },
-            lualine_y = { "encoding", "fileformat", "filetype" },
-            lualine_z = { "progress", "location" },
-          },
-          sections = {
-            lualine_a = {},
-            lualine_b = { { "filename", path = 1, symbols = symbols } },
-            lualine_c = {},
-            lualine_x = {},
-            lualine_y = {},
-            lualine_z = {},
-          },
-          inactive_sections = {
-            lualine_a = {},
-            lualine_b = {},
-            lualine_c = { { "filename", path = 1, symbols = symbols } },
-            lualine_x = {},
-            lualine_y = {},
-            lualine_z = {},
-          },
-        }
-      end,
-    },
-    {
-      "luukvbaal/statuscol.nvim",
-      opts = function()
-        local builtin = require("statuscol.builtin")
-        return {
-          relculright = true,
-          segments = {
-            { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
-            { text = { builtin.lnumfunc }, condition = { true }, click = "v:lua.ScLa" },
-            { text = { "%s" }, click = "v:lua.ScSa" },
-          },
-        }
-      end,
-    },
-    {
-      "mbbill/undotree",
-      keys = {
-        { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" },
-      },
-    },
-    {
-      "lukas-reineke/indent-blankline.nvim",
-      main = "ibl",
-      opts = {
-        indent = { char = "▏" },
-      },
-    },
-    {
-      "stevearc/oil.nvim",
-      keys = {
-        { "-", "<cmd>Oil<cr>" },
-      },
-      opts = {
-        keymaps = {
-          ["<cr>"] = "actions.select",
-          ["<C-v>"] = { "actions.select", opts = { vertical = true } },
-          ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
-          ["<C-t>"] = { "actions.select", opts = { tab = true } },
-          ["gq"] = { "actions.close", mode = "n" },
-          ["gr"] = { "actions.refresh", mode = "n" },
-          ["g?"] = { "actions.show_help", mode = "n" },
-          ["g."] = { "actions.toggle_hidden", mode = "n" },
-          ["-"] = { "actions.parent", mode = "n" },
         },
-        use_default_keymaps = false,
-        view_options = {
-          show_hidden = true,
-        },
-        float = {
-          max_width = 0.80,
-          max_height = 0.85,
-        },
-      },
-    },
-    {
-      "ibhagwan/fzf-lua",
-      dependencies = {
-        "junegunn/fzf",
-        build = "./install --bin",
-      },
-      keys = {
-        -- File, buffer, greps.
-        { "<C-f>", "<cmd>FzfLua files<cr>" },
-        { "<C-b>", "<cmd>FzfLua blines<cr>" },
-        { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
-        { "<leader>f", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
-
-        -- LSP actions.
-        { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
-        { "gr", "<cmd>FzfLua lsp_references<cr>" },
-        { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
-        { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
-        { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
-        { "<leader>a", "<cmd>FzfLua lsp_code_actions<cr>" },
-      },
-      opts = function()
-        local actions = require("fzf-lua").actions
-        return {
-          winopts = {
-            preview = {
-              layout = "vertical",
+        {
+            "lukas-reineke/indent-blankline.nvim",
+            main = "ibl",
+            opts = {
+                indent = { char = "│" },
+                scope = { show_start = false, show_end = false },
             },
-          },
-          files = {
-            cwd_prompt = false,
-          },
-          keymap = {
-            builtin = {
-              ["<C-f>"] = "preview-page-down",
-              ["<C-b>"] = "preview-page-up",
+        },
+        {
+            "stevearc/oil.nvim",
+            keys = {
+                { "-", "<cmd>Oil<cr>" },
             },
-            fzf = {
-              ["ctrl-d"] = "half-page-down",
-              ["ctrl-u"] = "half-page-up",
-              ["ctrl-a"] = "beginning-of-line",
-              ["ctrl-e"] = "end-of-line",
-              ["ctrl-q"] = "toggle-all",
-            },
-          },
-          actions = {
-            files = {
-              ["enter"] = actions.file_edit_or_qf,
-              ["ctrl-s"] = actions.file_split,
-              ["ctrl-v"] = actions.file_vsplit,
-              ["ctrl-t"] = actions.file_tabedit,
-              ["ctrl-i"] = actions.toggle_ignore,
-              ["ctrl-f"] = actions.toggle_follow,
-            },
-          },
-        }
-      end,
-    },
-    {
-      "windwp/nvim-autopairs",
-      event = "VeryLazy",
-      opts = {},
-      config = function(_, opts)
-        local autopairs = require("nvim-autopairs")
-        autopairs.setup(opts)
-        -- Disable closing single quotes on ocaml and rust files.
-        autopairs.get_rule("'")[1].not_filetypes = { "ocaml", "rust" }
-      end,
-    },
-    {
-      -- Allow using readline mappings (C-d/C-e/C-f/etc) in the command line mode.
-      "tpope/vim-rsi",
-      event = "VeryLazy",
-    },
-    {
-      "saghen/blink.cmp",
-      version = "*",
-      build = "cargo build --release",
-      opts = {
-        appearance = {
-          nerd_font_variant = "normal",
-        },
-        keymap = {
-          preset = "super-tab",
-        },
-        cmdline = {
-          keymap = {
-            ["<Tab>"] = { "show", "accept" },
-          },
-          completion = { menu = { auto_show = true } },
-        },
-        completion = {
-          documentation = {
-            auto_show = true,
-            auto_show_delay_ms = 500,
-          },
-          trigger = {
-            show_in_snippet = false,
-          },
-        },
-        signature = {
-          enabled = true,
-        },
-      },
-    },
-    {
-      "williamboman/mason.nvim",
-      keys = {
-        { "<leader>m", "<cmd>Mason<cr>" },
-      },
-      build = ":MasonUpdate",
-      opts = {},
-    },
-    {
-      "williamboman/mason-lspconfig.nvim",
-      dependencies = {
-        "williamboman/mason.nvim",
-        "neovim/nvim-lspconfig",
-        "saghen/blink.cmp",
-      },
-      opts = {
-        ensure_installed = { "lua_ls" },
-        automatic_installation = false,
-      },
-      config = function(_, opts)
-        local mason_lspconfig = require("mason-lspconfig")
-        mason_lspconfig.setup(opts)
-
-        local lspconfig = require("lspconfig")
-        mason_lspconfig.setup_handlers({
-          -- Default set up handler.
-          function(server_name)
-            lspconfig[server_name].setup({
-              capabilities = require("blink.cmp").get_lsp_capabilities(),
-            })
-          end,
-          lua_ls = function()
-            lspconfig.lua_ls.setup({
-              capabilities = require("blink.cmp").get_lsp_capabilities(),
-              settings = {
-                Lua = {
-                  runtime = {
-                    version = "LuaJIT",
-                  },
-                  diagnostics = {
-                    globals = { "vim", "vim.g", "vim.b" },
-                  },
-                  workspace = {
-                    library = vim.api.nvim_get_runtime_file("", true),
-                  },
-                  telemetry = {
-                    enable = false,
-                  },
+            opts = {
+                keymaps = {
+                    ["<cr>"] = "actions.select",
+                    ["<C-v>"] = { "actions.select", opts = { vertical = true } },
+                    ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
+                    ["<C-t>"] = { "actions.select", opts = { tab = true } },
+                    ["gq"] = { "actions.close", mode = "n" },
+                    ["gr"] = { "actions.refresh", mode = "n" },
+                    ["g?"] = { "actions.show_help", mode = "n" },
+                    ["g."] = { "actions.toggle_hidden", mode = "n" },
+                    ["-"] = { "actions.parent", mode = "n" },
                 },
-              },
-            })
-          end,
-          -- Disable Mason lsp config for rust analyzer.
-          rust_analyzer = function() end,
-        })
-      end,
-    },
-    {
-      "mrcjkb/rustaceanvim",
-      ft = { "rust" },
-      opts = {
-        server = {
-          on_attach = function(_, bufnr)
-            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-          end,
-          default_settings = {
-            ["rust-analyzer"] = {
-              completion = {
-                callable = {
-                  snippets = "add_parentheses",
+                use_default_keymaps = false,
+                view_options = {
+                    show_hidden = true,
                 },
-              },
+                float = {
+                    max_width = 0.80,
+                    max_height = 0.85,
+                },
             },
-          },
         },
-      },
-      config = function(_, opts)
-        vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
-      end,
-    },
-    {
-      "linrongbin16/lsp-progress.nvim",
-      event = "VeryLazy",
-      opts = {
-        format = function(client_messages)
-          local ready_sign = " lsp"
-          local busy_sign = "󰔚 lsp"
-          if #client_messages > 0 then
-            return busy_sign .. " " .. table.concat(client_messages, " ")
-          end
-          local api = require("lsp-progress.api")
-          if #api.lsp_clients() > 0 then
-            return ready_sign
-          end
-          return ""
-        end,
-      },
-      config = function(_, opts)
-        require("lsp-progress").setup(opts)
-        vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
-        vim.api.nvim_create_autocmd("User", {
-          group = "lualine_augroup",
-          pattern = "LspProgressStatusUpdated",
-          callback = require("lualine").refresh,
-        })
-      end,
-    },
-    {
-      "nvim-treesitter/nvim-treesitter",
-      build = ":TSUpdate",
-      opts = {
-        ensure_installed = {
-          "c",
-          "diff",
-          "gitcommit",
-          "gitignore",
-          "json",
-          "lua",
-          "vim",
-          "vimdoc",
-          "markdown",
-          "markdown_inline",
-        },
-        sync_install = false,
-        auto_install = true,
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "+",
-            node_incremental = "+",
-            scope_incremental = false,
-            node_decremental = "<bs>",
-          },
-        },
-        highlight = {
-          enable = true,
-          disable = function(_, buf)
-            -- Disable treesitter when the file size is larger than 1 MB.
-            local max_filesize = 1024 * 1024
-            local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
-            if ok and stats and stats.size > max_filesize then
-              return true
-            end
-          end,
-          -- Disable Vim's regex-based syntax highlighting when treesitter is enabled.
-          additional_vim_regex_highlighting = false,
-        },
-      },
-      config = function(_, opts)
-        require("nvim-treesitter.configs").setup(opts)
-        vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-        vim.opt.foldmethod = "expr"
-        -- Expand all folds by default.
-        vim.opt.foldlevel = 999
-      end,
-    },
-    {
-      "stevearc/conform.nvim",
-      event = "VeryLazy",
-      opts = {
-        default_format_opts = {
-          timeout_ms = 3000,
-          async = false,
-          quiet = false,
-          lsp_format = "fallback",
-        },
-        format_on_save = {
-          enabled = true,
-        },
-        formatters_by_ft = {
-          lua = { "stylua" },
-          python = { "black" },
-          rust = { "rustfmt" },
-          typescript = { "prettierd" },
-        },
-      },
-      config = function(_, opts)
-        require("conform").setup(opts)
-        vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-      end,
-    },
-    {
-      "lewis6991/gitsigns.nvim",
-      event = "VeryLazy",
-      keys = {
-        { "<leader>hq", "<cmd>Gitsigns setqflist<cr>" },
-        { "<leader>hs", "<cmd>Gitsigns stage_hunk<cr>" },
         {
-          "<leader>hs",
-          function()
-            require("gitsigns").stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-          end,
-          mode = "v",
+            "ibhagwan/fzf-lua",
+            dependencies = {
+                "junegunn/fzf",
+                build = "./install --bin",
+            },
+            keys = {
+                -- File, buffer, greps.
+                { "<C-f>", "<cmd>FzfLua files<cr>" },
+                { "<C-b>", "<cmd>FzfLua blines<cr>" },
+                { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
+                { "<leader>f", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
+
+                -- LSP actions.
+                { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
+                { "gr", "<cmd>FzfLua lsp_references<cr>" },
+                { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
+                { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
+                { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
+                { "<leader>a", "<cmd>FzfLua lsp_code_actions<cr>" },
+            },
+            opts = function()
+                local actions = require("fzf-lua").actions
+                return {
+                    winopts = {
+                        preview = {
+                            layout = "vertical",
+                        },
+                    },
+                    files = {
+                        cwd_prompt = false,
+                    },
+                    keymap = {
+                        builtin = {
+                            ["<C-f>"] = "preview-page-down",
+                            ["<C-b>"] = "preview-page-up",
+                        },
+                        fzf = {
+                            ["ctrl-d"] = "half-page-down",
+                            ["ctrl-u"] = "half-page-up",
+                            ["ctrl-a"] = "beginning-of-line",
+                            ["ctrl-e"] = "end-of-line",
+                            ["ctrl-q"] = "toggle-all",
+                        },
+                    },
+                    actions = {
+                        files = {
+                            ["enter"] = actions.file_edit_or_qf,
+                            ["ctrl-s"] = actions.file_split,
+                            ["ctrl-v"] = actions.file_vsplit,
+                            ["ctrl-t"] = actions.file_tabedit,
+                            ["ctrl-i"] = actions.toggle_ignore,
+                            ["ctrl-f"] = actions.toggle_follow,
+                        },
+                    },
+                }
+            end,
         },
-        { "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>" },
-        { "<leader>hx", "<cmd>Gitsigns reset_hunk<cr>" },
         {
-          "<leader>hx",
-          function()
-            require("gitsigns").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-          end,
-          mode = "v",
+            "windwp/nvim-autopairs",
+            event = "VeryLazy",
+            opts = {},
+            config = function(_, opts)
+                local autopairs = require("nvim-autopairs")
+                autopairs.setup(opts)
+                -- Disable closing single quotes on ocaml and rust files.
+                autopairs.get_rule("'")[1].not_filetypes = { "ocaml", "rust" }
+            end,
         },
-        { "<leader>hX", "<cmd>Gitsigns reset_buffer<cr>" },
-        { "<leader>hp", "<cmd>Gitsigns preview_hunk<cr>" },
-        { "<leader>hb", "<cmd>Gitsigns blame<cr>" },
-        { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
-        { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
-      },
-      opts = {
-        preview_config = {
-          border = "rounded",
-        },
-      },
-    },
-    {
-      "tpope/vim-fugitive",
-      event = "VeryLazy",
-      keys = {
-        { "<leader>g", "<cmd>tab Git<cr>" },
-      },
-      config = function()
-        vim.api.nvim_create_augroup("fugitive_commit_augroup", { clear = true })
-        vim.api.nvim_create_autocmd("User", {
-          group = "fugitive_commit_augroup",
-          pattern = "FugitiveCommit",
-          callback = function()
-            vim.wo.foldmethod = "syntax"
-          end,
-        })
-      end,
-    },
-    {
-      "MagicDuck/grug-far.nvim",
-      keys = {
         {
-          "<leader>R",
-          function()
-            require("grug-far").open()
-          end,
+            -- Allow using readline mappings (C-d/C-e/C-f/etc) in the command line mode.
+            "tpope/vim-rsi",
+            event = "VeryLazy",
         },
-      },
-      opts = {
-        icons = {
-          resultsChangeIndicator = "┃",
-          resultsAddedIndicator = "┃",
-          resultsRemovedIndicator = "┃",
-          resultsDiffSeparatorIndicator = "┊",
+        {
+            "saghen/blink.cmp",
+            version = "*",
+            build = "cargo build --release",
+            opts = {
+                appearance = {
+                    nerd_font_variant = "normal",
+                },
+                keymap = {
+                    preset = "super-tab",
+                },
+                cmdline = {
+                    keymap = {
+                        ["<Tab>"] = { "show", "accept" },
+                    },
+                    completion = { menu = { auto_show = true } },
+                },
+                completion = {
+                    documentation = {
+                        auto_show = true,
+                        auto_show_delay_ms = 500,
+                    },
+                    trigger = {
+                        show_in_snippet = false,
+                    },
+                },
+                signature = {
+                    enabled = true,
+                },
+            },
         },
-      },
+        {
+            "williamboman/mason.nvim",
+            keys = {
+                { "<leader>m", "<cmd>Mason<cr>" },
+            },
+            build = ":MasonUpdate",
+            opts = {},
+        },
+        {
+            "williamboman/mason-lspconfig.nvim",
+            dependencies = {
+                "williamboman/mason.nvim",
+                "neovim/nvim-lspconfig",
+                "saghen/blink.cmp",
+            },
+            opts = {
+                ensure_installed = { "lua_ls" },
+                automatic_installation = false,
+            },
+            config = function(_, opts)
+                local mason_lspconfig = require("mason-lspconfig")
+                mason_lspconfig.setup(opts)
+
+                local lspconfig = require("lspconfig")
+                mason_lspconfig.setup_handlers({
+                    -- Default set up handler.
+                    function(server_name)
+                        lspconfig[server_name].setup({
+                            capabilities = require("blink.cmp").get_lsp_capabilities(),
+                        })
+                    end,
+                    lua_ls = function()
+                        lspconfig.lua_ls.setup({
+                            capabilities = require("blink.cmp").get_lsp_capabilities(),
+                            settings = {
+                                Lua = {
+                                    runtime = {
+                                        version = "LuaJIT",
+                                    },
+                                    diagnostics = {
+                                        globals = { "vim", "vim.g", "vim.b" },
+                                    },
+                                    workspace = {
+                                        library = vim.api.nvim_get_runtime_file("", true),
+                                    },
+                                    telemetry = {
+                                        enable = false,
+                                    },
+                                },
+                            },
+                        })
+                    end,
+                    -- Disable Mason lsp config for rust analyzer.
+                    rust_analyzer = function() end,
+                })
+            end,
+        },
+        {
+            "mrcjkb/rustaceanvim",
+            ft = { "rust" },
+            opts = {
+                server = {
+                    on_attach = function(_, bufnr)
+                        vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                    end,
+                    default_settings = {
+                        ["rust-analyzer"] = {
+                            completion = {
+                                callable = {
+                                    snippets = "add_parentheses",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            config = function(_, opts)
+                vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
+            end,
+        },
+        {
+            "linrongbin16/lsp-progress.nvim",
+            event = "VeryLazy",
+            opts = {
+                format = function(client_messages)
+                    local ready_sign = " lsp"
+                    local busy_sign = "󰔚 lsp"
+                    if #client_messages > 0 then
+                        return busy_sign .. " " .. table.concat(client_messages, " ")
+                    end
+                    local api = require("lsp-progress.api")
+                    if #api.lsp_clients() > 0 then
+                        return ready_sign
+                    end
+                    return ""
+                end,
+            },
+            config = function(_, opts)
+                require("lsp-progress").setup(opts)
+                vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
+                vim.api.nvim_create_autocmd("User", {
+                    group = "lualine_augroup",
+                    pattern = "LspProgressStatusUpdated",
+                    callback = require("lualine").refresh,
+                })
+            end,
+        },
+        {
+            "nvim-treesitter/nvim-treesitter",
+            build = ":TSUpdate",
+            opts = {
+                ensure_installed = {
+                    "c",
+                    "diff",
+                    "gitcommit",
+                    "gitignore",
+                    "json",
+                    "lua",
+                    "vim",
+                    "vimdoc",
+                    "markdown",
+                    "markdown_inline",
+                },
+                sync_install = false,
+                auto_install = true,
+                incremental_selection = {
+                    enable = true,
+                    keymaps = {
+                        init_selection = "+",
+                        node_incremental = "+",
+                        scope_incremental = false,
+                        node_decremental = "<bs>",
+                    },
+                },
+                highlight = {
+                    enable = true,
+                    disable = function(_, buf)
+                        -- Disable treesitter when the file size is larger than 1 MB.
+                        local max_filesize = 1024 * 1024
+                        local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+                        if ok and stats and stats.size > max_filesize then
+                            return true
+                        end
+                    end,
+                    -- Disable Vim's regex-based syntax highlighting when treesitter is enabled.
+                    additional_vim_regex_highlighting = false,
+                },
+            },
+            config = function(_, opts)
+                require("nvim-treesitter.configs").setup(opts)
+                vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+                vim.opt.foldmethod = "expr"
+                -- Expand all folds by default.
+                vim.opt.foldlevel = 999
+            end,
+        },
+        {
+            "stevearc/conform.nvim",
+            event = "VeryLazy",
+            opts = {
+                default_format_opts = {
+                    timeout_ms = 3000,
+                    async = false,
+                    quiet = false,
+                    lsp_format = "fallback",
+                },
+                format_on_save = {
+                    enabled = true,
+                },
+                formatters_by_ft = {
+                    lua = { "stylua" },
+                    python = { "black" },
+                    rust = { "rustfmt" },
+                    typescript = { "prettierd" },
+                },
+            },
+            config = function(_, opts)
+                require("conform").setup(opts)
+                vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+            end,
+        },
+        {
+            "lewis6991/gitsigns.nvim",
+            event = "VeryLazy",
+            keys = {
+                { "<leader>hq", "<cmd>Gitsigns setqflist<cr>" },
+                { "<leader>hs", "<cmd>Gitsigns stage_hunk<cr>" },
+                {
+                    "<leader>hs",
+                    function()
+                        require("gitsigns").stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+                    end,
+                    mode = "v",
+                },
+                { "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>" },
+                { "<leader>hx", "<cmd>Gitsigns reset_hunk<cr>" },
+                {
+                    "<leader>hx",
+                    function()
+                        require("gitsigns").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+                    end,
+                    mode = "v",
+                },
+                { "<leader>hX", "<cmd>Gitsigns reset_buffer<cr>" },
+                { "<leader>hp", "<cmd>Gitsigns preview_hunk<cr>" },
+                { "<leader>hb", "<cmd>Gitsigns blame<cr>" },
+                { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
+                { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
+            },
+            opts = {
+                preview_config = {
+                    border = "rounded",
+                },
+            },
+        },
+        {
+            "tpope/vim-fugitive",
+            event = "VeryLazy",
+            keys = {
+                { "<leader>g", "<cmd>tab Git<cr>" },
+            },
+            config = function()
+                vim.api.nvim_create_augroup("fugitive_commit_augroup", { clear = true })
+                vim.api.nvim_create_autocmd("User", {
+                    group = "fugitive_commit_augroup",
+                    pattern = "FugitiveCommit",
+                    callback = function()
+                        vim.wo.foldmethod = "syntax"
+                    end,
+                })
+            end,
+        },
+        {
+            "MagicDuck/grug-far.nvim",
+            keys = {
+                {
+                    "<leader>R",
+                    function()
+                        require("grug-far").open()
+                    end,
+                },
+            },
+            opts = {
+                icons = {
+                    resultsChangeIndicator = "┃",
+                    resultsAddedIndicator = "┃",
+                    resultsRemovedIndicator = "┃",
+                    resultsDiffSeparatorIndicator = "┊",
+                },
+            },
+        },
     },
-  },
-  checker = {
-    enabled = false,
-  },
+    checker = {
+        enabled = false,
+    },
 })
