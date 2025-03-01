@@ -49,9 +49,6 @@ vim.o.scrolloff = 3
 -- Show line numbers.
 vim.o.number = true
 
--- Show sign column.
-vim.o.signcolumn = "yes"
-
 -- Hide intro at Vim startup.
 vim.opt.shortmess:append("I")
 
@@ -60,7 +57,7 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱", foldopen = "", foldclose = "", foldsep = " ", fold = " " }
+vim.opt.fillchars = { diff = "╱", foldopen = "⌄", foldclose = ">", foldsep = " " }
 
 -- Show relative line number.
 vim.opt.relativenumber = true
@@ -188,12 +185,31 @@ require("lazy").setup({
             "luukvbaal/statuscol.nvim",
             opts = function()
                 local builtin = require("statuscol.builtin")
+                local function has_line_diagnostics(args)
+                    return #vim.diagnostic.get(args.buf, { lnum = args.lnum - 1 }) > 0
+                end
+                local function no_line_diagnostics(args)
+                    return not has_line_diagnostics(args)
+                end
                 return {
                     relculright = true,
                     segments = {
-                        { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
-                        { text = { builtin.lnumfunc }, condition = { true }, click = "v:lua.ScLa" },
-                        { text = { "%s" }, click = "v:lua.ScSa" },
+                        { text = { builtin.lnumfunc }, click = "v:lua.ScLa" },
+                        {
+                            sign = { namespace = { ".*" }, maxwidth = 1, colwidth = 1, wrap = true },
+                            condition = { no_line_diagnostics },
+                            click = "v:lua.ScSa",
+                        },
+                        {
+                            text = { builtin.foldfunc },
+                            condition = { no_line_diagnostics },
+                            click = "v:lua.ScFa",
+                        },
+                        {
+                            sign = { namespace = { "diagnostic/signs" }, maxwidth = 1, colwidth = 2 },
+                            condition = { has_line_diagnostics },
+                            click = "v:lua.ScSa",
+                        },
                     },
                 }
             end,
@@ -202,14 +218,6 @@ require("lazy").setup({
             "mbbill/undotree",
             keys = {
                 { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" },
-            },
-        },
-        {
-            "lukas-reineke/indent-blankline.nvim",
-            main = "ibl",
-            opts = {
-                indent = { char = "│" },
-                scope = { show_start = false, show_end = false },
             },
         },
         {
@@ -588,9 +596,9 @@ require("lazy").setup({
             },
             opts = {
                 icons = {
-                    resultsChangeIndicator = "┃",
-                    resultsAddedIndicator = "┃",
-                    resultsRemovedIndicator = "┃",
+                    resultsChangeIndicator = "▉",
+                    resultsAddedIndicator = "▉",
+                    resultsRemovedIndicator = "▉",
                     resultsDiffSeparatorIndicator = "┊",
                 },
             },
