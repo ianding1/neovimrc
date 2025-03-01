@@ -60,7 +60,10 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱", foldopen = "▼", foldclose = "▶" }
+vim.opt.fillchars = { diff = "╱", foldopen = "", foldclose = "", foldsep = " " }
+
+-- Show relative line number.
+vim.opt.relativenumber = true
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
@@ -81,8 +84,9 @@ vim.opt.diffopt:append("linematch:60")
 -- Start diff mode with vertical splits.
 vim.opt.diffopt:append("vertical")
 
--- Set the fold column in diff mode to 1.
-vim.opt.diffopt:append("foldcolumn:1")
+-- Enable text highlight for fold mode.
+vim.opt.foldtext = ""
+vim.opt.fillchars:append({ fold = " " })
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
@@ -178,9 +182,30 @@ require("lazy").setup({
       end,
     },
     {
+      "luukvbaal/statuscol.nvim",
+      opts = function()
+        local builtin = require("statuscol.builtin")
+        return {
+          relculright = true,
+          segments = {
+            { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
+            { text = { builtin.lnumfunc }, condition = { true }, click = "v:lua.ScLa" },
+            { text = { "%s" }, click = "v:lua.ScSa" },
+          },
+        }
+      end,
+    },
+    {
       "mbbill/undotree",
       keys = {
         { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" },
+      },
+    },
+    {
+      "lukas-reineke/indent-blankline.nvim",
+      main = "ibl",
+      opts = {
+        indent = { char = "▏" },
       },
     },
     {
@@ -465,6 +490,10 @@ require("lazy").setup({
       },
       config = function(_, opts)
         require("nvim-treesitter.configs").setup(opts)
+        vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+        vim.opt.foldmethod = "expr"
+        -- Expand all folds by default.
+        vim.opt.foldlevel = 999
       end,
     },
     {
@@ -539,7 +568,6 @@ require("lazy").setup({
           pattern = "FugitiveCommit",
           callback = function()
             vim.wo.foldmethod = "syntax"
-            vim.wo.foldcolumn = "auto:1"
           end,
         })
       end,
