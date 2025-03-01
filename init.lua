@@ -57,10 +57,13 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱", foldopen = "⌄", foldclose = ">", foldsep = " " }
+vim.opt.fillchars = { diff = "╱", foldopen = "⌄", foldclose = "▶", foldsep = " " }
 
 -- Show relative line number.
 vim.opt.relativenumber = true
+
+-- Set sign column.
+vim.opt.signcolumn = "yes:1"
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
@@ -83,10 +86,21 @@ vim.opt.diffopt:append("vertical")
 
 -- Set fold column to 1.
 vim.opt.diffopt:append("foldcolumn:1")
-vim.opt.foldcolumn = "auto:1"
+vim.opt.foldcolumn = "1"
 
 -- Enable text highlight for fold mode.
 vim.opt.foldtext = ""
+
+-- Disable sign column and fold column in help buffers.
+vim.api.nvim_create_augroup("helpbuf_augroup", { clear = true })
+vim.api.nvim_create_autocmd("FileType", {
+    group = "helpbuf_augroup",
+    pattern = "help",
+    callback = function()
+        vim.wo.signcolumn = "no"
+        vim.wo.foldcolumn = "0"
+    end,
+})
 
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
@@ -185,31 +199,23 @@ require("lazy").setup({
             "luukvbaal/statuscol.nvim",
             opts = function()
                 local builtin = require("statuscol.builtin")
-                local function has_line_diagnostics(args)
-                    return #vim.diagnostic.get(args.buf, { lnum = args.lnum - 1 }) > 0
-                end
-                local function no_line_diagnostics(args)
-                    return not has_line_diagnostics(args)
-                end
                 return {
                     relculright = true,
                     segments = {
-                        { text = { builtin.lnumfunc }, click = "v:lua.ScLa" },
                         {
-                            sign = { namespace = { ".*" }, maxwidth = 1, colwidth = 1, wrap = true },
-                            condition = { no_line_diagnostics },
-                            click = "v:lua.ScSa",
+                            text = { builtin.lnumfunc },
+                            click = "v:lua.ScLa",
                         },
                         {
-                            text = { builtin.foldfunc },
-                            condition = { no_line_diagnostics },
-                            click = "v:lua.ScFa",
+                            text = { "%s" },
+                            condition = {
+                                function(args)
+                                    return args.buf
+                                end,
+                            },
+                            click = "v:lua.ScLa",
                         },
-                        {
-                            sign = { namespace = { "diagnostic/signs" }, maxwidth = 1, colwidth = 2 },
-                            condition = { has_line_diagnostics },
-                            click = "v:lua.ScSa",
-                        },
+                        { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
                     },
                 }
             end,
@@ -238,6 +244,9 @@ require("lazy").setup({
                     ["-"] = { "actions.parent", mode = "n" },
                 },
                 use_default_keymaps = false,
+                win_options = {
+                    foldcolumn = "1",
+                },
                 view_options = {
                     show_hidden = true,
                 },
