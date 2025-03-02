@@ -44,7 +44,7 @@ vim.o.swapfile = false
 vim.o.mouse = "a"
 
 -- Always show 5 lines above or below the cursor.
-vim.o.scrolloff = 3
+vim.o.scrolloff = 5
 
 -- Show line numbers.
 vim.o.number = true
@@ -108,6 +108,10 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+-- Use H/L to switch tab pages.
+vim.keymap.set("n", "H", "<cmd>tabprevious<cr>")
+vim.keymap.set("n", "L", "<cmd>tabnext<cr>")
+
 -- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
@@ -133,8 +137,40 @@ end
 vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
 
 -- Quickfix navigation.
-vim.keymap.set("n", "}", "<cmd>cnext<cr>")
-vim.keymap.set("n", "{", "<cmd>cprevious<cr>")
+local function quickfix_next()
+    local ok, msg = pcall(vim.cmd, "cbelow")
+    if not ok and (string.find(msg, "E553:") or string.find(msg, "E42:")) then
+        ok, msg = pcall(vim.cmd, "cnext")
+        if not ok and string.find(msg, "E553:") then
+            vim.cmd("cfirst")
+        elseif not ok and string.find(msg, "E42:") then
+            vim.print("Empty quickfix list")
+        elseif not ok then
+            vim.api.nvim_err_writeln(msg)
+        end
+    elseif not ok then
+        vim.api.nvim_err_writeln(msg)
+    end
+end
+
+local function quickfix_previous()
+    local ok, msg = pcall(vim.cmd, "cabove")
+    if not ok and (string.find(msg, "E553:") or string.find(msg, "E42:")) then
+        ok, msg = pcall(vim.cmd, "cprevious")
+        if not ok and string.find(msg, "E553:") then
+            vim.cmd("clast")
+        elseif not ok and string.find(msg, "E42:") then
+            vim.print("Empty quickfix list")
+        elseif not ok then
+            vim.api.nvim_err_writeln(msg)
+        end
+    elseif not ok then
+        vim.api.nvim_err_writeln(msg)
+    end
+end
+
+vim.keymap.set("n", "}", quickfix_next)
+vim.keymap.set("n", "{", quickfix_previous)
 
 -- Quickfix filling.
 vim.keymap.set("n", "<leader>qd", "<cmd>lua vim.diagnostic.setqflist()<cr>")
@@ -291,6 +327,7 @@ require("lazy").setup({
                 { "<C-f>", "<cmd>FzfLua files<cr>" },
                 { "<C-b>", "<cmd>FzfLua blines<cr>" },
                 { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
+                { "<leader>t", "<cmd>FzfLua tabs<cr>" },
                 { "<leader>f", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
 
                 -- LSP actions.
@@ -331,8 +368,9 @@ require("lazy").setup({
                             ["ctrl-s"] = actions.file_split,
                             ["ctrl-v"] = actions.file_vsplit,
                             ["ctrl-t"] = actions.file_tabedit,
-                            ["ctrl-i"] = actions.toggle_ignore,
-                            ["ctrl-f"] = actions.toggle_follow,
+                            ["alt-i"] = actions.toggle_ignore,
+                            ["alt-h"] = actions.toggle_hidden,
+                            ["alt-f"] = actions.toggle_follow,
                         },
                     },
                 }
