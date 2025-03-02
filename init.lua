@@ -223,6 +223,11 @@ require("lazy").setup({
                 }
                 return {
                     extensions = { "quickfix" },
+                    options = {
+                        disabled_filetypes = {
+                            winbar = { "qf" },
+                        },
+                    },
                     sections = {
                         lualine_a = { "mode" },
                         lualine_b = {
@@ -248,26 +253,16 @@ require("lazy").setup({
                         lualine_z = { "progress", "location" },
                     },
                     winbar = {
-                        lualine_a = {},
                         lualine_b = {
                             { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
                             { "filename", path = 1, symbols = symbols, shorting_target = 3 },
                         },
-                        lualine_c = {},
-                        lualine_x = {},
-                        lualine_y = {},
-                        lualine_z = {},
                     },
                     inactive_winbar = {
-                        lualine_a = {},
-                        lualine_b = {},
                         lualine_c = {
                             { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
                             { "filename", path = 1, symbols = symbols, shorting_target = 3 },
                         },
-                        lualine_x = {},
-                        lualine_y = {},
-                        lualine_z = {},
                     },
                 }
             end,
@@ -279,19 +274,8 @@ require("lazy").setup({
                 return {
                     relculright = true,
                     segments = {
-                        {
-                            text = { builtin.lnumfunc },
-                            click = "v:lua.ScLa",
-                        },
-                        {
-                            text = { "%s" },
-                            condition = {
-                                function(args)
-                                    return args.buf
-                                end,
-                            },
-                            click = "v:lua.ScLa",
-                        },
+                        { text = { builtin.lnumfunc }, click = "v:lua.ScLa" },
+                        { text = { "%s" }, click = "v:lua.ScLa" },
                         { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
                     },
                 }
@@ -299,9 +283,7 @@ require("lazy").setup({
         },
         {
             "mbbill/undotree",
-            keys = {
-                { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" },
-            },
+            keys = { { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" } },
         },
         {
             "stevearc/oil.nvim",
@@ -318,13 +300,7 @@ require("lazy").setup({
                     ["g?"] = { "actions.show_help", mode = "n" },
                     ["<localleader>r"] = { "actions.refresh", mode = "n" },
                     ["<localleader>h"] = { "actions.toggle_hidden", mode = "n" },
-                    ["<localleader>s"] = {
-                        function()
-                            require("grug-far").open({ prefills = { paths = require("oil").get_current_dir() } })
-                        end,
-                        mode = "n",
-                        desc = "Search in directory",
-                    },
+                    ["<localleader>cd"] = { "actions.cd", mode = "n" },
                     ["-"] = { "actions.parent", mode = "n" },
                 },
                 use_default_keymaps = false,
@@ -678,31 +654,6 @@ require("lazy").setup({
                     end,
                 })
             end,
-        },
-        {
-            "MagicDuck/grug-far.nvim",
-            keys = {
-                {
-                    "<leader>sf",
-                    function()
-                        require("grug-far").open({ prefills = { paths = vim.fn.expand("%") } })
-                    end,
-                },
-                {
-                    "<leader>ss",
-                    function()
-                        require("grug-far").open()
-                    end,
-                },
-            },
-            opts = {
-                icons = {
-                    resultsChangeIndicator = "▉",
-                    resultsAddedIndicator = "▉",
-                    resultsRemovedIndicator = "▉",
-                    resultsDiffSeparatorIndicator = "┊",
-                },
-            },
         },
     },
     checker = {
