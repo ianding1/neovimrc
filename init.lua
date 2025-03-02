@@ -65,6 +65,12 @@ vim.opt.relativenumber = true
 -- Set sign column.
 vim.opt.signcolumn = "yes:1"
 
+-- Never show tablines.
+vim.opt.showtabline = 0
+
+-- Always show a global status line.
+vim.opt.laststatus = 3
+
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
     vim.fn.system("mkdir -p $HOME/.cache/vim-undo")
@@ -164,30 +170,48 @@ require("lazy").setup({
                 }
                 return {
                     extensions = { "quickfix" },
-                    tabline = {
+                    sections = {
                         lualine_a = { "mode" },
-                        lualine_b = { "branch", "diff", "diagnostics" },
-                        lualine_c = { { "tabs", mode = 2, show_modified_status = false } },
-                        lualine_x = {
+                        lualine_b = {
+                            {
+                                "󱂬 [%{tabpagenr()}/%{tabpagenr('$')}]",
+                                type = "stl",
+                                cond = function()
+                                    return vim.fn.tabpagenr("$") > 1
+                                end,
+                            },
+                            "branch",
+                            "diff",
+                        },
+                        lualine_c = {
                             function()
                                 return require("lsp-progress").progress()
                             end,
                         },
+                        lualine_x = {
+                            "diagnostics",
+                        },
                         lualine_y = { "encoding", "fileformat", "filetype" },
                         lualine_z = { "progress", "location" },
                     },
-                    sections = {
+                    winbar = {
                         lualine_a = {},
-                        lualine_b = { { "filename", path = 1, symbols = symbols } },
+                        lualine_b = {
+                            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
+                            { "filename", path = 1, symbols = symbols, shorting_target = 3 },
+                        },
                         lualine_c = {},
                         lualine_x = {},
                         lualine_y = {},
                         lualine_z = {},
                     },
-                    inactive_sections = {
+                    inactive_winbar = {
                         lualine_a = {},
                         lualine_b = {},
-                        lualine_c = { { "filename", path = 1, symbols = symbols } },
+                        lualine_c = {
+                            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
+                            { "filename", path = 1, symbols = symbols, shorting_target = 3 },
+                        },
                         lualine_x = {},
                         lualine_y = {},
                         lualine_z = {},
@@ -447,7 +471,7 @@ require("lazy").setup({
             opts = {
                 format = function(client_messages)
                     local ready_sign = " lsp"
-                    local busy_sign = "󰔚 lsp"
+                    local busy_sign = "󰔚 "
                     if #client_messages > 0 then
                         return busy_sign .. " " .. table.concat(client_messages, " ")
                     end
