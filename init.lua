@@ -18,7 +18,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Bind leader keys.
 vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
+vim.g.maplocalleader = ","
 
 -- Use 24-bit colors in the terminal.
 vim.o.termguicolors = true
@@ -138,49 +138,66 @@ vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
 
 -- Quickfix navigation.
 local function quickfix_next()
-    local ok, msg = pcall(vim.cmd, "cbelow")
-    if not ok and (string.find(msg, "E553:") or string.find(msg, "E42:")) then
-        ok, msg = pcall(vim.cmd, "cnext")
-        if not ok and string.find(msg, "E553:") then
-            vim.cmd("cfirst")
-        elseif not ok and string.find(msg, "E42:") then
-            vim.print("Empty quickfix list")
+    local count = vim.v.count == 0 and 1 or vim.v.count
+    for _ = 1, count do
+        local ok, msg = pcall(vim.cmd, "cbelow")
+        if not ok and (string.find(msg, "E553:") or string.find(msg, "E42:")) then
+            ok, msg = pcall(vim.cmd, "cnext")
+            if not ok and string.find(msg, "E553:") then
+                vim.cmd("cfirst")
+            elseif not ok and string.find(msg, "E42:") then
+                vim.print("Empty quickfix list")
+            elseif not ok then
+                vim.api.nvim_err_writeln(msg)
+            end
         elseif not ok then
             vim.api.nvim_err_writeln(msg)
         end
-    elseif not ok then
-        vim.api.nvim_err_writeln(msg)
     end
 end
 
 local function quickfix_previous()
-    local ok, msg = pcall(vim.cmd, "cabove")
-    if not ok and (string.find(msg, "E553:") or string.find(msg, "E42:")) then
-        ok, msg = pcall(vim.cmd, "cprevious")
-        if not ok and string.find(msg, "E553:") then
-            vim.cmd("clast")
-        elseif not ok and string.find(msg, "E42:") then
-            vim.print("Empty quickfix list")
+    local count = vim.v.count == 0 and 1 or vim.v.count
+    for _ = 1, count do
+        local ok, msg = pcall(vim.cmd, "cabove")
+        if not ok and (string.find(msg, "E553:") or string.find(msg, "E42:")) then
+            ok, msg = pcall(vim.cmd, "cprevious")
+            if not ok and string.find(msg, "E553:") then
+                vim.cmd("clast")
+            elseif not ok and string.find(msg, "E42:") then
+                vim.print("Empty quickfix list")
+            elseif not ok then
+                vim.api.nvim_err_writeln(msg)
+            end
         elseif not ok then
             vim.api.nvim_err_writeln(msg)
         end
-    elseif not ok then
-        vim.api.nvim_err_writeln(msg)
     end
 end
 
 vim.keymap.set("n", "}", quickfix_next)
 vim.keymap.set("n", "{", quickfix_previous)
 
--- Quickfix filling.
-vim.keymap.set("n", "<leader>qd", "<cmd>lua vim.diagnostic.setqflist()<cr>")
+vim.api.nvim_create_augroup("qf_augroup", { clear = true })
+vim.api.nvim_create_autocmd("FileType", {
+    group = "qf_augroup",
+    pattern = "qf",
+    callback = function()
+        -- Disable unnecessary status column components.
+        vim.wo.relativenumber = false
+        vim.wo.signcolumn = "no"
+
+        -- Close quickfix window with q.
+        vim.keymap.set("n", "q", "<C-w>q", { buffer = true })
+    end,
+})
 
 -- LSP key bindings.
-vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float)
-vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename)
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
+vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename)
 
 -- Lazy.nvim UI.
-vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
+vim.keymap.set("n", "<leader>ol", "<cmd>Lazy<cr>")
 
 require("lazy").setup({
     spec = {
@@ -298,9 +315,16 @@ require("lazy").setup({
                     ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
                     ["<C-t>"] = { "actions.select", opts = { tab = true } },
                     ["gq"] = { "actions.close", mode = "n" },
-                    ["gr"] = { "actions.refresh", mode = "n" },
                     ["g?"] = { "actions.show_help", mode = "n" },
-                    ["g."] = { "actions.toggle_hidden", mode = "n" },
+                    ["<localleader>r"] = { "actions.refresh", mode = "n" },
+                    ["<localleader>h"] = { "actions.toggle_hidden", mode = "n" },
+                    ["<localleader>s"] = {
+                        function()
+                            require("grug-far").open({ prefills = { paths = require("oil").get_current_dir() } })
+                        end,
+                        mode = "n",
+                        desc = "Search in directory",
+                    },
                     ["-"] = { "actions.parent", mode = "n" },
                 },
                 use_default_keymaps = false,
@@ -336,7 +360,7 @@ require("lazy").setup({
                 { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
                 { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
                 { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
-                { "<leader>a", "<cmd>FzfLua lsp_code_actions<cr>" },
+                { "<leader>ca", "<cmd>FzfLua lsp_code_actions<cr>" },
             },
             opts = function()
                 local actions = require("fzf-lua").actions
@@ -426,7 +450,7 @@ require("lazy").setup({
         {
             "williamboman/mason.nvim",
             keys = {
-                { "<leader>m", "<cmd>Mason<cr>" },
+                { "<leader>om", "<cmd>Mason<cr>" },
             },
             build = ":MasonUpdate",
             opts = {},
@@ -659,7 +683,13 @@ require("lazy").setup({
             "MagicDuck/grug-far.nvim",
             keys = {
                 {
-                    "<leader>R",
+                    "<leader>sf",
+                    function()
+                        require("grug-far").open({ prefills = { paths = vim.fn.expand("%") } })
+                    end,
+                },
+                {
+                    "<leader>ss",
                     function()
                         require("grug-far").open()
                     end,
