@@ -288,7 +288,12 @@ require("lazy").setup({
         {
             "stevearc/oil.nvim",
             keys = {
-                { "-", "<cmd>Oil<cr>" },
+                {
+                    "-",
+                    function()
+                        require("oil").open(nil, { preview = { vertical = true } })
+                    end,
+                },
             },
             opts = {
                 keymaps = {
@@ -296,12 +301,27 @@ require("lazy").setup({
                     ["<C-v>"] = { "actions.select", opts = { vertical = true } },
                     ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
                     ["<C-t>"] = { "actions.select", opts = { tab = true } },
+                    ["<C-f>"] = { "actions.preview_scroll_down" },
+                    ["<C-b>"] = { "actions.preview_scroll_up" },
+                    ["-"] = { "actions.parent", mode = "n" },
                     ["gq"] = { "actions.close", mode = "n" },
                     ["g?"] = { "actions.show_help", mode = "n" },
                     ["<localleader>r"] = { "actions.refresh", mode = "n" },
                     ["<localleader>h"] = { "actions.toggle_hidden", mode = "n" },
                     ["<localleader>cd"] = { "actions.cd", mode = "n" },
-                    ["-"] = { "actions.parent", mode = "n" },
+                    ["<localleader>p"] = { "actions.preview", mode = "n" },
+                    ["<localleader>f"] = {
+                        callback = function()
+                            require("fzf-lua").files({ cwd = require("oil").get_current_dir() })
+                        end,
+                        desc = "oil: Search files in directory",
+                    },
+                    ["<localleader>g"] = {
+                        callback = function()
+                            require("fzf-lua").live_grep_glob({ cwd = require("oil").get_current_dir() })
+                        end,
+                        desc = "oil: Search file content in directory",
+                    },
                 },
                 use_default_keymaps = false,
                 win_options = {
@@ -310,9 +330,21 @@ require("lazy").setup({
                 view_options = {
                     show_hidden = true,
                 },
-                float = {
-                    max_width = 0.80,
-                    max_height = 0.85,
+                preview_win = {
+                    win_options = {
+                        signcolumn = "no",
+                        foldcolumn = "1",
+                        relativenumber = false,
+                    },
+                    disable_preview = function(filename)
+                        -- Disable treesitter when the file size is larger than 1 MB.
+                        local max_filesize = 1024 * 1024
+                        local ok, stats = pcall(vim.uv.fs_stat, filename)
+                        if ok and stats and stats.size > max_filesize then
+                            return true
+                        end
+                        return false
+                    end,
                 },
             },
         },
@@ -324,11 +356,15 @@ require("lazy").setup({
             },
             keys = {
                 -- File, buffer, greps.
-                { "<C-f>", "<cmd>FzfLua files<cr>" },
-                { "<C-b>", "<cmd>FzfLua blines<cr>" },
-                { "<C-g>", "<cmd>FzfLua live_grep_glob<cr>" },
-                { "<leader>t", "<cmd>FzfLua tabs<cr>" },
-                { "<leader>f", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
+                { "sf", "<cmd>FzfLua files<cr>" },
+                { "ss", "<cmd>FzfLua blines<cr>" },
+                { "sb", "<cmd>FzfLua buffers<cr>" },
+                { "sG", "<cmd>FzfLua live_grep_glob<cr>" },
+                { "st", "<cmd>FzfLua tabs<cr>" },
+                { "sh", "<cmd>FzfLua helptags<cr>" },
+                { "sd", "<cmd>FzfLua diagnostics_document<cr>" },
+                { "sD", "<cmd>FzfLua diagnostics_workspace<cr>" },
+                { "s<space>", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
 
                 -- LSP actions.
                 { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
