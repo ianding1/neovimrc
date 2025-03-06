@@ -287,6 +287,7 @@ require("lazy").setup({
         },
         {
             "stevearc/oil.nvim",
+            lazy = false,
             keys = {
                 {
                     "-",
@@ -301,8 +302,6 @@ require("lazy").setup({
                     ["<C-v>"] = { "actions.select", opts = { vertical = true } },
                     ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
                     ["<C-t>"] = { "actions.select", opts = { tab = true } },
-                    ["<C-f>"] = { "actions.preview_scroll_down" },
-                    ["<C-b>"] = { "actions.preview_scroll_up" },
                     ["-"] = { "actions.parent", mode = "n" },
                     ["gq"] = { "actions.close", mode = "n" },
                     ["g?"] = { "actions.show_help", mode = "n" },
@@ -314,13 +313,13 @@ require("lazy").setup({
                         callback = function()
                             require("fzf-lua").files({ cwd = require("oil").get_current_dir() })
                         end,
-                        desc = "oil: Search files in directory",
+                        desc = "Search files in directory",
                     },
                     ["<localleader>g"] = {
                         callback = function()
                             require("fzf-lua").live_grep_glob({ cwd = require("oil").get_current_dir() })
                         end,
-                        desc = "oil: Search file content in directory",
+                        desc = "Search file content in directory",
                     },
                 },
                 use_default_keymaps = false,
@@ -333,7 +332,8 @@ require("lazy").setup({
                 preview_win = {
                     win_options = {
                         signcolumn = "no",
-                        foldcolumn = "1",
+                        foldcolumn = "0",
+                        number = false,
                         relativenumber = false,
                     },
                     disable_preview = function(filename)
