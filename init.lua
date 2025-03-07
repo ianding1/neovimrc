@@ -140,16 +140,11 @@ vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
 local function quickfix_next()
     local count = vim.v.count == 0 and 1 or vim.v.count
     for _ = 1, count do
-        local ok, msg = pcall(vim.cmd, "cbelow")
-        if not ok and (string.find(msg, "E553:") or string.find(msg, "E42:")) then
-            ok, msg = pcall(vim.cmd, "cnext")
-            if not ok and string.find(msg, "E553:") then
-                vim.cmd("cfirst")
-            elseif not ok and string.find(msg, "E42:") then
-                vim.print("Empty quickfix list")
-            elseif not ok then
-                vim.api.nvim_err_writeln(msg)
-            end
+        local ok, msg = pcall(vim.cmd, "cnext")
+        if not ok and string.find(msg, "E553:") then
+            vim.cmd("cfirst")
+        elseif not ok and string.find(msg, "E42:") then
+            vim.print("Empty quickfix list")
         elseif not ok then
             vim.api.nvim_err_writeln(msg)
         end
@@ -159,16 +154,11 @@ end
 local function quickfix_previous()
     local count = vim.v.count == 0 and 1 or vim.v.count
     for _ = 1, count do
-        local ok, msg = pcall(vim.cmd, "cabove")
-        if not ok and (string.find(msg, "E553:") or string.find(msg, "E42:")) then
-            ok, msg = pcall(vim.cmd, "cprevious")
-            if not ok and string.find(msg, "E553:") then
-                vim.cmd("clast")
-            elseif not ok and string.find(msg, "E42:") then
-                vim.print("Empty quickfix list")
-            elseif not ok then
-                vim.api.nvim_err_writeln(msg)
-            end
+        local ok, msg = pcall(vim.cmd, "cprevious")
+        if not ok and string.find(msg, "E553:") then
+            vim.cmd("clast")
+        elseif not ok and string.find(msg, "E42:") then
+            vim.print("Empty quickfix list")
         elseif not ok then
             vim.api.nvim_err_writeln(msg)
         end
