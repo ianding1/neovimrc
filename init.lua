@@ -23,6 +23,9 @@ vim.g.maplocalleader = ","
 -- Use 24-bit colors in the terminal.
 vim.o.termguicolors = true
 
+-- Do not show mode change.
+vim.o.showmode = false
+
 -- Use spaces instead of tabs.
 vim.o.expandtab = true
 
@@ -116,6 +119,9 @@ vim.api.nvim_create_autocmd("TermOpen", {
         vim.wo.number = false
         vim.wo.relativenumber = false
         vim.wo.signcolumn = "no"
+
+        -- Auto enter insert mode.
+        vim.cmd("startinsert")
     end,
 })
 
@@ -143,6 +149,7 @@ vim.diagnostic.config({
 -- Window and tab key bindings.
 for _, dir in ipairs({ "h", "j", "k", "l" }) do
     vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir)
+    vim.keymap.set("t", "<C-" .. dir .. ">", "<C-\\><C-n><C-w>" .. dir)
 end
 
 vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
@@ -201,6 +208,16 @@ vim.keymap.set("n", "<leader>ol", "<cmd>Lazy<cr>")
 
 require("lazy").setup({
     spec = {
+        {
+            "willothy/flatten.nvim",
+            opts = {
+                window = {
+                    open = "alternate",
+                },
+            },
+            lazy = false,
+            priority = 1001,
+        },
         {
             "rebelot/kanagawa.nvim",
             priority = 1000,
