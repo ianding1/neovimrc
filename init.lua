@@ -52,6 +52,9 @@ vim.o.scrolloff = 5
 -- Show line numbers.
 vim.o.number = true
 
+-- Show winbar at startup to make the startup process snappier.
+vim.o.winbar = " "
+
 -- Hide intro at Vim startup.
 vim.opt.shortmess:append("I")
 
@@ -207,6 +210,7 @@ require("lazy").setup({
     spec = {
         {
             "willothy/flatten.nvim",
+            priority = 1000,
             opts = function()
                 local saved_terminal
                 return {
@@ -244,12 +248,10 @@ require("lazy").setup({
                     },
                 }
             end,
-            lazy = false,
-            priority = 1001,
         },
         {
             "rebelot/kanagawa.nvim",
-            priority = 1000,
+            priority = 500,
             config = function()
                 vim.cmd.colorscheme("kanagawa")
             end,
@@ -416,6 +418,7 @@ require("lazy").setup({
             "saghen/blink.cmp",
             version = "*",
             build = "cargo build --release",
+            event = "VeryLazy",
             opts = {
                 appearance = {
                     nerd_font_variant = "normal",
@@ -449,6 +452,7 @@ require("lazy").setup({
                 { "<leader>om", "<cmd>Mason<cr>" },
             },
             build = ":MasonUpdate",
+            event = "VeryLazy",
             opts = {},
         },
         {
@@ -458,6 +462,7 @@ require("lazy").setup({
                 "neovim/nvim-lspconfig",
                 "saghen/blink.cmp",
             },
+            event = "VeryLazy",
             opts = {
                 ensure_installed = { "lua_ls" },
                 automatic_installation = false,
@@ -553,6 +558,7 @@ require("lazy").setup({
         {
             "nvim-treesitter/nvim-treesitter",
             build = ":TSUpdate",
+            event = "VeryLazy",
             opts = {
                 ensure_installed = {
                     "c",
