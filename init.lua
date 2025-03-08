@@ -187,8 +187,9 @@ vim.api.nvim_create_autocmd("FileType", {
     group = "vimrc",
     pattern = "qf",
     callback = function()
-        -- Disable relative number in quickfix.
+        -- Disable relative number and sign column in quickfix.
         vim.wo.relativenumber = false
+        vim.wo.signcolumn = "no"
 
         -- Close quickfix window with q.
         vim.keymap.set("n", "q", "<C-w>q", { buffer = true })
