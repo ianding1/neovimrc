@@ -103,10 +103,18 @@ vim.opt.foldtext = ""
 vim.api.nvim_create_augroup("vimrc", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
     group = "vimrc",
-    pattern = { "help", "terminal" },
+    pattern = "help",
     callback = function()
         vim.wo.number = false
         vim.wo.relativenumber = false
+        vim.wo.signcolumn = "no"
+    end,
+})
+
+-- Disable the sign column in the term buffer.
+vim.api.nvim_create_autocmd("TermOpen", {
+    group = "vimrc",
+    callback = function()
         vim.wo.signcolumn = "no"
     end,
 })
