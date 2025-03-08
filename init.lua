@@ -645,9 +645,10 @@ require("lazy").setup({
             "akinsho/toggleterm.nvim",
             version = "*",
             keys = {
-                { "-", '<cmd>exe v:count1 . "ToggleTerm"<cr>' },
+                { "<C-/>", '<cmd>exe v:count1 . "ToggleTerm"<cr>' },
             },
             opts = {
+                open_mapping = "<C-/>",
                 shading_factor = -20,
             },
         },
