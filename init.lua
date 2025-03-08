@@ -153,6 +153,9 @@ end
 
 vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
 
+-- Delete buffer without changing the window layout.
+vim.keymap.set("n", "<leader>bd", "<cmd>bprevious<bar>bdelete! #<cr>")
+
 -- Quickfix navigation.
 local function quickfix_next()
     local count = vim.v.count == 0 and 1 or vim.v.count
