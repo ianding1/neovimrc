@@ -111,19 +111,6 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- Disable the status column in the help buffer.
-vim.api.nvim_create_autocmd("TermOpen", {
-    group = "vimrc",
-    callback = function()
-        vim.wo.number = false
-        vim.wo.relativenumber = false
-        vim.wo.signcolumn = "no"
-
-        -- Auto enter insert mode.
-        vim.cmd("startinsert")
-    end,
-})
-
 -- Use H/L to switch tab pages.
 vim.keymap.set("n", "H", "<cmd>tabprevious<cr>")
 vim.keymap.set("n", "L", "<cmd>tabnext<cr>")
