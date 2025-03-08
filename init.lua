@@ -92,19 +92,30 @@ vim.opt.diffopt:append("vertical")
 
 -- Set fold column to 1.
 vim.opt.diffopt:append("foldcolumn:1")
-vim.opt.foldcolumn = "1"
 
 -- Enable text highlight for fold mode.
 vim.opt.foldtext = ""
 
--- Disable sign column and fold column in help buffers.
-vim.api.nvim_create_augroup("helpbuf_augroup", { clear = true })
+-- Disable the status column in the help buffer.
+vim.api.nvim_create_augroup("vimrc_help", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
-    group = "helpbuf_augroup",
-    pattern = "help",
+    group = "vimrc_help",
+    pattern = { "help", "terminal" },
     callback = function()
+        vim.wo.number = false
+        vim.wo.relativenumber = false
         vim.wo.signcolumn = "no"
-        vim.wo.foldcolumn = "0"
+    end,
+})
+
+-- Disable the status column in the help buffer.
+vim.api.nvim_create_augroup("vimrc_term", { clear = true })
+vim.api.nvim_create_autocmd("TermOpen", {
+    group = "vimrc_term",
+    callback = function()
+        vim.wo.number = false
+        vim.wo.relativenumber = false
+        vim.wo.signcolumn = "no"
     end,
 })
 
@@ -168,14 +179,13 @@ end
 vim.keymap.set("n", "}", quickfix_next)
 vim.keymap.set("n", "{", quickfix_previous)
 
-vim.api.nvim_create_augroup("qf_augroup", { clear = true })
+vim.api.nvim_create_augroup("vimrc_qf", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
-    group = "qf_augroup",
+    group = "vimrc_qf",
     pattern = "qf",
     callback = function()
-        -- Disable unnecessary status column components.
+        -- Disable relative number in quickfix.
         vim.wo.relativenumber = false
-        vim.wo.signcolumn = "no"
 
         -- Close quickfix window with q.
         vim.keymap.set("n", "q", "<C-w>q", { buffer = true })
@@ -262,6 +272,7 @@ require("lazy").setup({
             opts = function()
                 local builtin = require("statuscol.builtin")
                 return {
+                    bt_ignore = { "help", "quickfix", "terminal" },
                     relculright = true,
                     segments = {
                         { text = { builtin.lnumfunc }, click = "v:lua.ScLa" },
@@ -276,69 +287,6 @@ require("lazy").setup({
             keys = { { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" } },
         },
         {
-            "stevearc/oil.nvim",
-            lazy = false,
-            keys = {
-                {
-                    "-",
-                    function()
-                        require("oil").open(nil, { preview = { vertical = true } })
-                    end,
-                },
-            },
-            opts = {
-                keymaps = {
-                    ["<cr>"] = "actions.select",
-                    ["<C-v>"] = { "actions.select", opts = { vertical = true } },
-                    ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
-                    ["<C-t>"] = { "actions.select", opts = { tab = true } },
-                    ["-"] = { "actions.parent", mode = "n" },
-                    ["gq"] = { "actions.close", mode = "n" },
-                    ["g?"] = { "actions.show_help", mode = "n" },
-                    ["<localleader>r"] = { "actions.refresh", mode = "n" },
-                    ["<localleader>h"] = { "actions.toggle_hidden", mode = "n" },
-                    ["<localleader>cd"] = { "actions.cd", mode = "n" },
-                    ["<localleader>p"] = { "actions.preview", mode = "n" },
-                    ["<localleader>f"] = {
-                        callback = function()
-                            require("fzf-lua").files({ cwd = require("oil").get_current_dir() })
-                        end,
-                        desc = "Search files in directory",
-                    },
-                    ["<localleader>g"] = {
-                        callback = function()
-                            require("fzf-lua").live_grep_glob({ cwd = require("oil").get_current_dir() })
-                        end,
-                        desc = "Search file content in directory",
-                    },
-                },
-                use_default_keymaps = false,
-                win_options = {
-                    foldcolumn = "1",
-                },
-                view_options = {
-                    show_hidden = true,
-                },
-                preview_win = {
-                    win_options = {
-                        signcolumn = "no",
-                        foldcolumn = "0",
-                        number = false,
-                        relativenumber = false,
-                    },
-                    disable_preview = function(filename)
-                        -- Disable treesitter when the file size is larger than 1 MB.
-                        local max_filesize = 1024 * 1024
-                        local ok, stats = pcall(vim.uv.fs_stat, filename)
-                        if ok and stats and stats.size > max_filesize then
-                            return true
-                        end
-                        return false
-                    end,
-                },
-            },
-        },
-        {
             "ibhagwan/fzf-lua",
             dependencies = {
                 "junegunn/fzf",
@@ -349,7 +297,7 @@ require("lazy").setup({
                 { "sf", "<cmd>FzfLua files<cr>" },
                 { "ss", "<cmd>FzfLua blines<cr>" },
                 { "sb", "<cmd>FzfLua buffers<cr>" },
-                { "sG", "<cmd>FzfLua live_grep_glob<cr>" },
+                { "sg", "<cmd>FzfLua live_grep_glob<cr>" },
                 { "st", "<cmd>FzfLua tabs<cr>" },
                 { "sh", "<cmd>FzfLua helptags<cr>" },
                 { "sd", "<cmd>FzfLua diagnostics_document<cr>" },
@@ -634,8 +582,7 @@ require("lazy").setup({
             "lewis6991/gitsigns.nvim",
             event = "VeryLazy",
             keys = {
-                { "<leader>hq", "<cmd>Gitsigns setqflist<cr>" },
-                { "<leader>hs", "<cmd>Gitsigns stage_hunk<cr>" },
+                { "<leader>gs", "<cmd>Gitsigns stage_hunk<cr>" },
                 {
                     "<leader>hs",
                     function()
@@ -643,18 +590,18 @@ require("lazy").setup({
                     end,
                     mode = "v",
                 },
-                { "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>" },
-                { "<leader>hx", "<cmd>Gitsigns reset_hunk<cr>" },
+                { "<leader>gS", "<cmd>Gitsigns stage_buffer<cr>" },
+                { "<leader>gx", "<cmd>Gitsigns reset_hunk<cr>" },
                 {
-                    "<leader>hx",
+                    "<leader>gx",
                     function()
                         require("gitsigns").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
                     end,
                     mode = "v",
                 },
-                { "<leader>hX", "<cmd>Gitsigns reset_buffer<cr>" },
-                { "<leader>hp", "<cmd>Gitsigns preview_hunk<cr>" },
-                { "<leader>hb", "<cmd>Gitsigns blame<cr>" },
+                { "<leader>gX", "<cmd>Gitsigns reset_buffer<cr>" },
+                { "<leader>gp", "<cmd>Gitsigns preview_hunk<cr>" },
+                { "<leader>gb", "<cmd>Gitsigns blame<cr>" },
                 { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
                 { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
             },
@@ -663,23 +610,6 @@ require("lazy").setup({
                     border = "rounded",
                 },
             },
-        },
-        {
-            "tpope/vim-fugitive",
-            event = "VeryLazy",
-            keys = {
-                { "<leader>g", "<cmd>tab Git<cr>" },
-            },
-            config = function()
-                vim.api.nvim_create_augroup("fugitive_commit_augroup", { clear = true })
-                vim.api.nvim_create_autocmd("User", {
-                    group = "fugitive_commit_augroup",
-                    pattern = "FugitiveCommit",
-                    callback = function()
-                        vim.wo.foldmethod = "syntax"
-                    end,
-                })
-            end,
         },
     },
     checker = {
