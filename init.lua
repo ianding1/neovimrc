@@ -197,21 +197,6 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- Automatically close the gitcommit/rebase buffer after save.
-vim.api.nvim_create_autocmd("FileType", {
-    group = "vimrc",
-    pattern = { "gitcommit", "gitrebase" },
-    callback = function()
-        vim.api.nvim_create_autocmd("BufWritePost", {
-            callback = function()
-                vim.schedule(function()
-                    vim.cmd("bprevious | bdelete #")
-                end)
-            end,
-        })
-    end,
-})
-
 -- LSP key bindings.
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
 vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename)
@@ -223,11 +208,43 @@ require("lazy").setup({
     spec = {
         {
             "willothy/flatten.nvim",
-            opts = {
-                window = {
-                    open = "alternate",
-                },
-            },
+            opts = function()
+                local saved_terminal
+                return {
+                    window = {
+                        open = "alternate",
+                    },
+                    hooks = {
+                        pre_open = function()
+                            local term = require("toggleterm.terminal")
+                            local termid = term.get_focused_id()
+                            saved_terminal = term.get(termid)
+                        end,
+                        post_open = function(ctx)
+                            if ctx.is_blocking then
+                                if saved_terminal then
+                                    saved_terminal:close()
+                                end
+                                vim.api.nvim_create_autocmd("BufWritePost", {
+                                    buffer = ctx.bufnr,
+                                    once = true,
+                                    callback = vim.schedule_wrap(function()
+                                        vim.api.nvim_buf_delete(ctx.bufnr, {})
+                                    end),
+                                })
+                            end
+                        end,
+                        block_end = function()
+                            vim.schedule(function()
+                                if saved_terminal then
+                                    saved_terminal:open()
+                                    saved_terminal = nil
+                                end
+                            end)
+                        end,
+                    },
+                }
+            end,
             lazy = false,
             priority = 1001,
         },
@@ -612,7 +629,7 @@ require("lazy").setup({
             "lewis6991/gitsigns.nvim",
             event = "VeryLazy",
             keys = {
-                { "<leader>gs", "<cmd>Gitsigns stage_hunk<cr>" },
+                { "<leader>hs", "<cmd>Gitsigns stage_hunk<cr>" },
                 {
                     "<leader>hs",
                     function()
@@ -620,20 +637,24 @@ require("lazy").setup({
                     end,
                     mode = "v",
                 },
-                { "<leader>gS", "<cmd>Gitsigns stage_buffer<cr>" },
-                { "<leader>gx", "<cmd>Gitsigns reset_hunk<cr>" },
+                { "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>" },
+                { "<leader>hx", "<cmd>Gitsigns reset_hunk<cr>" },
                 {
-                    "<leader>gx",
+                    "<leader>hx",
                     function()
                         require("gitsigns").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
                     end,
                     mode = "v",
                 },
-                { "<leader>gX", "<cmd>Gitsigns reset_buffer<cr>" },
-                { "<leader>gp", "<cmd>Gitsigns preview_hunk<cr>" },
-                { "<leader>gb", "<cmd>Gitsigns blame<cr>" },
+                { "<leader>hX", "<cmd>Gitsigns reset_buffer<cr>" },
+                { "<leader>hp", "<cmd>Gitsigns preview_hunk<cr>" },
+                { "<leader>hi", "<cmd>Gitsigns preview_hunk_inline<cr>" },
+                { "<leader>hb", "<cmd>Gitsigns blame<cr>" },
+                { "<leader>hd", "<cmd>Gitsigns diffthis<cr>" },
+                { "<leader>hD", "<cmd>Gitsigns diffthis HEAD<cr>" },
                 { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
                 { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
+                { "ih", "<cmd>Gitsigns select_hunk<cr>", mode = { "o", "x" } },
             },
             opts = {
                 preview_config = {
