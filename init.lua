@@ -100,9 +100,9 @@ vim.opt.diffopt:append("foldcolumn:1")
 vim.opt.foldtext = ""
 
 -- Disable the status column in the help buffer.
-vim.api.nvim_create_augroup("vimrc_help", { clear = true })
+vim.api.nvim_create_augroup("vimrc", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
-    group = "vimrc_help",
+    group = "vimrc",
     pattern = { "help", "terminal" },
     callback = function()
         vim.wo.number = false
@@ -112,9 +112,8 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Disable the status column in the help buffer.
-vim.api.nvim_create_augroup("vimrc_term", { clear = true })
 vim.api.nvim_create_autocmd("TermOpen", {
-    group = "vimrc_term",
+    group = "vimrc",
     callback = function()
         vim.wo.number = false
         vim.wo.relativenumber = false
@@ -186,9 +185,8 @@ end
 vim.keymap.set("n", "}", quickfix_next)
 vim.keymap.set("n", "{", quickfix_previous)
 
-vim.api.nvim_create_augroup("vimrc_qf", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
-    group = "vimrc_qf",
+    group = "vimrc",
     pattern = "qf",
     callback = function()
         -- Disable relative number in quickfix.
@@ -196,6 +194,19 @@ vim.api.nvim_create_autocmd("FileType", {
 
         -- Close quickfix window with q.
         vim.keymap.set("n", "q", "<C-w>q", { buffer = true })
+    end,
+})
+
+-- Automatically close the gitcommit/rebase buffer after save.
+vim.api.nvim_create_autocmd("FileType", {
+    group = "vimrc",
+    pattern = { "gitcommit", "gitrebase" },
+    callback = function()
+        vim.api.nvim_create_autocmd("BufWritePost", {
+            callback = function()
+                vim.cmd("buffer # | bdelete #")
+            end,
+        })
     end,
 })
 
@@ -626,6 +637,16 @@ require("lazy").setup({
                 preview_config = {
                     border = "rounded",
                 },
+            },
+        },
+        {
+            "akinsho/toggleterm.nvim",
+            version = "*",
+            keys = {
+                { "-", '<cmd>exe v:count1 . "ToggleTerm"<cr>' },
+            },
+            opts = {
+                shading_factor = -20,
             },
         },
     },
