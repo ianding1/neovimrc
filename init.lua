@@ -197,19 +197,6 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- Automatically close the gitcommit/rebase buffer after save.
-vim.api.nvim_create_autocmd("FileType", {
-    group = "vimrc",
-    pattern = { "gitcommit", "gitrebase" },
-    callback = function()
-        vim.api.nvim_create_autocmd("BufWritePost", {
-            callback = function()
-                vim.cmd("buffer # | bdelete #")
-            end,
-        })
-    end,
-})
-
 -- LSP key bindings.
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
 vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename)
