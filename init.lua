@@ -335,6 +335,43 @@ require("lazy").setup({
             keys = { { "<leader>u", "<cmd>UndotreeToggle<bar>UndotreeFocus<cr>" } },
         },
         {
+            "stevearc/oil.nvim",
+            lazy = false,
+            keys = {
+                { "-", "<cmd>Oil<cr>" },
+            },
+            opts = {
+                keymaps = {
+                    ["<cr>"] = "actions.select",
+                    ["<C-v>"] = { "actions.select", opts = { vertical = true } },
+                    ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
+                    ["<C-t>"] = { "actions.select", opts = { tab = true } },
+                    ["-"] = { "actions.parent", mode = "n" },
+                    ["gq"] = { "actions.close", mode = "n" },
+                    ["g?"] = { "actions.show_help", mode = "n" },
+                    ["<localleader>r"] = { "actions.refresh", mode = "n" },
+                    ["<localleader>h"] = { "actions.toggle_hidden", mode = "n" },
+                    ["<localleader>cd"] = { "actions.cd", mode = "n" },
+                    ["sf"] = {
+                        callback = function()
+                            require("fzf-lua").files({ cwd = require("oil").get_current_dir() })
+                        end,
+                        desc = "Search files in directory",
+                    },
+                    ["sg"] = {
+                        callback = function()
+                            require("fzf-lua").live_grep_glob({ cwd = require("oil").get_current_dir() })
+                        end,
+                        desc = "Search file content in directory",
+                    },
+                },
+                use_default_keymaps = false,
+                win_options = {
+                    signcolumn = "yes:1",
+                },
+            },
+        },
+        {
             "ibhagwan/fzf-lua",
             dependencies = {
                 "junegunn/fzf",
