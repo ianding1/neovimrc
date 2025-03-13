@@ -3,3 +3,4 @@ Session.vim
 .luarc.json
 plugin/packer_compiled.lua
 spell/
+lua/plugins/local-*

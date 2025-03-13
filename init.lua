@@ -715,6 +715,21 @@ require("lazy").setup({
                 shading_factor = -20,
             },
         },
+        {
+            "MeanderingProgrammer/render-markdown.nvim",
+            dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+            ft = { "markdown" },
+            opts = {
+                sign = { enabled = false },
+                overrides = {
+                    -- Disable in documentation popups.
+                    buftype = { nofile = { enabled = false } },
+                },
+            },
+        },
+        {
+            import = "plugins",
+        },
     },
     checker = {
         enabled = false,
