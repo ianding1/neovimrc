@@ -1,6 +1,6 @@
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
+if not vim.loop.fs_stat(lazypath) then
     local lazyrepo = "https://github.com/folke/lazy.nvim.git"
     local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
     if vim.v.shell_error ~= 0 then
@@ -76,6 +76,9 @@ vim.opt.laststatus = 3
 
 -- Allow virtual editing in Visual block mode.
 vim.opt.virtualedit:append("block")
+
+-- Disable wrapping.
+vim.opt.wrap = false
 
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
@@ -396,7 +399,6 @@ require("lazy").setup({
             "saghen/blink.cmp",
             version = "*",
             build = "cargo build --release",
-            event = "VeryLazy",
             opts = {
                 appearance = { nerd_font_variant = "normal" },
                 keymap = { preset = "super-tab" },
@@ -416,39 +418,53 @@ require("lazy").setup({
         },
         {
             "neovim/nvim-lspconfig",
-            dependencies = {
-                "saghen/blink.cmp",
-            },
-            event = "VeryLazy",
+            dependencies = { "saghen/blink.cmp" },
             config = function()
                 -- Enable inlay hints if the LSP client supports it.
                 vim.api.nvim_create_autocmd("LspAttach", {
                     callback = function(args)
                         local client = vim.lsp.get_client_by_id(args.data.client_id)
-                        if client.server_capabilities.inlayHintProvider then
+                        if client and client.server_capabilities.inlayHintProvider then
                             vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
                         end
                     end,
                 })
                 local capabilities = require("blink.cmp").get_lsp_capabilities()
                 local lspconfig = require("lspconfig")
+
+                -- Lua
                 lspconfig.lua_ls.setup({
                     capabilities = capabilities,
-                    settings = {
-                        Lua = {
+                    on_init = function(client)
+                        if client.workspace_folders then
+                            local path = client.workspace_folders[1].name
+                            if
+                                path ~= vim.fn.stdpath("config")
+                                and (
+                                    vim.loop.fs_stat(path .. "/.luarc.json")
+                                    or vim.loop.fs_stat(path .. "/.luarc.jsonc")
+                                )
+                            then
+                                return
+                            end
+                        end
+
+                        client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
                             runtime = {
                                 version = "LuaJIT",
                             },
-                            diagnostics = {
-                                globals = { "vim", "vim.g", "vim.b" },
-                            },
                             workspace = {
-                                library = vim.api.nvim_get_runtime_file("", true),
+                                checkThirdParty = false,
+                                library = {
+                                    vim.env.VIMRUNTIME,
+                                    "${3rd}/luv/library",
+                                    "${3rd}/busted/library",
+                                },
                             },
-                            telemetry = {
-                                enable = false,
-                            },
-                        },
+                        })
+                    end,
+                    settings = {
+                        Lua = {},
                     },
                 })
             end,
@@ -619,7 +635,24 @@ require("lazy").setup({
             },
         },
         {
-            import = "plugins",
+            name = "amazonq",
+            url = "ssh://git.amazon.com/pkg/AmazonQNVim",
+            opts = {
+                ssoStartUrl = "https://amzn.awsapps.com/start",
+            },
+            config = function(_, opts)
+                require("amazonq").setup(opts)
+
+                -- Disable the sign column in the Amazon Q chat.
+                vim.api.nvim_create_autocmd("FileType", {
+                    group = "vimrc",
+                    callback = function()
+                        if vim.b.amazonq then
+                            vim.wo.signcolumn = "no"
+                        end
+                    end,
+                })
+            end,
         },
     },
     checker = {
