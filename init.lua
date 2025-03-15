@@ -20,47 +20,44 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
--- Use 24-bit colors in the terminal.
-vim.o.termguicolors = true
-
 -- Do not show mode change.
-vim.o.showmode = false
+vim.opt.showmode = false
 
 -- Use spaces instead of tabs.
-vim.o.expandtab = true
+vim.opt.expandtab = true
 
 -- Use 4 spaces by default.
-vim.o.shiftwidth = 4
-vim.o.softtabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
 
 -- Show a visual line under the cursor.
-vim.o.cursorline = true
+vim.opt.cursorline = true
 
 -- Ignore case by default.
-vim.o.ignorecase = true
+vim.opt.ignorecase = true
 
 -- Disable write backup and swap files.
-vim.o.writebackup = false
-vim.o.swapfile = false
+vim.opt.writebackup = false
+vim.opt.swapfile = false
 
 -- Enable mouse in the terminal.
-vim.o.mouse = "a"
+vim.opt.mouse = "a"
 
 -- Always show 5 lines above or below the cursor.
-vim.o.scrolloff = 5
+vim.opt.scrolloff = 5
 
 -- Show line numbers.
-vim.o.number = true
+vim.opt.number = true
 
 -- Show winbar at startup to make the startup process snappier.
-vim.o.winbar = " "
+vim.opt.winbar = " "
 
 -- Hide intro at Vim startup.
 vim.opt.shortmess:append("I")
 
 -- Split below and right.
-vim.o.splitbelow = true
-vim.o.splitright = true
+vim.opt.splitbelow = true
+vim.opt.splitright = true
 
 -- Set the fill char for diff to blank.
 vim.opt.fillchars = { diff = "╱", foldopen = "⌄", foldclose = "▶", foldsep = " " }
@@ -77,6 +74,9 @@ vim.opt.showtabline = 0
 -- Always show a global status line.
 vim.opt.laststatus = 3
 
+-- Allow virtual editing in Visual block mode.
+vim.opt.virtualedit:append("block")
+
 -- Persist the undo records on the disk.
 if vim.fn.has("persistent_undo") == 1 then
     vim.fn.system("mkdir -p $HOME/.cache/vim-undo")
@@ -84,29 +84,36 @@ if vim.fn.has("persistent_undo") == 1 then
     vim.o.undofile = true
 end
 
--- Don't wrap lines.
-vim.o.wrap = false
-
--- Use system clipboard.
-vim.o.clipboard = "unnamedplus"
-
 -- Enable linematch in diff mode (added in Neovim 0.9)
 vim.opt.diffopt:append("linematch:60")
 
 -- Start diff mode with vertical splits.
 vim.opt.diffopt:append("vertical")
 
--- Set fold column to 1.
+-- Set fold column to 1 in diff mode..
 vim.opt.diffopt:append("foldcolumn:1")
 
 -- Enable text highlight for fold mode.
 vim.opt.foldtext = ""
 
--- Disable the status column in the help buffer.
+-- Create an autocmd group for the vim config.
 vim.api.nvim_create_augroup("vimrc", { clear = true })
-vim.api.nvim_create_autocmd("FileType", {
+
+-- Disable the status column in help buffers.
+vim.api.nvim_create_autocmd("BufRead", {
     group = "vimrc",
-    pattern = "help",
+    callback = function()
+        if vim.bo.buftype == "help" then
+            vim.wo.number = false
+            vim.wo.relativenumber = false
+            vim.wo.signcolumn = "no"
+        end
+    end,
+})
+
+-- Disable the status column in term buffers.
+vim.api.nvim_create_autocmd("TermOpen", {
+    group = "vimrc",
     callback = function()
         vim.wo.number = false
         vim.wo.relativenumber = false
@@ -114,25 +121,23 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- Disable the sign column in the term buffer.
-vim.api.nvim_create_autocmd("TermOpen", {
+-- Disable relative number and sign column in the quickfix window.
+vim.api.nvim_create_autocmd("FileType", {
     group = "vimrc",
+    pattern = "qf",
     callback = function()
+        vim.wo.relativenumber = false
         vim.wo.signcolumn = "no"
     end,
 })
 
--- Use H/L to switch tab pages.
-vim.keymap.set("n", "H", "<cmd>tabprevious<cr>")
-vim.keymap.set("n", "L", "<cmd>tabnext<cr>")
-
--- Allow returning to normal mode by just pressing <Esc> in terminal mode.
 -- To send <Esc> to the terminal, press <M-Esc>.
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 vim.keymap.set("t", "<M-Esc>", "<Esc>")
 
 -- Set up diagnostic sign icons.
 vim.diagnostic.config({
+    severity_sort = true,
     signs = {
         text = {
             [vim.diagnostic.severity.ERROR] = " ",
@@ -149,62 +154,11 @@ for _, dir in ipairs({ "h", "j", "k", "l" }) do
     vim.keymap.set("t", "<C-" .. dir .. ">", "<C-\\><C-n><C-w>" .. dir)
 end
 
-vim.keymap.set("n", "<leader>x", "<cmd>tabclose<cr>")
-
--- Delete buffer without changing the window layout.
-vim.keymap.set("n", "<leader>bd", "<cmd>bprevious<bar>bdelete! #<cr>")
-
--- Quickfix navigation.
-local function quickfix_next()
-    local count = vim.v.count == 0 and 1 or vim.v.count
-    for _ = 1, count do
-        local ok, msg = pcall(vim.cmd, "cnext")
-        if not ok and string.find(msg, "E553:") then
-            vim.cmd("cfirst")
-        elseif not ok and string.find(msg, "E42:") then
-            vim.print("Empty quickfix list")
-        elseif not ok then
-            vim.api.nvim_err_writeln(msg)
-        end
-    end
-end
-
-local function quickfix_previous()
-    local count = vim.v.count == 0 and 1 or vim.v.count
-    for _ = 1, count do
-        local ok, msg = pcall(vim.cmd, "cprevious")
-        if not ok and string.find(msg, "E553:") then
-            vim.cmd("clast")
-        elseif not ok and string.find(msg, "E42:") then
-            vim.print("Empty quickfix list")
-        elseif not ok then
-            vim.api.nvim_err_writeln(msg)
-        end
-    end
-end
-
-vim.keymap.set("n", "}", quickfix_next)
-vim.keymap.set("n", "{", quickfix_previous)
-
-vim.api.nvim_create_autocmd("FileType", {
-    group = "vimrc",
-    pattern = "qf",
-    callback = function()
-        -- Disable relative number and sign column in quickfix.
-        vim.wo.relativenumber = false
-        vim.wo.signcolumn = "no"
-
-        -- Close quickfix window with q.
-        vim.keymap.set("n", "q", "<C-w>q", { buffer = true })
-    end,
-})
-
 -- LSP key bindings.
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
 vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename)
 
 -- Lazy.nvim UI.
-vim.keymap.set("n", "<leader>ol", "<cmd>Lazy<cr>")
+vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
 
 require("lazy").setup({
     spec = {
@@ -287,16 +241,9 @@ require("lazy").setup({
                                 end,
                             },
                             "branch",
-                            "diff",
                         },
-                        lualine_c = {
-                            function()
-                                return require("lsp-progress").progress()
-                            end,
-                        },
-                        lualine_x = {
-                            "diagnostics",
-                        },
+                        lualine_c = { "diff", "diagnostics" },
+                        lualine_x = { { "lsp_status", icon = " " } },
                         lualine_y = { "encoding", "fileformat", "filetype" },
                         lualine_z = { "progress", "location" },
                     },
@@ -349,8 +296,7 @@ require("lazy").setup({
                     ["-"] = { "actions.parent", mode = "n" },
                     ["gq"] = { "actions.close", mode = "n" },
                     ["g?"] = { "actions.show_help", mode = "n" },
-                    ["<localleader>r"] = { "actions.refresh", mode = "n" },
-                    ["<localleader>h"] = { "actions.toggle_hidden", mode = "n" },
+                    ["g."] = { "actions.toggle_hidden", mode = "n" },
                     ["<localleader>cd"] = { "actions.cd", mode = "n" },
                     ["sf"] = {
                         callback = function()
@@ -447,26 +393,15 @@ require("lazy").setup({
             end,
         },
         {
-            -- Allow using readline mappings (C-d/C-e/C-f/etc) in the command line mode.
-            "tpope/vim-rsi",
-            event = "VeryLazy",
-        },
-        {
             "saghen/blink.cmp",
             version = "*",
             build = "cargo build --release",
             event = "VeryLazy",
             opts = {
-                appearance = {
-                    nerd_font_variant = "normal",
-                },
-                keymap = {
-                    preset = "super-tab",
-                },
+                appearance = { nerd_font_variant = "normal" },
+                keymap = { preset = "super-tab" },
                 cmdline = {
-                    keymap = {
-                        ["<Tab>"] = { "show", "accept" },
-                    },
+                    keymap = { ["<Tab>"] = { "show", "accept" } },
                     completion = { menu = { auto_show = true } },
                 },
                 completion = {
@@ -474,71 +409,47 @@ require("lazy").setup({
                         auto_show = true,
                         auto_show_delay_ms = 500,
                     },
-                    trigger = {
-                        show_in_snippet = false,
-                    },
+                    trigger = { show_in_snippet = false },
                 },
-                signature = {
-                    enabled = true,
-                },
+                signature = { enabled = true },
             },
         },
         {
-            "williamboman/mason.nvim",
-            keys = {
-                { "<leader>om", "<cmd>Mason<cr>" },
-            },
-            build = ":MasonUpdate",
-            event = "VeryLazy",
-            opts = {},
-        },
-        {
-            "williamboman/mason-lspconfig.nvim",
+            "neovim/nvim-lspconfig",
             dependencies = {
-                "williamboman/mason.nvim",
-                "neovim/nvim-lspconfig",
                 "saghen/blink.cmp",
             },
             event = "VeryLazy",
-            opts = {
-                ensure_installed = { "lua_ls" },
-                automatic_installation = false,
-            },
-            config = function(_, opts)
-                local mason_lspconfig = require("mason-lspconfig")
-                mason_lspconfig.setup(opts)
-
+            config = function()
+                -- Enable inlay hints if the LSP client supports it.
+                vim.api.nvim_create_autocmd("LspAttach", {
+                    callback = function(args)
+                        local client = vim.lsp.get_client_by_id(args.data.client_id)
+                        if client.server_capabilities.inlayHintProvider then
+                            vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+                        end
+                    end,
+                })
+                local capabilities = require("blink.cmp").get_lsp_capabilities()
                 local lspconfig = require("lspconfig")
-                mason_lspconfig.setup_handlers({
-                    -- Default set up handler.
-                    function(server_name)
-                        lspconfig[server_name].setup({
-                            capabilities = require("blink.cmp").get_lsp_capabilities(),
-                        })
-                    end,
-                    lua_ls = function()
-                        lspconfig.lua_ls.setup({
-                            capabilities = require("blink.cmp").get_lsp_capabilities(),
-                            settings = {
-                                Lua = {
-                                    runtime = {
-                                        version = "LuaJIT",
-                                    },
-                                    diagnostics = {
-                                        globals = { "vim", "vim.g", "vim.b" },
-                                    },
-                                    workspace = {
-                                        library = vim.api.nvim_get_runtime_file("", true),
-                                    },
-                                    telemetry = {
-                                        enable = false,
-                                    },
-                                },
+                lspconfig.lua_ls.setup({
+                    capabilities = capabilities,
+                    settings = {
+                        Lua = {
+                            runtime = {
+                                version = "LuaJIT",
                             },
-                        })
-                    end,
-                    -- Disable Mason lsp config for rust analyzer.
-                    rust_analyzer = function() end,
+                            diagnostics = {
+                                globals = { "vim", "vim.g", "vim.b" },
+                            },
+                            workspace = {
+                                library = vim.api.nvim_get_runtime_file("", true),
+                            },
+                            telemetry = {
+                                enable = false,
+                            },
+                        },
+                    },
                 })
             end,
         },
@@ -563,33 +474,6 @@ require("lazy").setup({
             },
             config = function(_, opts)
                 vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
-            end,
-        },
-        {
-            "linrongbin16/lsp-progress.nvim",
-            event = "VeryLazy",
-            opts = {
-                format = function(client_messages)
-                    local ready_sign = " lsp"
-                    local busy_sign = "󰔚 "
-                    if #client_messages > 0 then
-                        return busy_sign .. " " .. table.concat(client_messages, " ")
-                    end
-                    local api = require("lsp-progress.api")
-                    if #api.lsp_clients() > 0 then
-                        return ready_sign
-                    end
-                    return ""
-                end,
-            },
-            config = function(_, opts)
-                require("lsp-progress").setup(opts)
-                vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
-                vim.api.nvim_create_autocmd("User", {
-                    group = "lualine_augroup",
-                    pattern = "LspProgressStatusUpdated",
-                    callback = require("lualine").refresh,
-                })
             end,
         },
         {
@@ -660,6 +544,7 @@ require("lazy").setup({
                     python = { "black" },
                     rust = { "rustfmt" },
                     typescript = { "prettierd" },
+                    vue = { "prettierd" },
                 },
             },
             config = function(_, opts)
@@ -713,6 +598,9 @@ require("lazy").setup({
             opts = {
                 open_mapping = "<C-/>",
                 shading_factor = -20,
+                size = function()
+                    return vim.o.lines * 0.4
+                end,
             },
         },
         {
@@ -721,6 +609,9 @@ require("lazy").setup({
             ft = { "markdown" },
             opts = {
                 sign = { enabled = false },
+                code = {
+                    position = "right",
+                },
                 overrides = {
                     -- Disable in documentation popups.
                     buftype = { nofile = { enabled = false } },
