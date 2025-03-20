@@ -637,6 +637,8 @@ require("lazy").setup({
         {
             name = "amazonq",
             url = "ssh://git.amazon.com/pkg/AmazonQNVim",
+            -- Enabled only on the cloud desktop
+            enabled = vim.loop.fs_stat("/apollo") ~= nil,
             opts = {
                 ssoStartUrl = "https://amzn.awsapps.com/start",
             },
