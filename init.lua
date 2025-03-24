@@ -467,6 +467,19 @@ require("lazy").setup({
                         Lua = {},
                     },
                 })
+
+                -- C/C++
+                lspconfig.clangd.setup({
+                    capabilities = capabilities,
+                    cmd = {
+                        "clangd",
+                        "--background-index",
+                        "--clang-tidy",
+                    },
+                    init_options = {
+                        fallbackFlags = { "-std=c++17" },
+                    },
+                })
             end,
         },
         {
