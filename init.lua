@@ -476,9 +476,6 @@ require("lazy").setup({
                         "--background-index",
                         "--clang-tidy",
                     },
-                    init_options = {
-                        fallbackFlags = { "-std=c++17" },
-                    },
                 })
             end,
         },
