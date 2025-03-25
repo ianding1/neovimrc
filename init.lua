@@ -26,6 +26,9 @@ vim.opt.showmode = false
 -- Use spaces instead of tabs.
 vim.opt.expandtab = true
 
+-- Enable line break.
+vim.opt.linebreak = true
+
 -- Use 4 spaces by default.
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
@@ -156,6 +159,12 @@ for _, dir in ipairs({ "h", "j", "k", "l" }) do
     vim.keymap.set("n", "<C-" .. dir .. ">", "<C-w>" .. dir)
     vim.keymap.set("t", "<C-" .. dir .. ">", "<C-\\><C-n><C-w>" .. dir)
 end
+
+-- Better movement keys.
+vim.keymap.set({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
+vim.keymap.set({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { expr = true })
+vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
+vim.keymap.set({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 
 -- LSP key bindings.
 vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename)
