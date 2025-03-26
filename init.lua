@@ -252,11 +252,22 @@ require("lazy").setup({
                                     return vim.fn.tabpagenr("$") > 1
                                 end,
                             },
-                            "branch",
+                            { "branch" },
                         },
-                        lualine_c = { "diff", "diagnostics" },
-                        lualine_x = { { "lsp_status", icon = " " } },
-                        lualine_y = { "encoding", "fileformat", "filetype" },
+                        lualine_c = {
+                            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
+                            { "filename", path = 1, symbols = symbols, shorting_target = 3 },
+                        },
+                        lualine_x = {
+                            {
+                                "diff",
+                                symbols = { added = " ", modified = " ", removed = " " },
+                            },
+                            "diagnostics",
+                        },
+                        lualine_y = {
+                            { "lsp_status", icon = " ", symbols = { separator = "  " } },
+                        },
                         lualine_z = { "progress", "location" },
                     },
                     winbar = {
