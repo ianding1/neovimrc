@@ -656,6 +656,17 @@ require("lazy").setup({
             },
         },
         {
+            "folke/trouble.nvim",
+            opts = {},
+            cmd = "Trouble",
+            keys = {
+                { "<leader>xd", "<cmd>Trouble diagnostics toggle<cr>" },
+                { "<leader>xD", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>" },
+                { "<leader>xs", "<cmd>Trouble symbols toggle focus=false<cr>" },
+                { "<leader>xl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>" },
+            },
+        },
+        {
             name = "amazonq",
             url = "ssh://git.amazon.com/pkg/AmazonQNVim",
             opts = {
