@@ -349,13 +349,15 @@ require("lazy").setup({
             keys = {
                 -- File, buffer, greps.
                 { "sf", "<cmd>FzfLua files<cr>" },
-                { "ss", "<cmd>FzfLua blines<cr>" },
                 { "sb", "<cmd>FzfLua buffers<cr>" },
+                { "sl", "<cmd>FzfLua blines<cr>" },
+                { "sL", "<cmd>FzfLua lines<cr>" },
+                { "sw", "<cmd>FzfLua grep_cword<cr>" },
+                { "sW", "<cmd>FzfLua grep_cWORD<cr>" },
                 { "sg", "<cmd>FzfLua live_grep_glob<cr>" },
-                { "st", "<cmd>FzfLua tabs<cr>" },
                 { "sh", "<cmd>FzfLua helptags<cr>" },
-                { "sd", "<cmd>FzfLua diagnostics_document<cr>" },
-                { "sD", "<cmd>FzfLua diagnostics_workspace<cr>" },
+                { "ss", "<cmd>FzfLua lsp_document_symbols<cr>" },
+                { "sS", "<cmd>FzfLua lsp_workspace_symbols<cr>" },
                 { "s<space>", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
 
                 -- LSP actions.
@@ -668,7 +670,11 @@ require("lazy").setup({
         },
         {
             "folke/trouble.nvim",
-            opts = {},
+            opts = {
+                modes = {
+                    symbols = { win = { size = 0.25 } },
+                },
+            },
             cmd = "Trouble",
             keys = {
                 { "<leader>xd", "<cmd>Trouble diagnostics toggle<cr>" },
