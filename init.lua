@@ -152,6 +152,9 @@ vim.diagnostic.config({
             [vim.diagnostic.severity.HINT] = "󰌵 ",
         },
     },
+    virtual_lines = {
+        current_line = true,
+    },
 })
 
 -- Window and tab key bindings.
@@ -239,7 +242,7 @@ require("lazy").setup({
                     extensions = { "quickfix" },
                     options = {
                         disabled_filetypes = {
-                            winbar = { "qf" },
+                            winbar = { "qf", "trouble" },
                         },
                     },
                     sections = {
@@ -259,11 +262,11 @@ require("lazy").setup({
                             { "filename", path = 1, symbols = symbols, shorting_target = 3 },
                         },
                         lualine_x = {
+                            "diagnostics",
                             {
                                 "diff",
                                 symbols = { added = " ", modified = " ", removed = " " },
                             },
-                            "diagnostics",
                         },
                         lualine_y = {
                             { "lsp_status", icon = " ", symbols = { separator = "  " } },
