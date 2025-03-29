@@ -52,8 +52,17 @@ vim.opt.scrolloff = 5
 -- Show line numbers.
 vim.opt.number = true
 
--- Show winbar at startup to make the startup process snappier.
-vim.opt.winbar = " "
+-- Show relative line number.
+vim.opt.relativenumber = true
+
+-- Set sign column.
+vim.opt.signcolumn = "yes:1"
+
+-- Set status column
+vim.opt.statuscolumn = "%l%s%C"
+
+-- Show only one status line.
+vim.opt.laststatus = 3
 
 -- Hide intro at Vim startup.
 vim.opt.shortmess:append("I")
@@ -64,18 +73,6 @@ vim.opt.splitright = true
 
 -- Set the fill char for diff to blank.
 vim.opt.fillchars = { diff = "╱", foldopen = "⌄", foldclose = "▶", foldsep = " " }
-
--- Show relative line number.
-vim.opt.relativenumber = true
-
--- Set sign column.
-vim.opt.signcolumn = "yes:1"
-
--- Never show tablines.
-vim.opt.showtabline = 0
-
--- Always show a global status line.
-vim.opt.laststatus = 3
 
 -- Allow virtual editing in Visual block mode.
 vim.opt.virtualedit:append("block")
@@ -89,9 +86,6 @@ if vim.fn.has("persistent_undo") == 1 then
     vim.o.undodir = os.getenv("HOME") .. "/.cache/vim-undo"
     vim.o.undofile = true
 end
-
--- Enable linematch in diff mode (added in Neovim 0.9)
-vim.opt.diffopt:append("linematch:60")
 
 -- Start diff mode with vertical splits.
 vim.opt.diffopt:append("vertical")
@@ -114,16 +108,6 @@ vim.api.nvim_create_autocmd("BufRead", {
             vim.wo.relativenumber = false
             vim.wo.signcolumn = "no"
         end
-    end,
-})
-
--- Disable the status column in term buffers.
-vim.api.nvim_create_autocmd("TermOpen", {
-    group = "vimrc",
-    callback = function()
-        vim.wo.number = false
-        vim.wo.relativenumber = false
-        vim.wo.signcolumn = "no"
     end,
 })
 
@@ -152,9 +136,7 @@ vim.diagnostic.config({
             [vim.diagnostic.severity.HINT] = "󰌵 ",
         },
     },
-    virtual_lines = {
-        current_line = true,
-    },
+    virtual_lines = true,
 })
 
 -- Window and tab key bindings.
@@ -232,73 +214,39 @@ require("lazy").setup({
         {
             "nvim-lualine/lualine.nvim",
             opts = function()
-                local symbols = {
-                    modified = " ",
-                    readonly = "󰌾 ",
-                    unnamed = "[No Name]",
-                    newfile = " ",
-                }
                 return {
-                    extensions = { "quickfix" },
-                    options = {
-                        disabled_filetypes = {
-                            winbar = { "qf", "trouble" },
-                        },
-                    },
+                    extensions = { "quickfix", "trouble", "oil" },
                     sections = {
                         lualine_a = { "mode" },
                         lualine_b = {
-                            {
-                                "󱂬 [%{tabpagenr()}/%{tabpagenr('$')}]",
-                                type = "stl",
-                                cond = function()
-                                    return vim.fn.tabpagenr("$") > 1
-                                end,
-                            },
-                            { "branch" },
-                        },
-                        lualine_c = {
+                            "branch",
                             { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-                            { "filename", path = 1, symbols = symbols, shorting_target = 3 },
-                        },
-                        lualine_x = {
-                            "diagnostics",
                             {
-                                "diff",
-                                symbols = { added = " ", modified = " ", removed = " " },
+                                "filename",
+                                path = 1,
+                                symbols = {
+                                    modified = " ",
+                                    readonly = "󰌾 ",
+                                    unnamed = "[No Name]",
+                                    newfile = " ",
+                                },
                             },
                         },
+                        lualine_c = { "diff" },
+                        lualine_x = { "diagnostics" },
                         lualine_y = {
-                            { "lsp_status", icon = " ", symbols = { separator = "  " } },
+                            {
+                                "lsp_status",
+                                icon = " ",
+                                symbols = { separator = "  " },
+                                ignore_lsp = { "amazonq-completion" },
+                            },
                         },
-                        lualine_z = { "progress", "location" },
-                    },
-                    winbar = {
-                        lualine_b = {
-                            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-                            { "filename", path = 1, symbols = symbols, shorting_target = 3 },
+                        lualine_z = {
+                            "location",
+                            "fileformat",
+                            { "encoding", show_bomb = true },
                         },
-                    },
-                    inactive_winbar = {
-                        lualine_c = {
-                            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-                            { "filename", path = 1, symbols = symbols, shorting_target = 3 },
-                        },
-                    },
-                }
-            end,
-        },
-        {
-            "luukvbaal/statuscol.nvim",
-            opts = function()
-                local builtin = require("statuscol.builtin")
-                return {
-                    bt_ignore = { "help", "quickfix", "terminal" },
-                    relculright = true,
-                    segments = {
-                        { text = { builtin.lnumfunc }, click = "v:lua.ScLa" },
-                        { text = { "%s" }, click = "v:lua.ScLa" },
-                        { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
                     },
                 }
             end,
