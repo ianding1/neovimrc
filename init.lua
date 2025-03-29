@@ -212,6 +212,12 @@ require("lazy").setup({
             opts = function()
                 local filepath = {
                     {
+                        "filetype",
+                        icon_only = true,
+                        separator = "",
+                        padding = { left = 1, right = 0 },
+                    },
+                    {
                         "filename",
                         path = 1,
                         newfile_status = true,
@@ -221,12 +227,6 @@ require("lazy").setup({
                             unnamed = "[No Name]",
                             newfile = " ",
                         },
-                        separator = "",
-                    },
-                    {
-                        "filetype",
-                        icon_only = true,
-                        padding = { left = 0, right = 1 },
                     },
                 }
                 return {
@@ -563,6 +563,9 @@ require("lazy").setup({
         {
             "lewis6991/gitsigns.nvim",
             event = "VeryLazy",
+            keys = {
+                { "g:", "<cmd>call feedkeys(':Gitsigns ', 'tn')<cr>" },
+            },
             opts = {
                 preview_config = {
                     border = "rounded",
