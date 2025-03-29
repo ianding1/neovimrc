@@ -315,6 +315,9 @@ require("lazy").setup({
                 build = "./install --bin",
             },
             keys = {
+                -- Disable default behavior for s.
+                { "s", "<nop>" },
+
                 -- File, buffer, greps.
                 { "sf", "<cmd>FzfLua files<cr>" },
                 { "sb", "<cmd>FzfLua buffers<cr>" },
@@ -334,6 +337,9 @@ require("lazy").setup({
             opts = function()
                 local actions = require("fzf-lua").actions
                 return {
+                    defaults = {
+                        no_header = true,
+                    },
                     files = {
                         cwd_prompt = false,
                     },
