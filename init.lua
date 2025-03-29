@@ -251,8 +251,7 @@ require("lazy").setup({
                             {
                                 "lsp_status",
                                 icon = " ",
-                                symbols = { separator = "  " },
-                                ignore_lsp = { "amazonq-completion" },
+                                ignore_lsp = { "amazonq", "amazonq-completion" },
                             },
                         },
                         lualine_z = { "location" },
