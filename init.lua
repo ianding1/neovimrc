@@ -623,15 +623,16 @@ require("lazy").setup({
             "folke/trouble.nvim",
             opts = {
                 modes = {
-                    symbols = { win = { size = 0.25 } },
+                    symbols = {
+                        win = { size = 0.25 },
+                    },
                 },
             },
             cmd = "Trouble",
             keys = {
-                { "<leader>xd", "<cmd>Trouble diagnostics toggle<cr>" },
-                { "<leader>xD", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>" },
+                { "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>" },
+                { "<leader>xD", "<cmd>Trouble diagnostics toggle<cr>" },
                 { "<leader>xs", "<cmd>Trouble symbols toggle focus=false<cr>" },
-                { "<leader>xl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>" },
             },
         },
         {
