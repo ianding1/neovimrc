@@ -61,9 +61,6 @@ vim.opt.signcolumn = "yes:1"
 -- Set status column
 vim.opt.statuscolumn = "%l%s%C"
 
--- Show only one status line.
-vim.opt.laststatus = 3
-
 -- Hide intro at Vim startup.
 vim.opt.shortmess:append("I")
 
@@ -151,12 +148,11 @@ vim.keymap.set({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { expr = tru
 vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 vim.keymap.set({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 
--- LSP key bindings.
-vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename)
+-- Disable search highlight.
+vim.keymap.set("n", "<leader>n", "<cmd>nohlsearch<cr>")
 
 -- Lazy.nvim UI.
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
-
 require("lazy").setup({
     spec = {
         {
@@ -214,26 +210,43 @@ require("lazy").setup({
         {
             "nvim-lualine/lualine.nvim",
             opts = function()
+                local filepath = {
+                    {
+                        "filename",
+                        path = 1,
+                        newfile_status = true,
+                        symbols = {
+                            modified = " ",
+                            readonly = "󰌾 ",
+                            unnamed = "[No Name]",
+                            newfile = " ",
+                        },
+                        separator = "",
+                    },
+                    {
+                        "filetype",
+                        icon_only = true,
+                        padding = { left = 0, right = 1 },
+                    },
+                }
                 return {
                     extensions = { "quickfix", "trouble", "oil" },
                     sections = {
-                        lualine_a = { "mode" },
-                        lualine_b = {
-                            "branch",
-                            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
+                        lualine_a = {
                             {
-                                "filename",
-                                path = 1,
-                                symbols = {
-                                    modified = " ",
-                                    readonly = "󰌾 ",
-                                    unnamed = "[No Name]",
-                                    newfile = " ",
-                                },
+                                "mode",
+                                fmt = function(str)
+                                    if string.find(str, "-") then
+                                        return str -- Do not shorten "V-BLOCK", "V-LINE", etc
+                                    else
+                                        return str:sub(1, 1)
+                                    end
+                                end,
                             },
                         },
-                        lualine_c = { "diff" },
-                        lualine_x = { "diagnostics" },
+                        lualine_b = filepath,
+                        lualine_c = { "diagnostics" },
+                        lualine_x = { "branch" },
                         lualine_y = {
                             {
                                 "lsp_status",
@@ -242,11 +255,16 @@ require("lazy").setup({
                                 ignore_lsp = { "amazonq-completion" },
                             },
                         },
-                        lualine_z = {
-                            "location",
-                            "fileformat",
-                            { "encoding", show_bomb = true },
+                        lualine_z = { "location" },
+                    },
+                    inactive_sections = {
+                        lualine_b = {
+                            function()
+                                return "  " -- Placeholder
+                            end,
                         },
+                        lualine_c = filepath,
+                        lualine_x = { "location" },
                     },
                 }
             end,
@@ -265,7 +283,7 @@ require("lazy").setup({
                 keymaps = {
                     ["<cr>"] = "actions.select",
                     ["<C-v>"] = { "actions.select", opts = { vertical = true } },
-                    ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
+                    ["<C-s>"] = { "actions.select", opts = { horizontal = true } },
                     ["<C-t>"] = { "actions.select", opts = { tab = true } },
                     ["-"] = { "actions.parent", mode = "n" },
                     ["gq"] = { "actions.close", mode = "n" },
@@ -301,32 +319,22 @@ require("lazy").setup({
                 -- File, buffer, greps.
                 { "sf", "<cmd>FzfLua files<cr>" },
                 { "sb", "<cmd>FzfLua buffers<cr>" },
-                { "sl", "<cmd>FzfLua blines<cr>" },
-                { "sL", "<cmd>FzfLua lines<cr>" },
-                { "sw", "<cmd>FzfLua grep_cword<cr>" },
-                { "sW", "<cmd>FzfLua grep_cWORD<cr>" },
                 { "sg", "<cmd>FzfLua live_grep_glob<cr>" },
+                { "sl", "<cmd>FzfLua blines<cr>" },
                 { "sh", "<cmd>FzfLua helptags<cr>" },
-                { "ss", "<cmd>FzfLua lsp_document_symbols<cr>" },
-                { "sS", "<cmd>FzfLua lsp_workspace_symbols<cr>" },
-                { "s<space>", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
+                { "ss", "<cmd>FzfLua git_status<cr>" },
+                { "s*", "<cmd>FzfLua grep_cword<cr>" },
+                { "s:", "<cmd>call feedkeys(':FzfLua ', 'tn')<cr>" },
 
                 -- LSP actions.
-                { "gd", "<cmd>FzfLua lsp_definitions<cr>" },
-                { "gr", "<cmd>FzfLua lsp_references<cr>" },
-                { "gI", "<cmd>FzfLua lsp_implementations<cr>" },
-                { "gy", "<cmd>FzfLua lsp_typedefs<cr>" },
-                { "gD", "<cmd>FzfLua lsp_declarations<cr>" },
-                { "<leader>ca", "<cmd>FzfLua lsp_code_actions<cr>" },
+                { "grr", "<cmd>FzfLua lsp_references<cr>" },
+                { "gri", "<cmd>FzfLua lsp_implementations<cr>" },
+                { "gO", "<cmd>FzfLua lsp_document_symbols<cr>" },
+                { "gra", "<cmd>FzfLua lsp_code_actions<cr>" },
             },
             opts = function()
                 local actions = require("fzf-lua").actions
                 return {
-                    winopts = {
-                        preview = {
-                            layout = "vertical",
-                        },
-                    },
                     files = {
                         cwd_prompt = false,
                     },
@@ -556,34 +564,6 @@ require("lazy").setup({
         {
             "lewis6991/gitsigns.nvim",
             event = "VeryLazy",
-            keys = {
-                { "<leader>hs", "<cmd>Gitsigns stage_hunk<cr>" },
-                {
-                    "<leader>hs",
-                    function()
-                        require("gitsigns").stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-                    end,
-                    mode = "v",
-                },
-                { "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>" },
-                { "<leader>hx", "<cmd>Gitsigns reset_hunk<cr>" },
-                {
-                    "<leader>hx",
-                    function()
-                        require("gitsigns").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-                    end,
-                    mode = "v",
-                },
-                { "<leader>hX", "<cmd>Gitsigns reset_buffer<cr>" },
-                { "<leader>hp", "<cmd>Gitsigns preview_hunk<cr>" },
-                { "<leader>hi", "<cmd>Gitsigns preview_hunk_inline<cr>" },
-                { "<leader>hb", "<cmd>Gitsigns blame<cr>" },
-                { "<leader>hd", "<cmd>Gitsigns diffthis<cr>" },
-                { "<leader>hD", "<cmd>Gitsigns diffthis HEAD<cr>" },
-                { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
-                { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
-                { "ih", "<cmd>Gitsigns select_hunk<cr>", mode = { "o", "x" } },
-            },
             opts = {
                 preview_config = {
                     border = "rounded",
@@ -622,22 +602,20 @@ require("lazy").setup({
         {
             "folke/trouble.nvim",
             opts = {
-                modes = {
-                    symbols = {
-                        win = { size = 0.25 },
-                    },
-                },
+                modes = { symbols = { win = { size = 0.25 } } },
             },
             cmd = "Trouble",
             keys = {
-                { "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>" },
-                { "<leader>xD", "<cmd>Trouble diagnostics toggle<cr>" },
-                { "<leader>xs", "<cmd>Trouble symbols toggle focus=false<cr>" },
+                { "<leader>s", "<cmd>Trouble symbols toggle focus=false<cr>" },
             },
         },
         {
             name = "amazonq",
             url = "ssh://git.amazon.com/pkg/AmazonQNVim",
+            lazy = false,
+            keys = {
+                { "q:", "<cmd>call feedkeys(':AmazonQ ', 'tn')<cr>" },
+            },
             opts = {
                 ssoStartUrl = "https://amzn.awsapps.com/start",
             },
