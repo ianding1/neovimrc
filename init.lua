@@ -331,7 +331,6 @@ require("lazy").setup({
                 -- LSP actions.
                 { "grr", "<cmd>FzfLua lsp_references<cr>" },
                 { "gri", "<cmd>FzfLua lsp_implementations<cr>" },
-                { "gO", "<cmd>FzfLua lsp_document_symbols<cr>" },
                 { "gra", "<cmd>FzfLua lsp_code_actions<cr>" },
             },
             opts = function()
@@ -413,6 +412,8 @@ require("lazy").setup({
                         if client and client.server_capabilities.inlayHintProvider then
                             vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
                         end
+
+                        vim.keymap.set("n", "gO", "<cmd>Trouble symbols toggle focus=false<cr>", { buffer = args.buf })
                     end,
                 })
                 local capabilities = require("blink.cmp").get_lsp_capabilities()
@@ -613,9 +614,6 @@ require("lazy").setup({
                 modes = { symbols = { win = { size = 0.25 } } },
             },
             cmd = "Trouble",
-            keys = {
-                { "<leader>s", "<cmd>Trouble symbols toggle focus=false<cr>" },
-            },
         },
         {
             name = "amazonq",
