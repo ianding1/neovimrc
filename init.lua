@@ -133,8 +133,21 @@ vim.diagnostic.config({
             [vim.diagnostic.severity.HINT] = "󰌵 ",
         },
     },
-    virtual_lines = true,
+    virtual_text = true,
+    virtual_lines = false,
 })
+
+-- Toggle virtual text/line style diagnostics with <leader>e
+vim.keymap.set("n", "<leader>e", function()
+    local orig_config = vim.diagnostic.config() or {
+        virtual_text = true,
+        virtual_lines = false,
+    }
+    vim.diagnostic.config(vim.tbl_deep_extend("force", orig_config, {
+        virtual_text = not orig_config.virtual_text,
+        virtual_lines = not orig_config.virtual_lines,
+    }))
+end)
 
 -- Window and tab key bindings.
 for _, dir in ipairs({ "h", "j", "k", "l" }) do
