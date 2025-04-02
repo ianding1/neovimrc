@@ -619,27 +619,9 @@ require("lazy").setup({
             },
         },
         {
-            "MeanderingProgrammer/render-markdown.nvim",
-            dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
-            ft = { "markdown" },
-            opts = {
-                sign = { enabled = false },
-                code = {
-                    position = "right",
-                },
-                overrides = {
-                    -- Disable in documentation popups.
-                    buftype = { nofile = { enabled = false } },
-                },
-            },
-        },
-        {
             "folke/trouble.nvim",
-            opts = {
-                modes = { symbols = { win = { size = 0.25 } } },
-            },
             keys = {
-                { "x:", "<cmd>call feedkeys(':Trouble ', 'tn')<cr>" },
+                { "d:", "<cmd>call feedkeys(':Trouble ', 'tn')<cr>" },
             },
             cmd = "Trouble",
         },
