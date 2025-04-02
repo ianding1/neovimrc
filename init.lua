@@ -243,7 +243,14 @@ require("lazy").setup({
                     },
                 }
                 return {
-                    extensions = { "quickfix", "trouble", "oil" },
+                    options = {
+                        theme = function()
+                            local theme = require("lualine.themes.kanagawa")
+                            theme.terminal = theme.insert
+                            return theme
+                        end,
+                    },
+                    extensions = { "quickfix", "trouble", "oil", "toggleterm" },
                     sections = {
                         lualine_a = {
                             {
