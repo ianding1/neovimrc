@@ -258,16 +258,10 @@ require("lazy").setup({
                             },
                         },
                         lualine_b = filepath,
-                        lualine_c = { "diagnostics" },
-                        lualine_x = { "branch" },
-                        lualine_y = {
-                            {
-                                "lsp_status",
-                                icon = " ",
-                                ignore_lsp = { "amazonq", "amazonq-completion" },
-                            },
-                        },
-                        lualine_z = { "location" },
+                        lualine_c = { "require('lsp-progress').progress()" },
+                        lualine_x = { "diagnostics" },
+                        lualine_y = { { "b:gitsigns_head", icon = "" } },
+                        lualine_z = { "progress", "location" },
                     },
                     inactive_sections = {
                         lualine_b = {
@@ -276,9 +270,27 @@ require("lazy").setup({
                             end,
                         },
                         lualine_c = filepath,
-                        lualine_x = { "location" },
+                        lualine_x = { "progress", "location" },
                     },
                 }
+            end,
+        },
+        {
+            "linrongbin16/lsp-progress.nvim",
+            config = function()
+                require("lsp-progress").setup({
+                    format = function(client_messages)
+                        if #client_messages > 0 then
+                            return table.concat(client_messages, "  ")
+                        end
+                        return ""
+                    end,
+                })
+                vim.api.nvim_create_autocmd("User", {
+                    group = "vimrc",
+                    pattern = "LspProgressStatusUpdated",
+                    callback = require("lualine").refresh,
+                })
             end,
         },
         {
@@ -625,6 +637,9 @@ require("lazy").setup({
             "folke/trouble.nvim",
             opts = {
                 modes = { symbols = { win = { size = 0.25 } } },
+            },
+            keys = {
+                { "x:", "<cmd>call feedkeys(':Trouble ', 'tn')<cr>" },
             },
             cmd = "Trouble",
         },
