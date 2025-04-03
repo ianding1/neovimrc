@@ -161,8 +161,15 @@ vim.keymap.set({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { expr = tru
 vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 vim.keymap.set({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 
--- Disable search highlight.
-vim.keymap.set("n", "<leader>n", "<cmd>nohlsearch<cr>")
+-- Disable search highlight and clear command line.
+vim.keymap.set("n", "<C-c>", function()
+    vim.cmd("nohlsearch")
+    vim.cmd("echon")
+end)
+
+-- Rebind q (start/stop macro) to Ctrl-Q.
+vim.keymap.set({ "n", "v" }, "q", "<NOP>")
+vim.keymap.set({ "n", "v" }, "<C-q>", "q")
 
 -- Lazy.nvim UI.
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>")
