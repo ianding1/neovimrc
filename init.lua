@@ -627,6 +627,7 @@ require("lazy").setup({
             opts = {
                 open_mapping = "<C-/>",
                 shading_factor = -20,
+                auto_scroll = false,
                 size = function()
                     return vim.o.lines * 0.4
                 end,
