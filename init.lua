@@ -638,6 +638,7 @@ require("lazy").setup({
                 { "d:", "<cmd>call feedkeys(':Trouble ', 'tn')<cr>" },
             },
             cmd = "Trouble",
+            opts = {},
         },
         {
             name = "amazonq",
