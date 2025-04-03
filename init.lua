@@ -643,6 +643,9 @@ require("lazy").setup({
         {
             name = "amazonq",
             url = "ssh://git.amazon.com/pkg/AmazonQNVim",
+            enabled = function()
+                return vim.loop.fs_stat(vim.fn.expand("~/.midway/cookie"))
+            end,
             lazy = false,
             keys = {
                 { "q:", "<cmd>call feedkeys(':AmazonQ ', 'tn')<cr>" },
