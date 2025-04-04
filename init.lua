@@ -709,7 +709,7 @@ require("lazy").setup({
             end,
             lazy = false,
             keys = {
-                { "q:", "<cmd>call feedkeys(':AmazonQ ', 'tn')<cr>" },
+                { "q:", "<cmd>call feedkeys(':AmazonQ ', 'tn')<cr>", mode = { "n", "v" } },
             },
             opts = {
                 ssoStartUrl = "https://amzn.awsapps.com/start",
