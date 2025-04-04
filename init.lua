@@ -61,8 +61,8 @@ vim.opt.signcolumn = "yes:1"
 -- Set status column
 vim.opt.statuscolumn = "%l%s%C"
 
--- Hide intro at Vim startup.
-vim.opt.shortmess:append("I")
+-- Update shortmess: hide intro and search count.
+vim.opt.shortmess:append("IS")
 
 -- Split below and right.
 vim.opt.splitbelow = true
@@ -93,6 +93,9 @@ vim.opt.diffopt:append("foldcolumn:1")
 -- Enable text highlight for fold mode.
 vim.opt.foldtext = ""
 
+-- Show the winbar at startup.
+vim.opt.winbar = " "
+
 -- Create an autocmd group for the vim config.
 vim.api.nvim_create_augroup("vimrc", { clear = true })
 
@@ -113,6 +116,7 @@ vim.api.nvim_create_autocmd("FileType", {
     group = "vimrc",
     pattern = "qf",
     callback = function()
+        vim.wo.number = false
         vim.wo.relativenumber = false
         vim.wo.signcolumn = "no"
     end,
@@ -230,16 +234,20 @@ require("lazy").setup({
         {
             "nvim-lualine/lualine.nvim",
             opts = function()
-                local filepath = {
+                local special_fts = { "qf", "toggleterm", "oil", "trouble" }
+                local bufname = {
                     {
                         "filetype",
                         icon_only = true,
                         separator = "",
                         padding = { left = 1, right = 0 },
+                        cond = function()
+                            return not vim.list_contains(special_fts, vim.bo.filetype)
+                        end,
                     },
                     {
                         "filename",
-                        path = 1,
+                        path = 0,
                         newfile_status = true,
                         symbols = {
                             modified = " ",
@@ -247,46 +255,98 @@ require("lazy").setup({
                             unnamed = "[No Name]",
                             newfile = " ",
                         },
+                        cond = function()
+                            return not vim.list_contains(special_fts, vim.bo.filetype)
+                        end,
+                    },
+                    {
+                        function()
+                            return "ToggleTerm #" .. vim.b.toggle_number
+                        end,
+                        icon = { " ", color = { fg = 36 } },
+                        cond = function()
+                            return vim.bo.filetype == "toggleterm"
+                        end,
+                    },
+                    {
+                        function()
+                            return vim.fn.fnamemodify(require("oil").get_current_dir(), ":~")
+                        end,
+                        icon = { " ", color = { fg = 75 } },
+                        cond = function()
+                            return vim.bo.filetype == "oil"
+                        end,
+                    },
+                    {
+                        function()
+                            local trouble = vim.w.trouble
+                            local words = vim.split(trouble.mode, "[%W]")
+                            for i, word in ipairs(words) do
+                                words[i] = word:sub(1, 1):upper() .. word:sub(2)
+                            end
+                            return table.concat(words, " ")
+                        end,
+                        icon = { " ", color = { fg = 74 } },
+                        cond = function()
+                            return vim.bo.filetype == "trouble"
+                        end,
+                    },
+                    {
+                        function()
+                            if vim.fn.getwininfo(vim.fn.win_getid())[1].loclist > 0 then
+                                return "Location  " .. vim.fn.getloclist(0, { title = 0 }).title
+                            end
+                            return "Quickfix  " .. vim.fn.getqflist({ title = 0 }).title
+                        end,
+                        icon = { " ", color = { fg = 74 } },
+                        cond = function()
+                            return vim.bo.filetype == "qf"
+                        end,
+                    },
+                    {
+                        "diagnostics",
                     },
                 }
-                return {
+                local opts = {
                     options = {
+                        globalstatus = true,
                         theme = function()
                             local theme = require("lualine.themes.kanagawa")
                             theme.terminal = theme.insert
                             return theme
                         end,
                     },
-                    extensions = { "quickfix", "trouble", "oil", "toggleterm" },
                     sections = {
-                        lualine_a = {
+                        lualine_a = { "mode" },
+                        lualine_b = vim.list_extend({
+                            { "b:gitsigns_head", icon = "" },
                             {
-                                "mode",
-                                fmt = function(str)
-                                    if string.find(str, "-") then
-                                        return str -- Do not shorten "V-BLOCK", "V-LINE", etc
-                                    else
-                                        return str:sub(1, 1)
-                                    end
+                                function()
+                                    local dir = vim.fn.expand("%:~:.:h")
+                                    return dir == "." and "" or dir
+                                end,
+                                cond = function()
+                                    return not vim.list_contains(special_fts, vim.bo.filetype)
+                                end,
+                            },
+                        }, bufname),
+                        lualine_c = { "searchcount", "require('lsp-progress').progress()" },
+                        lualine_x = { "diff" },
+                        lualine_y = { "encoding", "fileformat" },
+                        lualine_z = {
+                            "progress",
+                            {
+                                "location",
+                                cond = function()
+                                    return vim.bo.buftype ~= "terminal"
                                 end,
                             },
                         },
-                        lualine_b = filepath,
-                        lualine_c = { "require('lsp-progress').progress()" },
-                        lualine_x = { "diagnostics" },
-                        lualine_y = { { "b:gitsigns_head", icon = "" } },
-                        lualine_z = { "progress", "location" },
                     },
-                    inactive_sections = {
-                        lualine_b = {
-                            function()
-                                return "  " -- Placeholder
-                            end,
-                        },
-                        lualine_c = filepath,
-                        lualine_x = { "progress", "location" },
-                    },
+                    winbar = { lualine_b = bufname },
                 }
+                opts.inactive_winbar = opts.winbar
+                return opts
             end,
         },
         {
