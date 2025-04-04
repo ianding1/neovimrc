@@ -655,7 +655,6 @@ require("lazy").setup({
                 },
                 formatters_by_ft = {
                     lua = { "stylua" },
-                    python = { "black" },
                     rust = { "rustfmt" },
                     typescript = { "prettierd" },
                     vue = { "prettierd" },
