@@ -284,23 +284,25 @@ require("lazy").setup({
                     },
                     {
                         function()
-                            local buf_name = vim.api.nvim_buf_get_name(0)
-                            if vim.startswith(buf_name, "gitsigns://") then
-                                local tail = vim.split(buf_name, "//")[3]
+                            local buf_path = vim.api.nvim_buf_get_name(0)
+                            local file_name
+                            if vim.startswith(buf_path, "gitsigns://") then
+                                local tail = vim.split(buf_path, "//")[3]
                                 local commit = tail:match("^(:?[^:]+):")
                                 local rel_path = tail:match("^:?[^:]+:(.*)")
-                                return vim.fs.basename(rel_path) .. " [" .. commit .. "]"
+                                file_name = vim.fs.basename(rel_path) .. " [" .. commit .. "]"
+                            else
+                                file_name = vim.fs.basename(buf_path)
                             end
-                            return vim.fs.basename(buf_name)
+                            if vim.bo.modified then
+                                file_name = file_name .. "  "
+                            elseif not vim.bo.modifiable then
+                                file_name = file_name .. " 󰌾 "
+                            elseif file_name == "" then
+                                file_name = "[No Name]"
+                            end
+                            return file_name
                         end,
-                        path = 0,
-                        newfile_status = true,
-                        symbols = {
-                            modified = " ",
-                            readonly = "󰌾 ",
-                            unnamed = "[No Name]",
-                            newfile = " ",
-                        },
                         cond = function()
                             return not vim.list_contains(special_fts, vim.bo.filetype)
                         end,
@@ -367,7 +369,7 @@ require("lazy").setup({
                         lualine_b = vim.list_extend({
                             {
                                 "b:gitsigns_head",
-                                icon = "",
+                                icon = "",
                                 cond = function()
                                     return not vim.startswith(vim.api.nvim_buf_get_name(0), "gitsigns://")
                                 end,
@@ -398,7 +400,22 @@ require("lazy").setup({
                             },
                         }, bufname),
                         lualine_c = { "searchcount", "require('lsp-progress').progress()" },
-                        lualine_x = { "diff" },
+                        lualine_x = {
+                            {
+                                "diff",
+                                source = function()
+                                    local status = vim.b.gitsigns_status_dict
+                                    if status ~= nil then
+                                        return {
+                                            added = status.add,
+                                            modified = status.changed,
+                                            removed = status.removed,
+                                        }
+                                    end
+                                end,
+                                symbols = { added = "󰐖 ", modified = "󰏬 ", removed = "󰍵 " },
+                            },
+                        },
                         lualine_y = { "encoding", "fileformat" },
                         lualine_z = {
                             "progress",
