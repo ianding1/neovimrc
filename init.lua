@@ -283,7 +283,16 @@ require("lazy").setup({
                         end,
                     },
                     {
-                        "filename",
+                        function()
+                            local buf_name = vim.api.nvim_buf_get_name(0)
+                            if vim.startswith(buf_name, "gitsigns://") then
+                                local tail = vim.split(buf_name, "//")[3]
+                                local commit = tail:match("^(:?[^:]+):")
+                                local rel_path = tail:match("^:?[^:]+:(.*)")
+                                return vim.fs.basename(rel_path) .. " [" .. commit .. "]"
+                            end
+                            return vim.fs.basename(buf_name)
+                        end,
                         path = 0,
                         newfile_status = true,
                         symbols = {
@@ -356,11 +365,32 @@ require("lazy").setup({
                     sections = {
                         lualine_a = { "mode" },
                         lualine_b = vim.list_extend({
-                            { "b:gitsigns_head", icon = "" },
+                            {
+                                "b:gitsigns_head",
+                                icon = "",
+                                cond = function()
+                                    return not vim.startswith(vim.api.nvim_buf_get_name(0), "gitsigns://")
+                                end,
+                            },
                             {
                                 function()
-                                    local dir = vim.fn.expand("%:~:.:h")
-                                    return dir == "." and "" or dir
+                                    local cwd = vim.fn.getcwd()
+                                    local buf_name = vim.api.nvim_buf_get_name(0)
+                                    if vim.startswith(buf_name, "gitsigns://") then
+                                        local _, git_dir, tail = unpack(vim.split(buf_name, "//"))
+                                        local rel_git_dir = vim.fs.relpath(cwd, git_dir) or git_dir
+                                        local dir_name = vim.fs.dirname(tail:match("^:?[^:]+:(.*)"))
+                                        if dir_name == "." then
+                                            return " " .. rel_git_dir
+                                        end
+                                        return " " .. rel_git_dir .. "  " .. dir_name
+                                    end
+                                    local dir_name = vim.fs.dirname(buf_name)
+                                    local rel_dir_name = vim.fs.relpath(cwd, dir_name) or dir_name
+                                    if rel_dir_name == "." then
+                                        rel_dir_name = ""
+                                    end
+                                    return rel_dir_name
                                 end,
                                 cond = function()
                                     return not vim.list_contains(special_fts, vim.bo.filetype)
