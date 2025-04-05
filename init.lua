@@ -366,7 +366,7 @@ require("lazy").setup({
                     },
                     sections = {
                         lualine_a = { "mode" },
-                        lualine_b = vim.list_extend({
+                        lualine_b = {
                             {
                                 "b:gitsigns_head",
                                 icon = "",
@@ -398,8 +398,11 @@ require("lazy").setup({
                                     return not vim.list_contains(special_fts, vim.bo.filetype)
                                 end,
                             },
-                        }, bufname),
-                        lualine_c = { "searchcount", "require('lsp-progress').progress()" },
+                        },
+                        lualine_c = vim.list_extend(
+                            vim.deepcopy(bufname),
+                            { "searchcount", "require('lsp-progress').progress()" }
+                        ),
                         lualine_x = {
                             {
                                 "diff",
