@@ -57,18 +57,24 @@ vim.opt.relativenumber = true
 -- Set sign column.
 vim.opt.signcolumn = "yes:1"
 
--- Set status column
-function _G.vimrc_statuscol()
-    local lnum = vim.v.lnum
-    local fold_char
-    if vim.fn.foldlevel(lnum) <= vim.fn.foldlevel(lnum - 1) then
-        fold_char = " "
-    else
-        fold_char = vim.fn.foldclosed(lnum) == -1 and "⌄" or "▶"
+-- Set status column.
+local function get_fold_char(lnum)
+    if not vim.o.number then
+        return ""
     end
-    return fold_char .. "%l%s"
+
+    if vim.fn.foldlevel(lnum) <= vim.fn.foldlevel(lnum - 1) then
+        return " "
+    else
+        return vim.fn.foldclosed(lnum) == -1 and "⌄" or "▶"
+    end
 end
-vim.opt.statuscolumn = "%!v:lua.vimrc_statuscol()"
+
+function _G.vimrc_statuscol(lnum)
+    return get_fold_char(lnum) .. "%l%s"
+end
+
+vim.opt.statuscolumn = "%{%v:lua.vimrc_statuscol(v:lnum)%}"
 
 -- Update shortmess: hide intro and search count.
 vim.opt.shortmess:append("IS")
