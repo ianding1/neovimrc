@@ -58,7 +58,17 @@ vim.opt.relativenumber = true
 vim.opt.signcolumn = "yes:1"
 
 -- Set status column
-vim.opt.statuscolumn = "%{&number ? ' ' : ''}%l%s%C"
+function _G.vimrc_statuscol()
+    local lnum = vim.v.lnum
+    local fold_char
+    if vim.fn.foldlevel(lnum) <= vim.fn.foldlevel(lnum - 1) then
+        fold_char = " "
+    else
+        fold_char = vim.fn.foldclosed(lnum) == -1 and "⌄" or "▶"
+    end
+    return fold_char .. "%l%s"
+end
+vim.opt.statuscolumn = "%!v:lua.vimrc_statuscol()"
 
 -- Update shortmess: hide intro and search count.
 vim.opt.shortmess:append("IS")
@@ -67,8 +77,8 @@ vim.opt.shortmess:append("IS")
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
--- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱", foldopen = "▼", foldclose = "▶" }
+-- Set the fill char for diff.
+vim.opt.fillchars = { diff = "╱" }
 
 -- Allow virtual editing in Visual block mode.
 vim.opt.virtualedit:append("block")
@@ -85,9 +95,6 @@ end
 
 -- Start diff mode with vertical splits.
 vim.opt.diffopt:append("vertical")
-
--- Set fold column to 1 in diff mode..
-vim.opt.diffopt:append("foldcolumn:1")
 
 -- Enable text highlight for fold mode.
 vim.opt.foldtext = ""
@@ -380,13 +387,16 @@ require("lazy").setup({
                                     local buf_name = vim.api.nvim_buf_get_name(0)
                                     if vim.startswith(buf_name, "gitsigns://") then
                                         local _, git_dir, tail = unpack(vim.split(buf_name, "//"))
-                                        local rel_git_dir = vim.fs.relpath(cwd, git_dir) or git_dir
+                                        local git_name = vim.fs.basename(git_dir) == ".git"
+                                                and vim.fs.basename(vim.fs.dirname(git_dir))
+                                            or vim.fs.basename(git_dir)
                                         local dir_name = vim.fs.dirname(tail:match("^:?[^:]+:(.*)"))
                                         if dir_name == "." then
-                                            return " " .. rel_git_dir
+                                            return " " .. git_name
                                         end
-                                        return " " .. rel_git_dir .. "  " .. dir_name
+                                        return " " .. git_name .. "  " .. dir_name
                                     end
+
                                     local dir_name = vim.fs.dirname(buf_name)
                                     local rel_dir_name = vim.fs.relpath(cwd, dir_name) or dir_name
                                     if rel_dir_name == "." then
