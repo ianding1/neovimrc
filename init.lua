@@ -16,9 +16,8 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
--- Bind leader keys.
+-- Bind leader key.
 vim.g.mapleader = " "
-vim.g.maplocalleader = ","
 
 -- Do not show mode change.
 vim.opt.showmode = false
@@ -59,7 +58,7 @@ vim.opt.relativenumber = true
 vim.opt.signcolumn = "yes:1"
 
 -- Set status column
-vim.opt.statuscolumn = "%l%s%C"
+vim.opt.statuscolumn = "%{&number ? ' ' : ''}%l%s%C"
 
 -- Update shortmess: hide intro and search count.
 vim.opt.shortmess:append("IS")
@@ -69,7 +68,7 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 
 -- Set the fill char for diff to blank.
-vim.opt.fillchars = { diff = "╱", foldopen = "⌄", foldclose = "▶", foldsep = " " }
+vim.opt.fillchars = { diff = "╱", foldopen = "▼", foldclose = "▶" }
 
 -- Allow virtual editing in Visual block mode.
 vim.opt.virtualedit:append("block")
@@ -166,7 +165,7 @@ vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 vim.keymap.set({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 
 -- Disable search highlight and clear command line.
-vim.keymap.set("n", "<C-c>", function()
+vim.keymap.set("n", "<space>n", function()
     vim.cmd("nohlsearch")
     vim.cmd("echon")
 end)
@@ -223,8 +222,46 @@ require("lazy").setup({
         {
             "rebelot/kanagawa.nvim",
             priority = 500,
-            config = function()
+            opts = {
+                overrides = function(colors)
+                    local theme = colors.theme
+                    -- Disable fg color in DiffDelete to avoid overwriting syntax highlight.
+                    return { DiffDelete = { fg = "none", bg = theme.diff.delete } }
+                end,
+            },
+            config = function(_, opts)
+                require("kanagawa").setup(opts)
                 vim.cmd.colorscheme("kanagawa")
+
+                -- Invert the diff colors of the left window in two-file diff mode.
+                vim.api.nvim_create_autocmd("DiffUpdated", {
+                    group = "vimrc",
+                    callback = function()
+                        -- Get the number of windows with diff on.
+                        local diff_wins = {}
+                        for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+                            if vim.api.nvim_get_option_value("diff", { win = winid }) then
+                                table.insert(diff_wins, { winid = winid, winnr = vim.api.nvim_win_get_number(winid) })
+                            end
+                        end
+                        if #diff_wins ~= 2 then
+                            return
+                        end
+                        -- Sort the windows by number (left/top < right/bottom).
+                        table.sort(diff_wins, function(a, b)
+                            return a.winnr < b.winnr
+                        end)
+                        vim.wo[diff_wins[1].winid].winhighlight = table.concat({
+                            "DiffDelete:FloatBorder",
+                            "DiffAdd:DiffDelete",
+                            "DiffChange:DiffDelete",
+                        }, ",")
+                        vim.wo[diff_wins[2].winid].winhighlight = table.concat({
+                            "DiffDelete:FloatBorder",
+                            "DiffChange:DiffAdd",
+                        }, ",")
+                    end,
+                })
             end,
         },
         {
@@ -387,7 +424,7 @@ require("lazy").setup({
                     ["gq"] = { "actions.close", mode = "n" },
                     ["g?"] = { "actions.show_help", mode = "n" },
                     ["g."] = { "actions.toggle_hidden", mode = "n" },
-                    ["<localleader>cd"] = { "actions.cd", mode = "n" },
+                    ["<leader>r"] = { "actions.refresh", mode = "n" },
                     ["sf"] = {
                         callback = function()
                             require("fzf-lua").files({ cwd = require("oil").get_current_dir() })
@@ -670,6 +707,8 @@ require("lazy").setup({
             event = "VeryLazy",
             keys = {
                 { "g:", "<cmd>call feedkeys(':Gitsigns ', 'tn')<cr>" },
+                { "[h", "<cmd>Gitsigns nav_hunk prev<cr>" },
+                { "]h", "<cmd>Gitsigns nav_hunk next<cr>" },
             },
             opts = {
                 preview_config = {
