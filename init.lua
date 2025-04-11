@@ -105,9 +105,6 @@ vim.opt.diffopt:append("vertical")
 -- Enable text highlight for fold mode.
 vim.opt.foldtext = ""
 
--- Show the winbar at startup.
-vim.opt.winbar = " "
-
 -- Create an autocmd group for the vim config.
 vim.api.nvim_create_augroup("vimrc", { clear = true })
 
@@ -364,62 +361,47 @@ require("lazy").setup({
                             return vim.bo.filetype == "qf"
                         end,
                     },
-                    {
-                        "diagnostics",
-                    },
                 }
                 local opts = {
                     options = {
-                        globalstatus = true,
                         theme = function()
-                            local theme = require("lualine.themes.kanagawa")
-                            theme.terminal = theme.insert
-                            return theme
+                            local theme = require("kanagawa.colors").setup().theme
+                            local kanagawa = require("lualine.themes.kanagawa")
+                            kanagawa.normal.c = { bg = theme.ui.bg_p1, fg = theme.syn.comment }
+                            kanagawa.inactive = {
+                                a = { bg = theme.ui.bg_m3, fg = theme.syn.comment },
+                                b = { bg = theme.ui.bg_m3, fg = theme.syn.comment },
+                                c = { bg = theme.ui.bg_m3, fg = theme.syn.comment },
+                            }
+                            kanagawa.terminal = {
+                                a = { bg = theme.syn.identifier, fg = theme.ui.bg },
+                                b = { bg = theme.ui.bg, fg = theme.syn.identifier },
+                            }
+                            return kanagawa
                         end,
                     },
                     sections = {
-                        lualine_a = { "mode" },
-                        lualine_b = {
+                        lualine_a = {
                             {
-                                "b:gitsigns_head",
-                                icon = "",
-                                cond = function()
-                                    return not vim.startswith(vim.api.nvim_buf_get_name(0), "gitsigns://")
-                                end,
-                            },
-                            {
-                                function()
-                                    local cwd = vim.fn.getcwd()
-                                    local buf_name = vim.api.nvim_buf_get_name(0)
-                                    if vim.startswith(buf_name, "gitsigns://") then
-                                        local _, git_dir, tail = unpack(vim.split(buf_name, "//"))
-                                        local git_name = vim.fs.basename(git_dir) == ".git"
-                                                and vim.fs.basename(vim.fs.dirname(git_dir))
-                                            or vim.fs.basename(git_dir)
-                                        local dir_name = vim.fs.dirname(tail:match("^:?[^:]+:(.*)"))
-                                        if dir_name == "." then
-                                            return " " .. git_name
-                                        end
-                                        return " " .. git_name .. "  " .. dir_name
+                                "mode",
+                                fmt = function(mode)
+                                    if mode:find("-") ~= nil then
+                                        return mode
+                                    else
+                                        return mode:sub(1, 1)
                                     end
-
-                                    local dir_name = vim.fs.dirname(buf_name)
-                                    local rel_dir_name = vim.fs.relpath(cwd, dir_name) or dir_name
-                                    if rel_dir_name == "." then
-                                        rel_dir_name = ""
-                                    end
-                                    return rel_dir_name
-                                end,
-                                cond = function()
-                                    return not vim.list_contains(special_fts, vim.bo.filetype)
                                 end,
                             },
                         },
-                        lualine_c = vim.list_extend(
-                            vim.deepcopy(bufname),
-                            { "searchcount", "require('lsp-progress').progress()" }
-                        ),
-                        lualine_x = {
+                        lualine_b = bufname,
+                        lualine_c = {
+                            {
+                                "diagnostics",
+                            },
+                            "require('lsp-progress').progress()",
+                        },
+                        lualine_x = { "searchcount" },
+                        lualine_y = {
                             {
                                 "diff",
                                 source = function()
@@ -434,19 +416,21 @@ require("lazy").setup({
                                 end,
                                 symbols = { added = "󰐖 ", modified = "󰏬 ", removed = "󰍵 " },
                             },
-                        },
-                        lualine_y = { "encoding", "fileformat" },
-                        lualine_z = {
-                            "progress",
                             {
-                                "location",
+                                "b:gitsigns_head",
+                                icon = "",
                                 cond = function()
-                                    return vim.bo.buftype ~= "terminal"
+                                    return not vim.startswith(vim.api.nvim_buf_get_name(0), "gitsigns://")
                                 end,
                             },
+                            "string.format(' %-2d', vim.fn.charcol('.'))",
                         },
+                        lualine_z = { "encoding", "fileformat" },
                     },
-                    winbar = { lualine_b = bufname },
+                    inactive_sections = {
+                        lualine_c = bufname,
+                        lualine_x = {},
+                    },
                 }
                 opts.inactive_winbar = opts.winbar
                 return opts
@@ -458,7 +442,22 @@ require("lazy").setup({
                 require("lsp-progress").setup({
                     format = function(client_messages)
                         if #client_messages > 0 then
-                            return table.concat(client_messages, "  ")
+                            return table.concat(client_messages, " ")
+                        end
+                        local api = require("lsp-progress.api")
+                        if #api.lsp_clients() > 0 then
+                            local client_names = {}
+                            for _, client in ipairs(api.lsp_clients()) do
+                                if client.name == "amazonq" then
+                                    table.insert(client_names, "Q")
+                                elseif client.name == "amazonq-completion" then
+                                    -- Skip
+                                else
+                                    table.insert(client_names, client.name)
+                                end
+                            end
+                            table.sort(client_names)
+                            return "  " .. table.concat(client_names, " ")
                         end
                         return ""
                     end,
@@ -615,7 +614,7 @@ require("lazy").setup({
                             vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
                         end
 
-                        vim.keymap.set("n", "gO", "<cmd>Trouble symbols toggle focus=false<cr>", { buffer = args.buf })
+                        vim.keymap.set("n", "gO", "<cmd>Trouble symbols<cr>", { buffer = args.buf })
                     end,
                 })
                 local capabilities = require("blink.cmp").get_lsp_capabilities()
