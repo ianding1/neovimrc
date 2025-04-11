@@ -191,43 +191,7 @@ require("lazy").setup({
         {
             "willothy/flatten.nvim",
             priority = 1000,
-            opts = function()
-                local saved_terminal
-                return {
-                    window = {
-                        open = "alternate",
-                    },
-                    hooks = {
-                        pre_open = function()
-                            local term = require("toggleterm.terminal")
-                            local termid = term.get_focused_id()
-                            saved_terminal = term.get(termid)
-                        end,
-                        post_open = function(ctx)
-                            if ctx.is_blocking then
-                                if saved_terminal then
-                                    saved_terminal:close()
-                                end
-                                vim.api.nvim_create_autocmd("BufWritePost", {
-                                    buffer = ctx.bufnr,
-                                    once = true,
-                                    callback = vim.schedule_wrap(function()
-                                        vim.api.nvim_buf_delete(ctx.bufnr, {})
-                                    end),
-                                })
-                            end
-                        end,
-                        block_end = function()
-                            vim.schedule(function()
-                                if saved_terminal then
-                                    saved_terminal:open()
-                                    saved_terminal = nil
-                                end
-                            end)
-                        end,
-                    },
-                }
-            end,
+            opts = { window = { open = "alternate" } },
         },
         {
             "rebelot/kanagawa.nvim",
